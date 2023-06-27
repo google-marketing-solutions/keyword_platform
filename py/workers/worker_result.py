@@ -17,7 +17,7 @@ import dataclasses
 import enum
 
 
-class Status(enum.Enum):
+class Status(str, enum.Enum):
   """The status of a Google Ads worker."""
   SUCCESS = 'SUCCESS'
   FAILURE = 'FAILURE'
