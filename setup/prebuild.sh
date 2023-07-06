@@ -15,11 +15,29 @@
 echo "Setting Project ID: ${GOOGLE_CLOUD_PROJECT}"
 gcloud config set project ${GOOGLE_CLOUD_PROJECT}
 
-echo "Enabling Cloud Storage service..."
-gcloud services enable storage-component.googleapis.com
+REQUIRED_SERVICES=(
+  cloudbuild.googleapis.com
+  logging.googleapis.com
+  secretmanager.googleapis.com
+  storage-component.googleapis.com
+  googleads.googleapis.com
+  translate.googleapis.com
+  artifactregistry.googleapis.com
+)
 
-echo "Enabling APIs..."
-gcloud services enable storage-component.googleapis.com googleads.googleapis.com translate.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com secretmanager.googleapis.com
+echo "Enabling Cloud APIs if necessary..."
+ENABLED_SERVICES=$(gcloud services list)
+for SERVICE in "${REQUIRED_SERVICES[@]}"
+do
+  if echo "$ENABLED_SERVICES" | grep -q "$SERVICE"
+  then
+    echo "$SERVICE is already enabled."
+  else
+    gcloud services enable "$SERVICE" \
+      && echo "$SERVICE has been successfully enabled."
+    sleep 1
+  fi
+done
 
 echo "Creating cloud storage bucket..."
 gcloud alpha storage buckets create gs://${GOOGLE_CLOUD_PROJECT}-keyword-platform --project=${GOOGLE_CLOUD_PROJECT}
