@@ -37,8 +37,7 @@ _FAKE_CREDENTIALS = {
     'login_customer_id': 'fake_login_customer_id',
 }
 
-_ACCOUNTS_RESPONSES = [
-    [{
+_ACCOUNTS_RESPONSES = [{
         'results': [
             {
                 'customerClient': {
@@ -61,8 +60,7 @@ _ACCOUNTS_RESPONSES = [
         ],
         'fieldMask': 'customerClient.id,customerClient.descriptiveName',
         'requestId': 'fake_req_id',
-    }],
-]
+    }]
 
 _EXPECTED_ACCOUNTS_LIST = list([
     accounts_lib.Account(id='5459155099', name='Account 1'),

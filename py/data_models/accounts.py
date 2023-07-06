@@ -34,7 +34,7 @@ class Accounts:
     accounts_list: A list of account objects.
   """
 
-  def __init__(self, response_jsons: list[Any]):
+  def __init__(self, response_json: list[Any]):
     """Initializes the Accounts object.
 
     Creates a list of accounts.
@@ -42,20 +42,19 @@ class Accounts:
     See class docstring for more details.
 
     Args:
-      response_jsons: A list of JSON responses from a Google Ads API
-        searchStream request. The request should contain the following fields:
-        customerClient.id, customerClient.descriptive_name,
+      response_json: A JSON response from a Google Ads API searchStream request.
+        The request should contain the following fields: customerClient.id,
+        customerClient.descriptive_name,
     """
     self._accounts = []
-    for response_json in response_jsons:
-      for batch in response_json:
-        for result in batch['results']:
-          self._accounts.append(
-              Account(
-                  id=result['customerClient']['id'],
-                  name=result['customerClient']['descriptiveName'],
-              )
-          )
+    for batch in response_json:
+      for result in batch['results']:
+        self._accounts.append(
+            Account(
+                id=result['customerClient']['id'],
+                name=result['customerClient']['descriptiveName'],
+            )
+        )
     logging.info(
         'Initialized Accounts list with length %d.', len(self._accounts)
     )

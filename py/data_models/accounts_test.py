@@ -19,38 +19,36 @@ from absl.testing import parameterized
 from py.data_models import accounts as accounts_lib
 
 # TODO()
-_GOOGLE_ADS_RESPONSE = [
-    [{
-        'results': [
-            {
-                'customerClient': {
-                    'resourceName': (
-                        'customers/8056520078/customerClients/5459155099'
-                    ),
-                    'descriptiveName': 'Account 1',
-                    'id': '5459155099',
-                }
-            },
-            {
-                'customerClient': {
-                    'resourceName': (
-                        'customers/8056520078/customerClients/8647404629'
-                    ),
-                    'descriptiveName': 'Account 2',
-                    'id': '8647404629',
-                }
-            },
-        ],
-        'fieldMask': 'customerClient.id,customerClient.descriptiveName',
-        'requestId': 'fake_req_id',
-    }],
-]
+_GOOGLE_ADS_RESPONSE = [{
+    'results': [
+        {
+            'customerClient': {
+                'resourceName': (
+                    'customers/8056520078/customerClients/5459155099'
+                ),
+                'descriptiveName': 'Account 1',
+                'id': '5459155099',
+            }
+        },
+        {
+            'customerClient': {
+                'resourceName': (
+                    'customers/8056520078/customerClients/8647404629'
+                ),
+                'descriptiveName': 'Account 2',
+                'id': '8647404629',
+            }
+        },
+    ],
+    'fieldMask': 'customerClient.id,customerClient.descriptiveName',
+    'requestId': 'fake_req_id',
+}]
 
-_EMPTY_GOOGLE_ADS_RESPONSE = [[{
+_EMPTY_GOOGLE_ADS_RESPONSE = [{
     'results': [],
     'fieldMask': 'customerClient.id,customerClient.descriptiveName',
     'requestId': 'fake_req_id',
-}]]
+}]
 
 _EXPECTED_LIST = [
     accounts_lib.Account(id='5459155099', name='Account 1'),
@@ -62,12 +60,12 @@ class AccountsTest(parameterized.TestCase):
 
   @parameterized.named_parameters(
       {
-          'testcase_name': 'response_with_campaign_data',
+          'testcase_name': 'response_with_account_data',
           'google_ads_api_response': _GOOGLE_ADS_RESPONSE,
           'expected_list': _EXPECTED_LIST,
       },
       {
-          'testcase_name': 'no_campaign_data',
+          'testcase_name': 'no_account_data',
           'google_ads_api_response': _EMPTY_GOOGLE_ADS_RESPONSE,
           'expected_list': [],
       },
