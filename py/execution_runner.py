@@ -100,7 +100,8 @@ class ExecutionRunner:
           f'projects/{self._gcp_project_id}/secrets/{secret_key}/versions/'
           'latest')
       secret_response = secret_manager_client.access_secret_version(
-          full_secret_name)
+          request={'name': full_secret_name}
+      )
       credentials[
           secret_key] = secret_response.payload.data.decode('UTF-8').strip()
 
