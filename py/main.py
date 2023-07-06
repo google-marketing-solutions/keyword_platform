@@ -62,8 +62,7 @@ def get_accessible_accounts() -> flask.Response:
   Returns:
     A list of dicts with account id and name.
   """
-  credentials = json.loads(flask.request.args.get('credentials'))
-  settings = settings_lib.Settings(credentials=credentials)
+  settings = settings_lib.Settings()
   execution_runner = execution_runner_lib.ExecutionRunner(settings)
   try:
     accounts_list = execution_runner.get_accounts()
@@ -84,8 +83,7 @@ def get_campaigns() -> flask.Response:
     A list of dicts with campaign id and name.
   """
   selected_accounts = flask.request.args.get('selected_accounts').split(',')
-  credentials = json.loads(flask.request.args.get('credentials'))
-  settings = settings_lib.Settings(credentials=credentials)
+  settings = settings_lib.Settings()
   execution_runner = execution_runner_lib.ExecutionRunner(settings)
 
   try:
