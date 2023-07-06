@@ -35,7 +35,6 @@ _GOOGLE_ADS_RESPONSE = [{
                 'resourceName': (
                     'customers/8056520078/customerClients/8647404629'
                 ),
-                'descriptiveName': 'Account 2',
                 'id': '8647404629',
             }
         },
@@ -52,7 +51,7 @@ _EMPTY_GOOGLE_ADS_RESPONSE = [{
 
 _EXPECTED_LIST = [
     accounts_lib.Account(id='5459155099', name='Account 1'),
-    accounts_lib.Account(id='8647404629', name='Account 2'),
+    accounts_lib.Account(id='8647404629', name='[NO NAME SET]'),
 ]
 
 

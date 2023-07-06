@@ -52,7 +52,9 @@ class Accounts:
         self._accounts.append(
             Account(
                 id=result['customerClient']['id'],
-                name=result['customerClient']['descriptiveName'],
+                name=result['customerClient'].get(
+                    'descriptiveName', '[NO NAME SET]'
+                ),
             )
         )
     logging.info(
