@@ -36,14 +36,12 @@ def main() -> flask.Response:
   )
   customer_ids = flask.request.args.get('customer_ids').split(',')
   campaigns = flask.request.args.get('campaigns').split(',')
-  credentials = json.loads(flask.request.args.get('credentials'))
   workers_to_run = flask.request.args.get('workers_to_run').split(',')
   settings = settings_lib.Settings(
       source_language_code=source_language_code,
       target_language_codes=target_language_codes,
       customer_ids=customer_ids,
       campaigns=campaigns,
-      credentials=credentials,
       workers_to_run=workers_to_run,
   )
   execution_runner = execution_runner_lib.ExecutionRunner(settings)

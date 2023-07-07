@@ -166,7 +166,10 @@ class ExecutionRunnerTest(absltest.TestCase):
     )
 
     # The ads API should be called for each customer ID in the request.
-    expected_get_campaign_calls = [mock.call(123), mock.call(456)]
+    expected_get_campaign_calls = [
+        mock.call(123, [789, 101]),
+        mock.call(456, [789, 101]),
+    ]
     expected_get_ads_data_calls = [mock.call(123, settings.campaigns),
                                    mock.call(456, settings.campaigns)]
     expected_get_keywords_calls = [mock.call(123), mock.call(456)]

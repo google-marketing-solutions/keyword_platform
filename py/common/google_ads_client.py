@@ -112,11 +112,16 @@ class GoogleAdsClient:
     url = SEARCH_URL.format(api_version=self.api_version, customer_id=mcc_id)
     return api_utils.send_api_request(url, payload, self._get_http_header())
 
-  def get_campaigns_for_account(self, customer_id: str) -> list[Any]:
+  def get_campaigns_for_account(
+      self,
+      customer_id: str,
+      campaign_ids: Optional[list[Union[int, str]]] = None,
+  ) -> list[Any]:
     """Gets the all accessible campaigns under the accounts.
 
     Args:
       customer_id: The Google Ads account id.
+      campaign_ids: A list of Google Ads campaign ids.
 
     Returns:
       The API response object containing a list of campaign ids and names.
@@ -132,6 +137,9 @@ class GoogleAdsClient:
         WHERE
           campaign.status = 'ENABLED'
         """
+    if campaign_ids:
+      campaign_ids_str = ', '.join([f"'{elem}'" for elem in campaign_ids])
+      query += f' AND campaign.id in ({campaign_ids_str})'
     payload = {'query': ' '.join(query.split())}
     url = SEARCH_URL.format(
         api_version=self.api_version, customer_id=customer_id

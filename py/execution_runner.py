@@ -193,10 +193,15 @@ class ExecutionRunner:
     """Builds a Campaigns object."""
     campaign_responses = []
     customer_ids = self._settings.customer_ids
+    campaigns = self._settings.campaigns
 
     with futures.ThreadPoolExecutor() as executor:
       responses = executor.map(
-          self._google_ads_client.get_campaigns_for_account, customer_ids)
+          lambda customer_id: self._google_ads_client.get_campaigns_for_account(
+              customer_id, campaigns
+          ),
+          customer_ids,
+      )
 
     for response in responses:
       if isinstance(response, list):
