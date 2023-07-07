@@ -172,7 +172,10 @@ class ExecutionRunnerTest(absltest.TestCase):
     ]
     expected_get_ads_data_calls = [mock.call(123, settings.campaigns),
                                    mock.call(456, settings.campaigns)]
-    expected_get_keywords_calls = [mock.call(123), mock.call(456)]
+    expected_get_keywords_calls = [
+        mock.call(123, settings.campaigns),
+        mock.call(456, settings.campaigns),
+    ]
 
     # Due to the way workers are dynamically loaded, they need to be mocked
     # using mock.path.dict.
@@ -194,7 +197,7 @@ class ExecutionRunnerTest(absltest.TestCase):
       self.mock_google_ads_client.return_value.get_ads_data_for_campaigns.assert_has_calls(
           expected_get_ads_data_calls, any_order=True
       )
-      self.mock_google_ads_client.return_value.get_active_keywords_for_account.assert_has_calls(
+      self.mock_google_ads_client.return_value.get_keywords_data_for_campaigns.assert_has_calls(
           expected_get_keywords_calls, any_order=True
       )
 
