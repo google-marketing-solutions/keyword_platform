@@ -129,7 +129,9 @@ class GoogleAdsClientTest(parameterized.TestCase):
     query = """
         SELECT
           campaign.name,
-          campaign.id
+          campaign.id,
+          campaign.advertising_channel_type,
+          campaign.bidding_strategy_type
         FROM
           campaign
         WHERE
