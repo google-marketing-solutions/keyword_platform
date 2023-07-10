@@ -16,13 +16,14 @@
 
 from unittest import mock
 
+import google.auth
 from google.cloud import exceptions
 from google.cloud import storage
 
+from absl.testing import absltest
 from py.common import storage_client as storage_client_lib
 from py.data_models import google_ads_objects as google_ads_objects_lib
 from py.data_models import keywords as keywords_lib
-from absl.testing import absltest
 
 
 _KEYWORDS_GOOGLE_ADS_API_RESPONSE = [[{
@@ -91,6 +92,18 @@ class StorageClientTest(absltest.TestCase):
 
   def setUp(self):
     super().setUp()
+    self.mock_credentials = mock.create_autospec(
+        google.auth.credentials.Credentials
+    )
+    self.mock_credentials.service_account_email = 'fake_service_account_email'
+    self.mock_auth = self.enter_context(
+        mock.patch.object(
+            google.auth,
+            'default',
+            autospec=True,
+            return_value=(self.mock_credentials, ''),
+        )
+    )
     self.storage_client_mock = self.enter_context(
         mock.patch.object(storage, 'Client', autospec=True)
     )
@@ -118,7 +131,7 @@ class StorageClientTest(absltest.TestCase):
         data=_FAKE_KEYWORDS_CSV, content_type='text/csv'
     )
     self.mock_blob.generate_signed_url.assert_called_once_with(
-        expiration=3600, version='v4'
+        expiration=3600, credentials=mock.ANY, version='v4'
     )
     self.assertEqual(actual_urls, expected_urls)
 

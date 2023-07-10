@@ -13,8 +13,10 @@
 # limitations under the License.
 
 """Defines the StorageClient class."""
-
 import logging
+import google.auth
+from google.auth import compute_engine
+from google.auth.transport import requests
 from google.cloud import exceptions
 from google.cloud import storage
 from py.data_models import google_ads_objects as google_ads_objects_lib
@@ -44,7 +46,16 @@ class StorageClient:
       google_ads_objects: An instance of the GoogleAdsObjects data class.
       url_expiration_seconds: The number of seconds until download links expire.
     """
-    self._storage_client = storage.Client()
+    credentials, project = google.auth.default()
+    self._storage_client = storage.Client(
+        credentials=credentials, project=project
+    )
+    auth_request = requests.Request()
+    self._signing_credentials = compute_engine.IDTokenCredentials(
+        auth_request,
+        '',
+        service_account_email=credentials.service_account_email,
+    )
     self._bucket = self._storage_client.bucket(bucket_name)
     self._google_ads_objects = google_ads_objects
     self._url_expiration_seconds = url_expiration_seconds
@@ -92,5 +103,7 @@ class StorageClient:
       )
       raise client_error
     return blob.generate_signed_url(
-        expiration=self._url_expiration_seconds, version='v4'
+        expiration=self._url_expiration_seconds,
+        credentials=self._signing_credentials,
+        version='v4',
     )
