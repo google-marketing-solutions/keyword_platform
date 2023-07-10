@@ -205,7 +205,7 @@ class KeywordsTest(parameterized.TestCase):
 
   @mock.patch.object(time, 'strftime', return_value='19700101-000000')
   def test_csv_file_name(self, _):
-    expected_file_name = 'campaigns_19700101-000000.csv'
+    expected_file_name = 'keywords_19700101-000000.csv'
     keywords = keywords_lib.Keywords(_GOOGLE_ADS_RESPONSE)
     actual_file_name = keywords.csv_file_name()
 

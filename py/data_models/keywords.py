@@ -145,7 +145,7 @@ class Keywords:
   def csv_file_name(self) -> str:
     """Returns the CSV file name."""
     time_str = time.strftime('%Y%m%d-%H%M%S')
-    return f'campaigns_{time_str}.csv'
+    return f'keywords_{time_str}.csv'
 
   def add_update(self, update: str) -> None:
     """Marks the row as having been updated by a processor.
