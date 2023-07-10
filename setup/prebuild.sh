@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+project_number=$(gcloud projects list --filter="$(gcloud config get-value project)" --format="value(PROJECT_NUMBER)")
+service_account_email="${project_number}-compute@developer.gserviceaccount.com"
+
 echo "Setting Project ID: ${GOOGLE_CLOUD_PROJECT}"
 gcloud config set project ${GOOGLE_CLOUD_PROJECT}
 
@@ -23,6 +27,7 @@ REQUIRED_SERVICES=(
   googleads.googleapis.com
   translate.googleapis.com
   artifactregistry.googleapis.com
+  iamcredentials.googleapis.com
 )
 
 echo "Enabling Cloud APIs if necessary..."
@@ -41,3 +46,6 @@ done
 
 echo "Creating cloud storage bucket..."
 gcloud alpha storage buckets create gs://${GOOGLE_CLOUD_PROJECT}-keyword-platform --project=${GOOGLE_CLOUD_PROJECT}
+
+echo "Granting ${service_account_email} token creator access..."
+gcloud iam service-accounts add-iam-policy-binding $service_account_email --role="roles/iam.serviceAccountTokenCreator" --member="serviceAccount:$service_account_email"

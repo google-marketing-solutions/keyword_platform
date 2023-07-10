@@ -51,6 +51,7 @@ class StorageClient:
         credentials=credentials, project=project
     )
     auth_request = requests.Request()
+    credentials.refresh(request=auth_request)
     self._signing_credentials = compute_engine.IDTokenCredentials(
         auth_request,
         '',
