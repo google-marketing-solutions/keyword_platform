@@ -28,6 +28,7 @@ import pandas as pd
 from py.data_models import translation_frame as translation_frame_lib
 
 ACTION = 'Action'
+CUSTOMER_ID = 'Customer ID'
 AD_STATUS = 'Ad status'
 CAMPAIGN = 'Campaign'
 AD_GROUP = 'Ad group'
@@ -75,6 +76,7 @@ UPDATES_APPLIED = 'Updates applied'
 
 _COLS = [
     ACTION,
+    CUSTOMER_ID,
     AD_STATUS,
     CAMPAIGN,  # Campaign name
     AD_GROUP,  # Ad group name
@@ -122,6 +124,7 @@ _COLS = [
 ]
 
 _DEFAULT_ACTION = 'Add'
+_DEFAULT_CUSTOMER_ID = 'Enter customer ID'
 _DEFAULT_STATUS = 'Paused'
 _DEFAULT_LABEL = 'Keyword Translator'
 
@@ -196,6 +199,7 @@ class Ads:
         for result in batch['results']:
           ad = {
               ACTION: _DEFAULT_ACTION,
+              CUSTOMER_ID: _DEFAULT_CUSTOMER_ID,
               AD_STATUS: _DEFAULT_STATUS,
               CAMPAIGN: result['campaign']['name'],
               AD_GROUP: result['adGroup']['name'],

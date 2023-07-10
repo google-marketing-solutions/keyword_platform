@@ -183,6 +183,7 @@ _EXPECTED_KEYWORDS_DF = pd.DataFrame(
 _EXPECTED_ADS_DF = pd.DataFrame(
     {
         'Action': ['Add', 'Add'],
+        'Customer ID': ['Enter customer ID', 'Enter customer ID'],
         'Ad status': ['Paused', 'Paused'],
         'Campaign': [
             'Gmail Test Campaign (es)',

@@ -127,6 +127,7 @@ _EMPTY_GOOGLE_ADS_RESPONSE = [[
 _EXPECTED_DF = pd.DataFrame(
     {
         'Action': ['Add', 'Add'],
+        'Customer ID': ['Enter customer ID', 'Enter customer ID'],
         'Ad status': ['Paused', 'Paused'],
         'Campaign': ['Gmail Test Campaign', 'Analytics Test Campaign'],
         'Ad group': ['Ad group 1', 'Ad group 1'],
@@ -190,23 +191,23 @@ _EXPECTED_DF = pd.DataFrame(
 )
 
 _EXPECTED_CSV_DATA = (
-    'Action,Ad status,Campaign,Ad group,Headline 1,Original Headline 1,Headline'
-    ' 2,Original Headline 2,Headline 3,Original Headline 3,Headline 4,Original'
-    ' Headline 4,Headline 5,Original Headline 5,Headline 6,Original Headline'
-    ' 6,Headline 7,Original Headline 7,Headline 8,Original Headline 8,Headline'
-    ' 9,Original Headline 9,Headline 10,Original Headline 10,Headline'
-    ' 11,Original Headline 11,Headline 12,Original Headline 12,Headline'
-    ' 13,Original Headline 13,Headline 14,Original Headline 14,Headline'
-    ' 15,Original Headline 15,Description 1,Original Description 1,Description'
-    ' 2,Original Description 2,Description 3,Original Description 3,Description'
-    ' 4,Original Description 4,Final URL,Label,Updates'
-    ' applied\nAdd,Paused,Gmail Test Campaign,Ad group 1,Email Login,Email'
-    ' Login,Online Email,Online Email,Sign in,Sign'
+    'Action,Customer ID,Ad status,Campaign,Ad group,Headline 1,Original'
+    ' Headline 1,Headline 2,Original Headline 2,Headline 3,Original Headline'
+    ' 3,Headline 4,Original Headline 4,Headline 5,Original Headline 5,Headline'
+    ' 6,Original Headline 6,Headline 7,Original Headline 7,Headline 8,Original'
+    ' Headline 8,Headline 9,Original Headline 9,Headline 10,Original Headline'
+    ' 10,Headline 11,Original Headline 11,Headline 12,Original Headline'
+    ' 12,Headline 13,Original Headline 13,Headline 14,Original Headline'
+    ' 14,Headline 15,Original Headline 15,Description 1,Original Description'
+    ' 1,Description 2,Original Description 2,Description 3,Original Description'
+    ' 3,Description 4,Original Description 4,Final URL,Label,Updates'
+    ' applied\nAdd,Enter customer ID,Paused,Gmail Test Campaign,Ad group'
+    ' 1,Email Login,Email Login,Online Email,Online Email,Sign in,Sign'
     ' in,,,,,,,,,,,,,,,,,,,,,,,,,"Email thats intuitive, efficient, and'
     ' useful","Email thats intuitive, efficient, and useful","15 GB of storage,'
     ' less spam, and mobile access","15 GB of storage, less spam, and mobile'
-    ' access",,,,,https://mail.google.com/,Keyword'
-    ' Translator,[]\nAdd,Paused,Analytics Test Campaign,Ad group 1,Official'
+    ' access",,,,,https://mail.google.com/,Keyword Translator,[]\nAdd,Enter'
+    ' customer ID,Paused,Analytics Test Campaign,Ad group 1,Official'
     ' Website,Official Website,Official Site,Official Site,High Quality'
     ' Products,High Quality Products,,,,,,,,,,,,,,,,,,,,,,,,,Google'
     ' Analytics,Google Analytics,Try Analytics today!,Try Analytics'
@@ -216,6 +217,7 @@ _EXPECTED_CSV_DATA = (
 _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame(
     {
         'Action': ['Add', 'Add'],
+        'Customer ID': ['Enter customer ID', 'Enter customer ID'],
         'Ad status': ['Paused', 'Paused'],
         'Campaign': ['Gmail Test Campaign', 'Analytics Test Campaign'],
         'Ad group': ['Ad group 1', 'Ad group 1'],
@@ -281,6 +283,7 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame(
 _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame(
     {
         'Action': ['Add', 'Add'],
+        'Customer ID': ['Enter customer ID', 'Enter customer ID'],
         'Ad status': ['Paused', 'Paused'],
         'Campaign': [
             'Gmail Test Campaign (es)',
@@ -349,6 +352,7 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame(
 _EXPECTED_DF_EMPTY = pd.DataFrame(
     {
         'Action': pd.Series([], dtype='object'),
+        'Customer ID': pd.Series([], dtype='object'),
         'Ad status': pd.Series([], dtype='object'),
         'Campaign': pd.Series([], dtype='object'),
         'Ad group': pd.Series([], dtype='object'),
@@ -397,21 +401,22 @@ _EXPECTED_DF_EMPTY = pd.DataFrame(
 )
 
 _EXPECTED_CSV_DATA_EMPTY = (
-    'Action,Ad status,Campaign,Ad group,Headline 1,Original Headline 1,Headline'
-    ' 2,Original Headline 2,Headline 3,Original Headline 3,Headline 4,Original'
-    ' Headline 4,Headline 5,Original Headline 5,Headline 6,Original Headline'
-    ' 6,Headline 7,Original Headline 7,Headline 8,Original Headline 8,Headline'
-    ' 9,Original Headline 9,Headline 10,Original Headline 10,Headline'
-    ' 11,Original Headline 11,Headline 12,Original Headline 12,Headline'
-    ' 13,Original Headline 13,Headline 14,Original Headline 14,Headline'
-    ' 15,Original Headline 15,Description 1,Original Description 1,Description'
-    ' 2,Original Description 2,Description 3,Original Description 3,Description'
-    ' 4,Original Description 4,Final URL,Label,Updates applied\n'
+    'Action,Customer ID,Ad status,Campaign,Ad group,Headline 1,Original'
+    ' Headline 1,Headline 2,Original Headline 2,Headline 3,Original Headline'
+    ' 3,Headline 4,Original Headline 4,Headline 5,Original Headline 5,Headline'
+    ' 6,Original Headline 6,Headline 7,Original Headline 7,Headline 8,Original'
+    ' Headline 8,Headline 9,Original Headline 9,Headline 10,Original Headline'
+    ' 10,Headline 11,Original Headline 11,Headline 12,Original Headline'
+    ' 12,Headline 13,Original Headline 13,Headline 14,Original Headline'
+    ' 14,Headline 15,Original Headline 15,Description 1,Original Description'
+    ' 1,Description 2,Original Description 2,Description 3,Original Description'
+    ' 3,Description 4,Original Description 4,Final URL,Label,Updates applied\n'
 )
 
 _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame(
     {
         'Action': ['Add', 'Add'],
+        'Customer ID': ['Enter customer ID', 'Enter customer ID'],
         'Ad status': ['Paused', 'Paused'],
         'Campaign': ['Gmail Test Campaign', 'Analytics Test Campaign'],
         'Ad group': ['Ad group 1', 'Ad group 1'],
@@ -477,6 +482,7 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame(
 _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame(
     {
         'Action': ['Add', 'Add'],
+        'Customer ID': ['Enter customer ID', 'Enter customer ID'],
         'Ad status': ['Paused', 'Paused'],
         'Campaign': [
             'Gmail Test Campaign (de)',
@@ -603,6 +609,7 @@ class AdsTest(parameterized.TestCase):
   def test_columns(self):
     expected_columns = [
         'Action',
+        'Customer ID',
         'Ad status',
         'Campaign',
         'Ad group',
