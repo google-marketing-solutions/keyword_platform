@@ -66,7 +66,7 @@ class ExecutionRunner:
     self._settings = settings
     self._gcp_project_id = os.environ['GCP_PROJECT']
     self._settings.credentials = self._get_credentials()
-    self._bucket_name = f'{self._gcp_project_id}_translated_assets'
+    self._bucket_name = f'{self._gcp_project_id}-translated-assets'
 
     logging.info('ExecutionRunner: initialized credentials.')
 
