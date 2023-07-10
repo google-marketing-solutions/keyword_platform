@@ -30,5 +30,5 @@ class WorkerResult:
   status: Status
   keywords_modified: int = 0
   keywords_added: int = 0
-  warning_msg: str|None = None
-  error_msg: str|None = None
+  warning_msg: str|None = ''
+  error_msg: str|None = ''
