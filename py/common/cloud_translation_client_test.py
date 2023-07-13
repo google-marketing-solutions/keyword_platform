@@ -18,10 +18,10 @@ from unittest import mock
 
 import pandas as pd
 
+from absl.testing import absltest
 from py.common import api_utils
 from py.common import cloud_translation_client as cloud_translation_client_lib
 from py.data_models import translation_frame as translation_frame_lib
-from absl.testing import absltest
 
 
 class CloudTranslationClientTest(absltest.TestCase):
@@ -50,14 +50,14 @@ class CloudTranslationClientTest(absltest.TestCase):
     source_language = 'en'
     target_language = 'es'
     api_version = 3
-    batch_size = 2  # Set to smaller size for testing
+    batch_char_limit = 10  # Set to smaller size for testing
 
     cloud_translation_client = (
         cloud_translation_client_lib.CloudTranslationClient(
             credentials=credentials,
             gcp_project_name=gcp_project_name,
             api_version=api_version,
-            batch_size=batch_size))
+            batch_char_limit=batch_char_limit))
 
     translation_frame = translation_frame_lib.TranslationFrame({
         'email': [(0, 'Keyword'), (2, 'Keyword')],

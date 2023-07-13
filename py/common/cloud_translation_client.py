@@ -36,8 +36,13 @@ _CREDENTIAL_REQUIRED_KEYS = (
     'refresh_token',
 )
 
-# TODO():
-_TRANSLATE_BATCH_SIZE = 128
+
+# Max batch size for the Cloud Translation API V3 is 5000 code points.
+# Setting the batch too high could result in long response times, and some chars
+# may be represented by 3 code points, so 1500 keeps response times short in the
+# average case, and stops us exceeding limits in the worst case of all chars
+# being represented by multiple code points.
+_DEFAULT_BATCH_CHAR_LIMIT = 1500
 
 
 class CloudTranslationClient:
@@ -67,7 +72,7 @@ class CloudTranslationClient:
       credentials: dict[str, str],
       gcp_project_name: str,
       api_version: str = _API_VERSION,
-      batch_size: int = _TRANSLATE_BATCH_SIZE,
+      batch_char_limit: int = _DEFAULT_BATCH_CHAR_LIMIT,
   ) -> None:
     """Instantiates the Clound Translation client.
 
@@ -77,10 +82,11 @@ class CloudTranslationClient:
       gcp_project_name: The name or ID of the Google Cloud Project associated
         with the credentials.
       api_version: The Cloud Translate API API Version.
-      batch_size: The size of content batches to send to the translation API.
+      batch_char_limit: The size of content batches to send to the translation
+        API, in chars.
     """
     self.api_version = api_version
-    self.batch_size = batch_size
+    self.batch_char_limit = batch_char_limit
     self.credentials = credentials
     self.gcp_project_name = gcp_project_name
     # The access_token be lazily loaded and cached when the API is called to
@@ -110,8 +116,9 @@ class CloudTranslationClient:
     parent = f'projects/{self.gcp_project_name}'
 
     while batch_start < translation_frame.size():
-      batch_end = (batch_start + self.batch_size) - 1  # Account for 0 indexing
-      batch = translation_frame.get_terms(batch_start, batch_end)
+
+      batch, next_batch_index = translation_frame.get_term_batch(
+          batch_start, self.batch_char_limit)
 
       params = {
           'contents': batch,
@@ -128,7 +135,8 @@ class CloudTranslationClient:
           url, params, self._get_http_header())
 
       logging.info('Got responses for terms %d-%d of %d',
-                   batch_start, batch_end, translation_frame.size())
+                   batch_start,
+                   batch_start + len(batch) - 1, translation_frame.size())
 
       translations = [t['translatedText'] for t in response['translations']]
 
@@ -138,7 +146,7 @@ class CloudTranslationClient:
           translations=translations,
       )
 
-      batch_start = batch_end + 1
+      batch_start = next_batch_index
 
     logging.info(
         'Completed translation for %d terms.', translation_frame.size())

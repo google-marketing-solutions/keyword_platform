@@ -127,14 +127,42 @@ class TranslationFrame:
     """Returns the number of rows."""
     return len(self._df)
 
-  def get_terms(self, start_row: int, end_row: int) -> list[str]:
-    """Returns source terms from start_row to end_row, inclusive.
+  def get_term_batch(
+      self, start_row: int, batch_char_limit: int
+  ) -> tuple[list[str], int]:
+    """Gets source terms from start_row for 'batch_char_limit' chars.
 
     Args:
       start_row: The start row in the DataFrame.
-      end_row: The end row in the DataFrame.
+      batch_char_limit: The number of chars that can be included in this batch.
 
     Returns:
-      The source terms between start_row and end_row, inclusive.
+      A list of source terms from start_row to <= batch_size_in_chars, and the
+        index that the next batch should start from.
     """
-    return list(self.df().loc[start_row:end_row, SOURCE_TERM])
+    char_count = 0
+    terms = []
+    next_start_row = 0
+
+    for row in range(start_row, len(self.df())):
+      next_term = self.df().loc[row, SOURCE_TERM]
+
+      if len(next_term) + char_count <= batch_char_limit:
+        # Next term can fit within the batch char limit.
+        terms.append(next_term)
+        char_count += len(next_term)
+      else:
+        # Next term cannot fit within the batch char limit, start from this row
+        # for the next batch.
+        next_start_row = row
+        break
+
+    logging.info('Got %d terms / %d chars for translation.',
+                 len(terms), char_count)
+
+    if next_start_row == 0:
+      # Sets next start row to end of DataFrame, in the case all terms could
+      # fit into this batch.
+      next_start_row = len(self.df())
+
+    return terms, next_start_row

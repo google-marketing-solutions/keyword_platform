@@ -83,7 +83,7 @@ class TranslationFrameTest(parameterized.TestCase):
     pd.util.testing.assert_frame_equal(
         actual_df, expected_df, check_index_type=False)
 
-  def test_get_terms(self):
+  def test_get_term_batch(self):
     input_data = {
         'email': [(0, 'Keyword'), (2, 'Keyword')],
         'fast': [(1, 'Keyword')],
@@ -91,11 +91,13 @@ class TranslationFrameTest(parameterized.TestCase):
     }
 
     expected_terms = ['email', 'fast']
+    expected_next_row = 2
 
     translation_frame = translation_frame_lib.TranslationFrame(input_data)
-    actual_terms = translation_frame.get_terms(0, 1)
+    actual_terms, actual_next_row = translation_frame.get_term_batch(0, 10)
 
     self.assertEqual(actual_terms, expected_terms)
+    self.assertEqual(actual_next_row, expected_next_row)
 
 
 if __name__ == '__main__':
