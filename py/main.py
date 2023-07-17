@@ -28,6 +28,8 @@ app = flask.Flask(__name__)
 @app.route('/run', methods=['POST'])
 def main() -> flask.Response:
   """Entry point for Cloud Run."""
+  logging.info('Received request: run/')
+
   source_language_code = flask.request.args.get('source_language_code').lower()
   target_language_codes = (
       flask.request.args.get('target_language_codes').lower().split(',')
@@ -42,6 +44,9 @@ def main() -> flask.Response:
       campaigns=campaigns,
       workers_to_run=workers_to_run,
   )
+
+  logging.info('Built run settings: %s', settings)
+
   execution_runner = execution_runner_lib.ExecutionRunner(settings)
   try:
     response_dict = execution_runner.run_workers()
@@ -53,6 +58,9 @@ def main() -> flask.Response:
         status=http.HTTPStatus.INTERNAL_SERVER_ERROR,
         content=('The server encountered and error and could not complete your '
                  'request. Developers can check the logs for details.'))
+
+  logging.info('Request complete: run/')
+
   return flask.make_response(flask.jsonify(response_dict), http.HTTPStatus.OK)
 
 
@@ -63,8 +71,11 @@ def get_accessible_accounts() -> flask.Response:
   Returns:
     A list of dicts with account id and name.
   """
+  logging.info('Received request: /accessible_accounts')
+
   settings = settings_lib.Settings()
   execution_runner = execution_runner_lib.ExecutionRunner(settings)
+
   try:
     accounts_list = execution_runner.get_accounts()
   except Exception as exception:
@@ -75,6 +86,9 @@ def get_accessible_accounts() -> flask.Response:
         status=http.HTTPStatus.INTERNAL_SERVER_ERROR,
         content=('The server encountered and error and could not complete your '
                  'request. Developers can check the logs for details.'))
+
+  logging.info('Request complete: /accessible_accounts')
+
   return flask.make_response(flask.jsonify(accounts_list), http.HTTPStatus.OK)
 
 
@@ -88,9 +102,13 @@ def get_campaigns() -> flask.Response:
   Returns:
     A list of dicts with campaign id and name.
   """
+  logging.info('Received request: /campaigns')
+
   selected_accounts = flask.request.args.get('selected_accounts').split(',')
   settings = settings_lib.Settings()
   execution_runner = execution_runner_lib.ExecutionRunner(settings)
+
+  logging.info('Getting campaigns for: %s', selected_accounts)
 
   try:
     campaigns_list = execution_runner.get_campaigns_for_selected_accounts(
@@ -104,6 +122,9 @@ def get_campaigns() -> flask.Response:
         status=http.HTTPStatus.INTERNAL_SERVER_ERROR,
         content=('The server encountered and error and could not complete your '
                  'request. Developers can check the logs for details.'))
+
+  logging.info('Request complete: /campaigns')
+
   return flask.make_response(flask.jsonify(campaigns_list), http.HTTPStatus.OK)
 
 

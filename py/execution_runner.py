@@ -81,7 +81,6 @@ class ExecutionRunner:
     )
 
     logging.info('ExecutionRunner: initialized Cloud Translation client.')
-
     logging.info('ExecutionRunner: initialization complete.')
 
   def _get_credentials(self) -> dict[str, str]:
@@ -115,7 +114,6 @@ class ExecutionRunner:
         'worker_results': A list of results for each worker that was run.
         'asset_urls': A list of URLs for saved assets.
     """
-
     # UI validation should confirm at least 1 worker is selected, but in case
     # that fails, this check will exit early.
     if not self._settings.workers_to_run:
@@ -134,16 +132,21 @@ class ExecutionRunner:
     asset_urls = self._save_to_bucket(google_ads_objects)
 
     logging.info('Wrote assets to Cloud Storage.')
-
     logging.info('Execution complete.')
 
     return {'worker_results': results, 'asset_urls': asset_urls}
 
   def get_accounts(self) -> list[accounts_lib.Account]:
     """Returns a list of accessible account objects."""
+    login_customer_id = self._settings.credentials['login_customer_id']
+
+    logging.info('Getting accounts for %s...', login_customer_id)
     accounts_responses = self._google_ads_client.get_accounts(
-        mcc_id=self._settings.credentials['login_customer_id']
+        mcc_id=login_customer_id
     )
+
+    logging.info('Finished getting accounts for %s.', login_customer_id)
+
     return accounts_lib.Accounts(accounts_responses).accounts_list
 
   def get_campaigns_for_selected_accounts(
@@ -170,6 +173,8 @@ class ExecutionRunner:
     campaigns_list = campaigns_lib.Campaigns(
         campaign_responses
     ).campaigns_list()
+
+    logging.info('Feteched %d campaigns', len(campaigns_list))
 
     return campaigns_list
 
