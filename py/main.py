@@ -13,9 +13,7 @@
 # limitations under the License.
 
 """Entry point for Cloud Run."""
-from concurrent import futures
 import http
-import json
 import logging
 import os
 
@@ -47,9 +45,14 @@ def main() -> flask.Response:
   execution_runner = execution_runner_lib.ExecutionRunner(settings)
   try:
     response_dict = execution_runner.run_workers()
-  except RuntimeError as err:
-    logging.error('Execution Runner raised an exception: %s', err)
-    return flask.Response(status=http.HTTPStatus.BAD_REQUEST, content=err)
+  except Exception as exception:
+                                  # (Isolation block for server)
+    logging.error('Execution Runner raised an exception trying to run '
+                  'workers: %s', exception)
+    return flask.Response(
+        status=http.HTTPStatus.INTERNAL_SERVER_ERROR,
+        content=('The server encountered and error and could not complete your '
+                 'request. Developers can check the logs for details.'))
   return flask.make_response(flask.jsonify(response_dict), http.HTTPStatus.OK)
 
 
@@ -64,9 +67,14 @@ def get_accessible_accounts() -> flask.Response:
   execution_runner = execution_runner_lib.ExecutionRunner(settings)
   try:
     accounts_list = execution_runner.get_accounts()
-  except RuntimeError as err:
-    logging.error('Google Ads Client raised an exception: %s', err)
-    return flask.Response(status=http.HTTPStatus.BAD_REQUEST, content=err)
+  except Exception as exception:
+                                  # (Isolation block for server)
+    logging.error('Execution Runner raised an exception trying to get '
+                  'accessible accounts: %s', exception)
+    return flask.Response(
+        status=http.HTTPStatus.INTERNAL_SERVER_ERROR,
+        content=('The server encountered and error and could not complete your '
+                 'request. Developers can check the logs for details.'))
   return flask.make_response(flask.jsonify(accounts_list), http.HTTPStatus.OK)
 
 
@@ -88,9 +96,14 @@ def get_campaigns() -> flask.Response:
     campaigns_list = execution_runner.get_campaigns_for_selected_accounts(
         selected_accounts
     )
-  except RuntimeError as err:
-    logging.error('Google Ads Client raised an exception: %s', err)
-    return flask.Response(status=http.HTTPStatus.BAD_REQUEST, content=err)
+  except Exception as exception:
+                                  # (Isolation block for server)
+    logging.error('Execution Runner raised an exception trying to get '
+                  'campaigns: %s', exception)
+    return flask.Response(
+        status=http.HTTPStatus.INTERNAL_SERVER_ERROR,
+        content=('The server encountered and error and could not complete your '
+                 'request. Developers can check the logs for details.'))
   return flask.make_response(flask.jsonify(campaigns_list), http.HTTPStatus.OK)
 
 
