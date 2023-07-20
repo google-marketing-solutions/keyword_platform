@@ -1,0 +1,23 @@
+{
+  "asset_urls": [
+    "http://storage.googleapis.com/bucket/file1",
+    "http://storage.googleapis.com/bucket/file2",
+    "http://storage.googleapis.com/bucket/file3"
+  ],
+  "worker_results": {
+    "miningWorker": {
+      "error_msg": "",
+      "keywords_added": 10,
+      "keywords_modified": 0,
+      "status": "SUCCESS",
+      "warning_msg": "Added weird words"
+    },
+    "translationWorker": {
+      "error_msg": "",
+      "keywords_added": 0,
+      "keywords_modified": 10,
+      "status": "SUCCESS",
+      "warning_msg": ""
+    }
+  }
+}
