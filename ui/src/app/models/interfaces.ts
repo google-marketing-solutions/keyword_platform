@@ -28,7 +28,7 @@ export interface GoogleAds {
 }
 
 /**
- * Language interface for API request/response.
+ * Language interface for input/output.
  */
 export interface Language {
   code: string;
