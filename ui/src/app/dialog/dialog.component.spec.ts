@@ -32,6 +32,7 @@ describe('DialogComponent', () => {
     fixture.detectChanges();
   });
 
+  // TODO(): Add effective unit tests.
   it('should create', () => {
     expect(component).toBeTruthy();
   });

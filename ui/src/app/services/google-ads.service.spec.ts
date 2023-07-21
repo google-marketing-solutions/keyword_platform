@@ -27,6 +27,7 @@ describe('GoogleAdsService', () => {
     service = TestBed.inject(GoogleAdsService);
   });
 
+  // TODO(): Add effective unit tests.
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
