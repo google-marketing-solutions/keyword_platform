@@ -16,7 +16,7 @@
 
 from unittest import mock
 
-from py.data_models import google_ads_objects as google_ads_objects_lib
+from ..data_models import google_ads_objects as google_ads_objects_lib
 from absl.testing import absltest
 
 

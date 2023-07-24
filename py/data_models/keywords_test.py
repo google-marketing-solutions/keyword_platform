@@ -19,8 +19,8 @@ from unittest import mock
 
 import pandas as pd
 
-from py.data_models import keywords as keywords_lib
-from py.data_models import translation_frame as translation_frame_lib
+from ..data_models import keywords as keywords_lib
+from ..data_models import translation_frame as translation_frame_lib
 from absl.testing import absltest
 from absl.testing import parameterized
 

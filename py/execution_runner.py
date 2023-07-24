@@ -21,18 +21,18 @@ from typing import Any
 from absl import logging
 from google.cloud import secretmanager
 
-from py.common import cloud_translation_client as cloud_translation_client_lib
-from py.common import google_ads_client as google_ads_client_lib
-from py.common import storage_client as storage_client_lib
-from py.data_models import accounts as accounts_lib
-from py.data_models import ad_groups as ad_groups_lib
-from py.data_models import ads as ads_lib
-from py.data_models import campaigns as campaigns_lib
-from py.data_models import google_ads_objects as google_ads_objects_lib
-from py.data_models import keywords as keywords_lib
-from py.data_models import settings as settings_lib
-from py.workers import translation_worker as translation_worker_lib
-from py.workers import worker_result
+from ..common import cloud_translation_client as cloud_translation_client_lib
+from ..common import google_ads_client as google_ads_client_lib
+from ..common import storage_client as storage_client_lib
+from ..data_models import accounts as accounts_lib
+from ..data_models import ad_groups as ad_groups_lib
+from ..data_models import ads as ads_lib
+from ..data_models import campaigns as campaigns_lib
+from ..data_models import google_ads_objects as google_ads_objects_lib
+from ..data_models import keywords as keywords_lib
+from ..data_models import settings as settings_lib
+from ..workers import translation_worker as translation_worker_lib
+from ..workers import worker_result
 
 
 _WORKERS = {

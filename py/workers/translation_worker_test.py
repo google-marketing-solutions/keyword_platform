@@ -18,14 +18,14 @@ from unittest import mock
 
 import pandas as pd
 
-from py.common import api_utils
-from py.common import cloud_translation_client as cloud_translation_client_lib
-from py.data_models import ads as ads_lib
-from py.data_models import google_ads_objects as google_ads_objects_lib
-from py.data_models import keywords as keywords_lib
-from py.data_models import settings as settings_lib
-from py.workers import translation_worker as translation_worker_lib
-from py.workers import worker_result
+from ..common import api_utils
+from ..common import cloud_translation_client as cloud_translation_client_lib
+from ..data_models import ads as ads_lib
+from ..data_models import google_ads_objects as google_ads_objects_lib
+from ..data_models import keywords as keywords_lib
+from ..data_models import settings as settings_lib
+from ..workers import translation_worker as translation_worker_lib
+from ..workers import worker_result
 from absl.testing import absltest
 
 _KEYWORDS_GOOGLE_ADS_API_RESPONSE = ([

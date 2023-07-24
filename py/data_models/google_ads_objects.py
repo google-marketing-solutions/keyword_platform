@@ -16,10 +16,10 @@
 
 import dataclasses
 
-from py.data_models import ad_groups as ad_groups_lib
-from py.data_models import ads as ads_lib
-from py.data_models import campaigns as campaigns_lib
-from py.data_models import keywords as keywords_lib
+from ..data_models import ad_groups as ad_groups_lib
+from ..data_models import ads as ads_lib
+from ..data_models import campaigns as campaigns_lib
+from ..data_models import keywords as keywords_lib
 
 
 @dataclasses.dataclass

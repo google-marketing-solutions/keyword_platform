@@ -18,8 +18,8 @@ See class doctring for more details.
 """
 from absl import logging
 
-from py.common import api_utils
-from py.data_models import translation_frame as translation_frame_lib
+from ..common import api_utils
+from ..data_models import translation_frame as translation_frame_lib
 
 TRANSLATE_API_BASE_URL = 'https://translate.googleapis.com'
 

@@ -15,7 +15,7 @@
 """The Google Ads client."""
 
 from typing import Any, Optional, Union
-from py.common import api_utils
+from ..common import api_utils
 
 GOOGLE_ADS_API_BASE_URL = 'https://googleads.googleapis.com'
 

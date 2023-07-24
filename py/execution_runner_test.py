@@ -20,13 +20,13 @@ from unittest import mock
 from google.cloud import secretmanager
 
 from absl.testing import absltest
-from py import execution_runner as execution_runner_lib
-from py.common import cloud_translation_client
-from py.common import google_ads_client
-from py.common import storage_client
-from py.data_models import accounts as accounts_lib
-from py.data_models import settings as settings_lib
-from py.workers import translation_worker
+from . import execution_runner as execution_runner_lib
+from ..common import cloud_translation_client
+from ..common import google_ads_client
+from ..common import storage_client
+from ..data_models import accounts as accounts_lib
+from ..data_models import settings as settings_lib
+from ..workers import translation_worker
 
 # TODO()
 _FAKE_CREDENTIALS = {

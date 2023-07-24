@@ -19,7 +19,7 @@ from unittest import mock
 
 import pandas as pd
 
-from py.data_models import ads as ads_lib
+from ..data_models import ads as ads_lib
 from absl.testing import absltest
 from absl.testing import parameterized
 

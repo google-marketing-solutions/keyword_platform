@@ -21,7 +21,7 @@ import pandas as pd
 
 from absl.testing import absltest
 from absl.testing import parameterized
-from py.data_models import campaigns as campaigns_lib
+from ..data_models import campaigns as campaigns_lib
 
 
 _GOOGLE_ADS_RESPONSE = [
