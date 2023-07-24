@@ -27,7 +27,7 @@ app = flask.Flask(__name__)
 flask_cors.CORS(app)
 
 
-@app.route('/run', methods=['POST'])
+@app.route('/run', methods=['POST', 'GET'])
 def main() -> flask.Response:
   """Entry point for Cloud Run."""
   logging.info('Received request: run/')
