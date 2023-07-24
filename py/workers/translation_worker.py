@@ -17,12 +17,12 @@
 
 from absl import logging
 
-from ..data_models import ads as ads_lib
-from ..data_models import google_ads_objects as google_ads_objects_lib
-from ..data_models import keywords as keywords_lib
-from ..data_models import settings as settings_lib
-from ..workers import base_worker
-from ..workers import worker_result
+from data_models import ads as ads_lib
+from data_models import google_ads_objects as google_ads_objects_lib
+from data_models import keywords as keywords_lib
+from data_models import settings as settings_lib
+from workers import base_worker
+from workers import worker_result
 
 
 class TranslationWorker(base_worker.BaseWorker):

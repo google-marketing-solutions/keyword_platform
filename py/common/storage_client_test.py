@@ -21,9 +21,9 @@ from google.cloud import exceptions
 from google.cloud import storage
 
 from absl.testing import absltest
-from ..common import storage_client as storage_client_lib
-from ..data_models import google_ads_objects as google_ads_objects_lib
-from ..data_models import keywords as keywords_lib
+from common import storage_client as storage_client_lib
+from data_models import google_ads_objects as google_ads_objects_lib
+from data_models import keywords as keywords_lib
 
 
 _KEYWORDS_GOOGLE_ADS_API_RESPONSE = [[{

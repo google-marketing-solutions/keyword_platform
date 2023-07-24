@@ -19,7 +19,7 @@ from google.auth import compute_engine
 from google.auth.transport import requests
 from google.cloud import exceptions
 from google.cloud import storage
-from ..data_models import google_ads_objects as google_ads_objects_lib
+from data_models import google_ads_objects as google_ads_objects_lib
 
 
 _DEFAULT_URL_EXPIRATION_SECONDS = 3600

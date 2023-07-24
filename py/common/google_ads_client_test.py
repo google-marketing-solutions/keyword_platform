@@ -19,7 +19,7 @@ from typing import Any
 import requests
 import requests_mock
 
-from ..common import google_ads_client
+from common import google_ads_client
 from absl.testing import absltest
 from absl.testing import parameterized
 

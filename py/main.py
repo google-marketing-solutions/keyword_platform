@@ -19,8 +19,8 @@ import os
 
 import flask
 
-from . import execution_runner as execution_runner_lib
-from ..data_models import settings as settings_lib
+import execution_runner as execution_runner_lib
+from data_models import settings as settings_lib
 
 app = flask.Flask(__name__)
 

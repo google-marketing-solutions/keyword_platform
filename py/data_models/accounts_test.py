@@ -16,7 +16,7 @@
 
 from absl.testing import absltest
 from absl.testing import parameterized
-from ..data_models import accounts as accounts_lib
+from data_models import accounts as accounts_lib
 
 # TODO()
 _GOOGLE_ADS_RESPONSE = [{

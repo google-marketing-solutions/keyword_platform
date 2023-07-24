@@ -16,7 +16,7 @@
 
 import requests
 import requests_mock
-from ..common import api_utils
+from common import api_utils
 from absl.testing import absltest
 from absl.testing import parameterized
 

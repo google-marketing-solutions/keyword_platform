@@ -19,9 +19,9 @@ from unittest import mock
 import pandas as pd
 
 from absl.testing import absltest
-from ..common import api_utils
-from ..common import cloud_translation_client as cloud_translation_client_lib
-from ..data_models import translation_frame as translation_frame_lib
+from common import api_utils
+from common import cloud_translation_client as cloud_translation_client_lib
+from data_models import translation_frame as translation_frame_lib
 
 
 class CloudTranslationClientTest(absltest.TestCase):

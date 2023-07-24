@@ -19,10 +19,10 @@ import abc
 
 from absl import logging
 
-from ..common import cloud_translation_client as cloud_translation_client_lib
-from ..data_models import google_ads_objects as google_ads_objects_lib
-from ..data_models import settings as settings_lib
-from ..workers import worker_result
+from common import cloud_translation_client as cloud_translation_client_lib
+from data_models import google_ads_objects as google_ads_objects_lib
+from data_models import settings as settings_lib
+from workers import worker_result
 
 
 class WorkerError(Exception):

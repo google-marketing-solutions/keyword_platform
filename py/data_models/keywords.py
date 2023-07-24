@@ -23,7 +23,7 @@ from typing import Any
 from absl import logging
 import pandas as pd
 
-from ..data_models import translation_frame as translation_frame_lib
+from data_models import translation_frame as translation_frame_lib
 
 ACTION = 'Action'
 CUSTOMER_ID = 'Customer ID'
