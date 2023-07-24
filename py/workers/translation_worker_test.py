@@ -190,6 +190,7 @@ _EXPECTED_ADS_DF = pd.DataFrame(
             'Analytics Test Campaign (es)',
         ],
         'Ad group': ['Ad group 1 (es)', 'Ad group 1 (es)'],
+        'Ad type': ['Responsive search ad', 'Responsive search ad'],
         'Headline 1': [
             'Inicio de sesión de correo electrónico',
             'Página web oficial',

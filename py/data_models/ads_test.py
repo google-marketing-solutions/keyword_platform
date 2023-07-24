@@ -131,6 +131,7 @@ _EXPECTED_DF = pd.DataFrame(
         'Ad status': ['Paused', 'Paused'],
         'Campaign': ['Gmail Test Campaign', 'Analytics Test Campaign'],
         'Ad group': ['Ad group 1', 'Ad group 1'],
+        'Ad type': ['Responsive search ad', 'Responsive search ad'],
         'Headline 1': ['Email Login', 'Official Website'],
         'Original Headline 1': ['Email Login', 'Official Website'],
         'Headline 2': ['Online Email', 'Official Site'],
@@ -191,7 +192,7 @@ _EXPECTED_DF = pd.DataFrame(
 )
 
 _EXPECTED_CSV_DATA = (
-    'Action,Customer ID,Ad status,Campaign,Ad group,Headline 1,Original'
+    'Action,Customer ID,Ad status,Campaign,Ad group,Ad type,Headline 1,Original'
     ' Headline 1,Headline 2,Original Headline 2,Headline 3,Original Headline'
     ' 3,Headline 4,Original Headline 4,Headline 5,Original Headline 5,Headline'
     ' 6,Original Headline 6,Headline 7,Original Headline 7,Headline 8,Original'
@@ -202,15 +203,16 @@ _EXPECTED_CSV_DATA = (
     ' 1,Description 2,Original Description 2,Description 3,Original Description'
     ' 3,Description 4,Original Description 4,Final URL,Label,Updates'
     ' applied\nAdd,Enter customer ID,Paused,Gmail Test Campaign,Ad group'
-    ' 1,Email Login,Email Login,Online Email,Online Email,Sign in,Sign'
-    ' in,,,,,,,,,,,,,,,,,,,,,,,,,"Email thats intuitive, efficient, and'
-    ' useful","Email thats intuitive, efficient, and useful","15 GB of storage,'
-    ' less spam, and mobile access","15 GB of storage, less spam, and mobile'
-    ' access",,,,,https://mail.google.com/,Keyword Translator,[]\nAdd,Enter'
-    ' customer ID,Paused,Analytics Test Campaign,Ad group 1,Official'
-    ' Website,Official Website,Official Site,Official Site,High Quality'
-    ' Products,High Quality Products,,,,,,,,,,,,,,,,,,,,,,,,,Google'
-    ' Analytics,Google Analytics,Try Analytics today!,Try Analytics'
+    ' 1,Responsive search ad,Email Login,Email Login,Online Email,Online'
+    ' Email,Sign in,Sign in,,,,,,,,,,,,,,,,,,,,,,,,,"Email thats intuitive,'
+    ' efficient, and useful","Email thats intuitive, efficient, and useful","15'
+    ' GB of storage, less spam, and mobile access","15 GB of storage, less'
+    ' spam, and mobile access",,,,,https://mail.google.com/,Keyword'
+    ' Translator,[]\nAdd,Enter customer ID,Paused,Analytics Test Campaign,Ad'
+    ' group 1,Responsive search ad,Official Website,Official Website,Official'
+    ' Site,Official Site,High Quality Products,High Quality'
+    ' Products,,,,,,,,,,,,,,,,,,,,,,,,,Google Analytics,Google Analytics,Try'
+    ' Analytics today!,Try Analytics'
     ' today!,,,,,http://analytics.google.com,Keyword Translator,[]\n'
 )
 
@@ -221,6 +223,7 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame(
         'Ad status': ['Paused', 'Paused'],
         'Campaign': ['Gmail Test Campaign', 'Analytics Test Campaign'],
         'Ad group': ['Ad group 1', 'Ad group 1'],
+        'Ad type': ['Responsive search ad', 'Responsive search ad'],
         'Headline 1': ['Email Login', 'Official Website'],
         'Original Headline 1': ['Email Login', 'Official Website'],
         'Headline 2': ['Online Email', 'Official Site'],
@@ -290,6 +293,7 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame(
             'Analytics Test Campaign (es)',
         ],
         'Ad group': ['Ad group 1 (es)', 'Ad group 1 (es)'],
+        'Ad type': ['Responsive search ad', 'Responsive search ad'],
         'Headline 1': ['Email Login', 'Official Website'],
         'Original Headline 1': ['Email Login', 'Official Website'],
         'Headline 2': ['Online Email', 'Official Site'],
@@ -356,6 +360,7 @@ _EXPECTED_DF_EMPTY = pd.DataFrame(
         'Ad status': pd.Series([], dtype='object'),
         'Campaign': pd.Series([], dtype='object'),
         'Ad group': pd.Series([], dtype='object'),
+        'Ad type': pd.Series([], dtype='object'),
         'Headline 1': pd.Series([], dtype='object'),
         'Original Headline 1': pd.Series([], dtype='object'),
         'Headline 2': pd.Series([], dtype='object'),
@@ -401,7 +406,7 @@ _EXPECTED_DF_EMPTY = pd.DataFrame(
 )
 
 _EXPECTED_CSV_DATA_EMPTY = (
-    'Action,Customer ID,Ad status,Campaign,Ad group,Headline 1,Original'
+    'Action,Customer ID,Ad status,Campaign,Ad group,Ad type,Headline 1,Original'
     ' Headline 1,Headline 2,Original Headline 2,Headline 3,Original Headline'
     ' 3,Headline 4,Original Headline 4,Headline 5,Original Headline 5,Headline'
     ' 6,Original Headline 6,Headline 7,Original Headline 7,Headline 8,Original'
@@ -420,6 +425,7 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame(
         'Ad status': ['Paused', 'Paused'],
         'Campaign': ['Gmail Test Campaign', 'Analytics Test Campaign'],
         'Ad group': ['Ad group 1', 'Ad group 1'],
+        'Ad type': ['Responsive search ad', 'Responsive search ad'],
         'Headline 1': ['E-Mail-Login', 'Offizielle Website'],
         'Original Headline 1': ['Email Login', 'Official Website'],
         'Headline 2': ['Online-E-Mail', 'Offizielle Seite'],
@@ -489,6 +495,7 @@ _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame(
             'Analytics Test Campaign (de)',
         ],
         'Ad group': ['Ad group 1 (de)', 'Ad group 1 (de)'],
+        'Ad type': ['Responsive search ad', 'Responsive search ad'],
         'Headline 1': ['E-Mail-Login', 'Offizielle Website'],
         'Original Headline 1': ['Email Login', 'Official Website'],
         'Headline 2': ['Online-E-Mail', 'Offizielle Seite'],
@@ -613,6 +620,7 @@ class AdsTest(parameterized.TestCase):
         'Ad status',
         'Campaign',
         'Ad group',
+        'Ad type',
         'Headline 1',
         'Original Headline 1',
         'Headline 2',

@@ -32,6 +32,7 @@ CUSTOMER_ID = 'Customer ID'
 AD_STATUS = 'Ad status'
 CAMPAIGN = 'Campaign'
 AD_GROUP = 'Ad group'
+AD_TYPE = 'Ad type'
 HEADLINE_1 = 'Headline 1'
 ORIGINAL_HEADLINE_1 = 'Original Headline 1'
 HEADLINE_2 = 'Headline 2'
@@ -80,6 +81,7 @@ _COLS = [
     AD_STATUS,
     CAMPAIGN,  # Campaign name
     AD_GROUP,  # Ad group name
+    AD_TYPE,
     HEADLINE_1,
     ORIGINAL_HEADLINE_1,
     HEADLINE_2,
@@ -126,6 +128,7 @@ _COLS = [
 _DEFAULT_ACTION = 'Add'
 _DEFAULT_CUSTOMER_ID = 'Enter customer ID'
 _DEFAULT_STATUS = 'Paused'
+_DEFAULT_AD_TYPE = 'Responsive search ad'
 _DEFAULT_LABEL = 'Keyword Translator'
 
 _NUM_HEADLINES = 15
@@ -201,6 +204,7 @@ class Ads:
               ACTION: _DEFAULT_ACTION,
               CUSTOMER_ID: _DEFAULT_CUSTOMER_ID,
               AD_STATUS: _DEFAULT_STATUS,
+              AD_TYPE: _DEFAULT_AD_TYPE,
               CAMPAIGN: result['campaign']['name'],
               AD_GROUP: result['adGroup']['name'],
           }
