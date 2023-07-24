@@ -1,9 +1,27 @@
 {
   "name": "keyword-platform",
+  "env": {
+    "BACKEND_SERVICE_NAME": {
+        "description": "Set the backend service name.",
+        "value": "keyword-platform-backend",
+        "required": false
+    },
+    "FRONTEND_SERVICE_NAME": {
+        "description": "Set the frontend service name.",
+        "value": "keyword-platform-frontend"
+    },
+    "BUCKET_NAME": {
+      "description": "Set a name for the bucket.",
+      "value": "keyword-platform"
+  }
+},
   "options": {
     "allow-unauthenticated": true,
     "memory": "2048Mi",
     "cpu": "4"
+  },
+  "build": {
+    "skip": true
   },
   "hooks": {
       "prebuild": {

@@ -12,46 +12,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-APPLICATION_TITLE="keyword-platform"
-DISPLAY_NAME="keyword-platform-web"
+#######################################
+# Adds secret to secret manager and grants backend access.
+# Globals:
+#   SECRET
+#   BACKEND_SERVICE_NAME
+#   GOOGLE_CLOUD_PROJECT
+# Arguments:
+#   None
+#######################################
+add_secret() {
+    printf '%s' "Enter a value for $SECRET :"
+    local input
+    read -r input
+    gcloud secrets create "$SECRET" --replication-policy=automatic
+    gcloud secrets versions add "$SECRET" --data-file=<(echo ${input})
+    sleep 1
+    gcloud secrets add-iam-policy-binding $SECRET \
+    --member="serviceAccount:${BACKEND_SERVICE_NAME}-identity@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com" \
+    --role="roles/secretmanager.secretAccessor"
+    echo "$SECRET has been successfully added."
+}
 
-echo "Please log in."
-gcloud auth login --no-launch-browser --brief
+echo "Adding required secrets to Secret Manager..."
 
-account=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")
-echo "Account is set to: $account"
+REQUIRED_SECRETS=(
+    client_id
+    client_secret
+    login_customer_id
+    refresh_token
+    developer_token
+)
 
-if [ "$(gcloud iap oauth-brands list --format="value(name)")" == "" ]; then
-    echo "The project does not have an oAuth Consent screen configured."
-    echo "Creating oAuth Consent screen."
-    oauth_brand=$(gcloud iap oauth-brands create --application_title=${APPLICATION_TITLE} --support_email=${account})
-else
-    oauth_brand=$(gcloud iap oauth-brands list --format="value(name)")
-    echo "Using existing oAuth consent screen: $oauth_brand"
+EXISTING_SECRETS=$(gcloud secrets list)
 
-echo "Creating dedicated web application oAuth2.0 client..."
-
-if [ "$(gcloud iap oauth-clients list $oauth_brand --filter="displayName:${DISPLAY_NAME}")" != "" ]; then
-    echo "Found existing oAuth client with name: ${DISPLAY_NAME}."
-    output=$(gcloud iap oauth-clients list ${oauth_brand} --filter="displayName:${DISPLAY_NAME}" --format="value(name,secret)")
-else
-    echo "Creating new oAuth client with name: ${DISPLAY_NAME}"
-    output=$(gcloud iap oauth-clients create  $oauth_brand --display_name=${DISPLAY_NAME} --format="value(name,secret)")
-
-client_id=$(echo "$output" | awk -F'/' '{print $NF}')
-echo "Client ID: $client_id"
-client_secret=$(echo "$output" | awk '{print $2}')
-echo "Client Secret: $client_secret"
-
-echo "Starting Google Ads authentication..."
-
-echo "Enter the a Google Ads Login Customer Id."
-read -p "Login Customer Id: " login_customer_id
-
-echo "Enter the a Google Ads developer token."
-read -p "Developer Token: " developer_token
-
-# TODO(): Go through Google Ads oAuth2 flow here.
-
-echo "Setting Cloud Run environment variables..."
-gcloud run services update keyword-platfrm --update-env-vars bucket_name=${GOOGLE_CLOUD_PROJECT}-keyword_factory --region=${GOOGLE_CLOUD_REGION}
+for SECRET in "${REQUIRED_SECRETS[@]}"
+do
+  if echo "$EXISTING_SECRETS" | grep -q "$SECRET"
+  then
+    printf '%s' "$SECRET already exists. Do you want to add a new value for it? [Y/n]:"
+    local input
+    read -r input
+    if [[ ${input} == 'n' || ${input} == 'N' ]]; then
+        gcloud secrets add-iam-policy-binding $SECRET \
+        --member="serviceAccount:${BACKEND_SERVICE_NAME}-identity@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com" \
+        --role="roles/secretmanager.secretAccessor"
+    else
+        gcloud --quiet secrets delete $SECRET
+        add_secret
+  else
+    add_secret
+  fi
+done

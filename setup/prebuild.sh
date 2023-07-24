@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-project_number=$(gcloud projects list --filter="$(gcloud config get-value project)" --format="value(PROJECT_NUMBER)")
-service_account_email="${project_number}-compute@developer.gserviceaccount.com"
+bucket_name="${GOOGLE_CLOUD_PROJECT}-${BUCKET_NAME}"
 
 echo "Setting Project ID: ${GOOGLE_CLOUD_PROJECT}"
 gcloud config set project ${GOOGLE_CLOUD_PROJECT}
@@ -45,7 +43,45 @@ do
 done
 
 echo "Creating cloud storage bucket..."
-gcloud alpha storage buckets create gs://${GOOGLE_CLOUD_PROJECT}-keyword-platform --project=${GOOGLE_CLOUD_PROJECT}
+gcloud alpha storage buckets create gs://${bucket_name} \
+--project=${GOOGLE_CLOUD_PROJECT}
 
-echo "Granting ${service_account_email} token creator access..."
-gcloud iam service-accounts add-iam-policy-binding $service_account_email --role="roles/iam.serviceAccountTokenCreator" --member="serviceAccount:$service_account_email"
+echo "Building backend service."
+gcloud builds submit ./py \
+--tag gcr.io/${GOOGLE_CLOUD_PROJECT}/${BACKEND_SERVICE_NAME}
+
+echo "Creating backend service account."
+gcloud iam service-accounts create ${BACKEND_SERVICE_NAME}-identity
+
+echo "Deploying backend service..."
+gcloud run deploy $BACKEND_SERVICE_NAME \
+--image gcr.io/${GOOGLE_CLOUD_PROJECT}/${BACKEND_SERVICE_NAME} \
+--set-env-vars GCP_PROJECT=$GOOGLE_CLOUD_PROJECT,BUCKET_NAME=$bucket_name \
+--service-account ${BACKEND_SERVICE_NAME}-identity@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
+--no-allow-unauthenticated
+
+backend_url=$(gcloud run services describe $BACKEND_SERVICE_NAME \
+--format='value(status.url)' \
+--platform managed \
+--region ${GOOGLE_CLOUD_REGION})
+
+echo "Building frontend service..."
+gcloud builds submit ./ui \
+--tag gcr.io/${GOOGLE_CLOUD_PROJECT}/${FRONTEND_SERVICE_NAME}
+
+echo "Creating frontend service account."
+gcloud iam service-accounts create ${FRONTEND_SERVICE_NAME}-identity
+
+gcloud run services add-iam-policy-binding $BACKEND_SERVICE_NAME \
+--member serviceAccount:${FRONTEND_SERVICE_NAME}-identity@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
+--role roles/run.invoker
+
+echo "Deploying frontend service..."
+gcloud run deploy $FRONTEND_SERVICE_NAME \
+--image gcr.io/${GOOGLE_CLOUD_PROJECT}/${FRONTEND_SERVICE_NAME} \
+--service-account ${FRONTEND_SERVICE_NAME}-identity@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
+--set-env-vars BACKEND_URL=$backend_url \
+--region ${GOOGLE_CLOUD_REGION} \
+--allow-unauthenticated
+
+echo "Frontend and Backend deployed successfully."
