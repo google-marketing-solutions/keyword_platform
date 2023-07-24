@@ -18,11 +18,13 @@ import logging
 import os
 
 import flask
+import flask_cors
 
 import execution_runner as execution_runner_lib
 from data_models import settings as settings_lib
 
 app = flask.Flask(__name__)
+flask_cors.CORS(app)
 
 
 @app.route('/run', methods=['POST'])
