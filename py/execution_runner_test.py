@@ -139,6 +139,9 @@ class ExecutionRunnerTest(absltest.TestCase):
     self.enter_context(
         mock.patch.dict(os.environ, {'GCP_PROJECT': 'fake_gcp_project'})
     )
+    self.enter_context(
+        mock.patch.dict(os.environ, {'BUCKET_NAME': 'fake_bucket_name'})
+    )
     self.mock_storage_client = self.enter_context(
         mock.patch.object(storage_client, 'StorageClient', autospec=True)
     )
