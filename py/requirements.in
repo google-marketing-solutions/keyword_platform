@@ -1,0 +1,11 @@
+absl-py
+flask
+Flask-Cors
+google-cloud
+google-cloud-secret-manager
+google-cloud-storage
+google-cloud-logging
+gunicorn
+httplib2
+pandas
+requests
