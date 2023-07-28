@@ -44,7 +44,7 @@ done
 
 echo "Creating cloud storage bucket..."
 if [$(gsutil -q stat gs://${bucket_name}) == 0]
-then 
+then
   gcloud alpha storage buckets create gs://${bucket_name} \
   --project=${GOOGLE_CLOUD_PROJECT}
 else
@@ -69,7 +69,7 @@ gcloud iam service-accounts create ${BACKEND_SERVICE_NAME}-sa
 echo "Deploying backend service..."
 gcloud run deploy $BACKEND_SERVICE_NAME \
 --image gcr.io/${GOOGLE_CLOUD_PROJECT}/${BACKEND_SERVICE_NAME} \
---set-env-vars GCP_PROJECT=$GOOGLE_CLOUD_PROJECT,BUCKET_NAME=$bucket_name \
+--set-env-vars GCP_PROJECT=${GOOGLE_CLOUD_PROJECT},BUCKET_NAME=${bucket_name} \
 --service-account ${BACKEND_SERVICE_NAME}-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
 --region ${GOOGLE_CLOUD_REGION} \
 --no-allow-unauthenticated
@@ -88,13 +88,14 @@ gcloud iam service-accounts create ${FRONTEND_SERVICE_NAME}-sa
 
 gcloud run services add-iam-policy-binding $BACKEND_SERVICE_NAME \
 --member serviceAccount:${FRONTEND_SERVICE_NAME}-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
---role roles/run.invoker
+--role roles/run.invoker \
+--region $GOOGLE_CLOUD_REGION
 
 echo "Deploying frontend service..."
 gcloud run deploy $FRONTEND_SERVICE_NAME \
 --image gcr.io/${GOOGLE_CLOUD_PROJECT}/${FRONTEND_SERVICE_NAME} \
 --service-account ${FRONTEND_SERVICE_NAME}-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
---set-env-vars BACKEND_URL=$backend_url \
+--set-env-vars BACKEND_URL=${backend_url} \
 --region ${GOOGLE_CLOUD_REGION} \
 --allow-unauthenticated
 
