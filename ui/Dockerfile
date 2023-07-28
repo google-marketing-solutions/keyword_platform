@@ -12,34 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-##
-# Base stage
-#
-FROM node:16.16 AS base
+FROM node:16.16 AS builder
 
 WORKDIR /app
 
+# Install angular dependencies.
 COPY package.json /app/package.json
 RUN npm install
 
-COPY . /app
+COPY . .
 
-##
-# Development stage
-#
-FROM base AS dev
-CMD npm run start -- --watch --hmr --live-reload --host 0.0.0.0 --port $PORT
-
-##
-# Builder stage
-#
-FROM base AS builder
+# Build static files.
 RUN npm run build -- -c production
 
-##
-# Production stage
-#
-FROM nginx:stable AS prod
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED True
+
+# Install production dependencies.
+RUN cd py && pip install --require-hashes --no-cache-dir -r requirements.txt && cd ..
+
+# Copy static files to root.
 COPY --from=builder /app/dist/ /var/www
-COPY ./nginx.conf /etc/nginx/conf.d/configfile.template
-CMD sh -c "envsubst '\$PORT,\$APP_TITLE' < /etc/nginx/conf.d/configfile.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+
+# Run the web service on container startup. Here we use the gunicorn
+# web server, with one worker process and 8 threads.
+# For environments with multiple CPU cores, increase the number of workers
+# to be equal to the cores available.
+# Timeout is set to 0 to disable the timeouts of the workers to allow Cloud Run to handle instance scaling.
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 --chdir $APP_HOME/py main:app
+EXPOSE $PORT
