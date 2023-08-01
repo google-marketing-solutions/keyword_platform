@@ -37,13 +37,14 @@ export class RunService {
         'campaigns': campaignIds.join(','),
         'source_language_code': sourceLanguageCode,
         'target_language_codes': targetLanguageCode,
-        'workers_to_run': workers.join(',')
+        'workers_to_run': workers.join(','),
+        'endpoint': 'run'
       }
     });
     return this.http
         .get<Output>(
             (window.location.hostname === 'localhost' ? './test-api/run.json' :
-                                                        './run'),
+                                                        './proxy'),
             {
               headers: new HttpHeaders({'Content-Type': 'application/json'}),
               observe: 'response',

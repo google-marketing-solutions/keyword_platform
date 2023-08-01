@@ -32,12 +32,15 @@ export class GoogleAdsService {
   constructor(private readonly http: HttpClient) {}
 
   getAccounts(): Observable<HttpResponse<GoogleAds[]>> {
+    const params =
+        new HttpParams({fromObject: {'endpoint': 'accessible_accounts'}});
     return this.http
         .get<GoogleAds[]>(
             this.getHost('accessible_accounts'),
             {
               headers: this.getHeader(),
               observe: 'response',
+              params,
               responseType: 'json'
             },
             )
@@ -45,12 +48,15 @@ export class GoogleAdsService {
   }
 
   getCampaigns(accountIds: string[]): Observable<HttpResponse<GoogleAds[]>> {
+    const params = new HttpParams({
+      fromObject:
+          {'selected_accounts': accountIds.join(','), 'endpoint': 'campaigns'}
+    });
     return this.http
         .get<GoogleAds[]>(this.getHost('campaigns'), {
           headers: this.getHeader(),
           observe: 'response',
-          params:
-              new HttpParams().set('selected_accounts', accountIds.join(',')),
+          params,
           responseType: 'json'
         })
         .pipe(map(response => response), catchError(this.handleError));
@@ -60,7 +66,7 @@ export class GoogleAdsService {
     return (
         window.location.hostname === 'localhost' ?
             './test-api/' + api + '.json' :
-            './' + api);
+            './proxy');
   }
 
   private getHeader() {
