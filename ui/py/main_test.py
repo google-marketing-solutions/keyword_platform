@@ -14,9 +14,13 @@
 
 """Tests for main."""
 
+import http
+import os
 from unittest import mock
+import urllib
 
 import flask
+import google.oauth2.id_token
 
 from absl.testing import absltest
 from keyword_platform.ui.py import main
@@ -45,6 +49,30 @@ class MainTest(absltest.TestCase):
     actual_favicon = main.favicon()
 
     self.assertEqual(expected_favicon, actual_favicon)
+
+  @mock.patch.dict(os.environ, {'BACKEND_URL': 'https://fake-url.a.run.app'})
+  @mock.patch.object(google.oauth2.id_token, 'fetch_id_token', autospec=True)
+  @mock.patch.object(urllib.request, 'urlopen', autospec=True)
+  def test_proxy(self, mock_urlopen, mock_fetch_id_token):
+    fake_id_token = '12345'
+    mock_fetch_id_token.return_value = fake_id_token
+    mock_urlopen.return_value = 'fake_response'
+
+    expected_response = 'fake_response'
+    expected_full_url = (
+        'https://fake-url.a.run.app/run?endpoint=run&campaign_ids=123')
+    expected_auth_header = 'Bearer 12345'
+
+    actual_response = main.app.test_client().get(
+        '/proxy?endpoint=run&campaign_ids=123')
+
+    request_arg = mock_urlopen.call_args_list[0][0][0]
+    actual_full_url = request_arg.full_url
+    actual_auth_header = request_arg.headers['Authorization']
+
+    self.assertEqual(expected_full_url, actual_full_url)
+    self.assertEqual(expected_auth_header, actual_auth_header)
+    self.assertEqual(expected_response, actual_response.data.decode('utf-8'))
 
 
 if __name__ == "__main__":

@@ -19,10 +19,20 @@ container-to-container communication in Cloud Run. This lightweight server
 serves static web content, and attaches authorization headers to requests to the
 backend container.
 """
+
 import os
+import urllib
 
 import flask
 import flask_cors
+import google.auth.transport.requests
+import google.oauth2.id_token
+
+
+# The name of the environment variable containing the URL of the backend
+# Cloud Run Python container.
+_BACKEND_URL_ENV_VAR = 'BACKEND_URL'
+
 
 app = flask.Flask(
     __name__,
@@ -45,6 +55,23 @@ def favicon() -> flask.Response:
   return flask.send_from_directory(
       '/var/www', 'favicon.ico', mimetype='image/vnd.microsoft.icon'
   )
+
+
+@app.route('/proxy', methods=['POST', 'GET'])
+def proxy() -> flask.Response:
+  """Makes a secure request to the backend Python container."""
+
+  # Gets the id token to make a secure request.
+  auth_request = google.auth.transport.requests.Request()
+  url = os.environ.get(_BACKEND_URL_ENV_VAR)
+  id_token = google.oauth2.id_token.fetch_id_token(auth_request, url)
+
+  # Makes the request to the backend container endpoint.
+  endpoint = flask.request.args.get('endpoint')
+  params = urllib.parse.urlencode(flask.request.args)
+  request = urllib.request.Request(f'{url}/{endpoint}?{params}')
+  request.add_header('Authorization', f'Bearer {id_token}')
+  return urllib.request.urlopen(request)
 
 
 if __name__ == '__main__':
