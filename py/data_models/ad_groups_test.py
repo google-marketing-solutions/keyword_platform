@@ -243,7 +243,7 @@ class AdGroupsTest(parameterized.TestCase):
     ad_groups = ad_groups_lib.AdGroups(google_ads_api_response)
     actual_df = ad_groups.df()
 
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         actual_df, expected_df, check_index_type=False)
 
   @parameterized.named_parameters(
@@ -279,7 +279,7 @@ class AdGroupsTest(parameterized.TestCase):
     ad_groups.add_update(update='Translated')
     actual_df = ad_groups.df()
 
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         actual_df, expected_df, check_index_type=False)
 
   def test_columns(self):
@@ -313,7 +313,7 @@ class AdGroupsTest(parameterized.TestCase):
     ad_groups.add_ad_group_suffix(suffix='(es)')
     actual_df = ad_groups.df()
 
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         actual_df, expected_df, check_index_type=False)
 
 

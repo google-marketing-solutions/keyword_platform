@@ -124,7 +124,7 @@ class CloudTranslationClientTest(absltest.TestCase):
     actual_translated_df = translation_frame.df()
 
     # Asserts expected translations added to translation frame
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         expected_translated_df, actual_translated_df, check_index_type=False)
 
     # Asserts mock calls (covering batching logic)

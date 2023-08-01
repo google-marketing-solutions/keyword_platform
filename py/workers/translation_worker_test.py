@@ -319,13 +319,13 @@ class TranslationWorkerTest(absltest.TestCase):
     # Asserts keywords translated
     actual_keywords_df = google_ads_objects.keywords.df()
 
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         actual_keywords_df, _EXPECTED_KEYWORDS_DF, check_index_type=False)
 
     # Asserts ads translated
     actual_ads_df = google_ads_objects.ads.df()
 
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         actual_ads_df, _EXPECTED_ADS_DF, check_index_type=False)
 
   def test_execute_empty_objects_returns_failure(self):

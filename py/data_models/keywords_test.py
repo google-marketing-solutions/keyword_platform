@@ -182,7 +182,7 @@ class KeywordsTest(parameterized.TestCase):
     keywords = keywords_lib.Keywords(google_ads_api_response)
     actual_df = keywords.df()
 
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         actual_df, expected_df, check_index_type=False)
 
   @parameterized.named_parameters(
@@ -218,7 +218,7 @@ class KeywordsTest(parameterized.TestCase):
     keywords.add_update(update='Translated')
     actual_df = keywords.df()
 
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         actual_df, expected_df, check_index_type=False)
 
   def test_columns(self):
@@ -263,7 +263,7 @@ class KeywordsTest(parameterized.TestCase):
     keywords.add_ad_group_suffix(suffix='(es)')
     actual_df = keywords.df()
 
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         actual_df, expected_df, check_index_type=False)
 
   def test_get_translation_frame(self):
@@ -277,7 +277,7 @@ class KeywordsTest(parameterized.TestCase):
     keywords = keywords_lib.Keywords(_GOOGLE_ADS_RESPONSE)
     actual_df = keywords.get_translation_frame().df()
 
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         actual_df, expected_df, check_index_type=False)
 
   @parameterized.named_parameters(
@@ -309,7 +309,7 @@ class KeywordsTest(parameterized.TestCase):
         update_ad_group_and_campaign_names=update_ad_group_and_campaign_names)
     actual_df = keywords.df()
 
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         actual_df, expected_df, check_index_type=False)
 
 

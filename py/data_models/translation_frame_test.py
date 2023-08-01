@@ -50,7 +50,7 @@ class TranslationFrameTest(parameterized.TestCase):
 
     actual_df = translation_frame.df()
 
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         actual_df, expected_df, check_index_type=False)
 
   def test_size(self):
@@ -80,7 +80,7 @@ class TranslationFrameTest(parameterized.TestCase):
 
     actual_df = translation_frame.df()
 
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         actual_df, expected_df, check_index_type=False)
 
   def test_get_term_batch(self):

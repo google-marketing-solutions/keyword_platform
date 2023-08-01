@@ -170,7 +170,7 @@ class CampaignsTest(parameterized.TestCase):
     campaigns = campaigns_lib.Campaigns(google_ads_api_response)
     actual_df = campaigns.df()
 
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         actual_df, expected_df, check_index_type=False)
 
   @parameterized.named_parameters(
@@ -224,7 +224,7 @@ class CampaignsTest(parameterized.TestCase):
     campaigns.add_update(update='Translated')
     actual_df = campaigns.df()
 
-    pd.util.testing.assert_frame_equal(
+    pd.testing.assert_frame_equal(
         actual_df, expected_df, check_index_type=False)
 
   def test_columns(self):
