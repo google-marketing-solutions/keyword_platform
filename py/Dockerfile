@@ -23,7 +23,8 @@ WORKDIR $APP_HOME
 COPY . ./
 
 # Install production dependencies.
-RUN pip install --require-hashes --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip
+RUN pip install --require-hashes --no-cache-dir --no-deps -r requirements.txt
 
 # Run the web service on container startup. Here we use the gunicorn
 # webserver, with one worker process and 8 threads.
