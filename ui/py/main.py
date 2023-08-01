@@ -12,7 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Frontend server for static angular files."""
+"""Frontend server for serving static files and proxying secure requests.
+
+Requests to the backend container must be authenticated to enable secure
+container-to-container communication in Cloud Run. This lightweight server
+serves static web content, and attaches authorization headers to requests to the
+backend container.
+"""
 import os
 
 import flask
@@ -28,12 +34,14 @@ flask_cors.CORS(app)
 
 
 @app.route('/')
-def index():
+def index() -> flask.Response:
+  """Serves the main Angular page."""
   return flask.send_from_directory('/var/www', 'index.html')
 
 
 @app.route('/favicon.ico')
-def favicon():
+def favicon() -> flask.Response:
+  """Serves the favicon."""
   return flask.send_from_directory(
       '/var/www', 'favicon.ico', mimetype='image/vnd.microsoft.icon'
   )
