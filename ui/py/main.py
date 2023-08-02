@@ -20,6 +20,7 @@ serves static web content, and attaches authorization headers to requests to the
 backend container.
 """
 
+import logging
 import os
 import urllib
 
@@ -60,17 +61,25 @@ def favicon() -> flask.Response:
 @app.route('/proxy', methods=['POST', 'GET'])
 def proxy() -> flask.Response:
   """Makes a secure request to the backend Python container."""
+  logging.info('Received proxy request')
 
   # Gets the id token to make a secure request.
   auth_request = google.auth.transport.requests.Request()
   url = os.environ.get(_BACKEND_URL_ENV_VAR)
   id_token = google.oauth2.id_token.fetch_id_token(auth_request, url)
 
+  if id_token:
+    logging.info('Got id_token for %s', url)
+  else:
+    logging.warning('Failed to get id_token for %s', url)
+
   # Makes the request to the backend container endpoint.
   endpoint = flask.request.args.get('endpoint')
   params = urllib.parse.urlencode(flask.request.args)
   request = urllib.request.Request(f'{url}/{endpoint}?{params}')
+  logging.info('Making request: %s', request)
   request.add_header('Authorization', f'Bearer {id_token}')
+
   return urllib.request.urlopen(request)
 
 
