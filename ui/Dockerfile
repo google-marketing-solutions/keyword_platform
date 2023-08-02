@@ -20,7 +20,7 @@ WORKDIR /app
 COPY package.json /app/package.json
 RUN npm install
 
-COPY . .
+COPY . ./
 
 # Build static files.
 RUN npm run build -- -c production
@@ -29,8 +29,11 @@ FROM python:3.11-slim
 
 ENV PYTHONUNBUFFERED True
 
+WORKDIR /app
+
+COPY ./py ./py/
 # Install production dependencies.
-RUN cd py && pip install --require-hashes --no-cache-dir -r requirements.txt && cd ..
+RUN cd ./py && pip install --require-hashes --no-cache-dir --no-deps -r requirements.txt && cd ..
 
 # Copy static files to root.
 COPY --from=builder /app/dist/ /var/www
