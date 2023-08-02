@@ -1,2 +1,7 @@
+absl-py
 flask
 Flask-Cors
+google-cloud-logging
+gunicorn
+google-auth
+requests
