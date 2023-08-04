@@ -1,22 +1,33 @@
 {
   "name": "keyword-platform",
   "env": {
-    "BACKEND_SERVICE_NAME": {
-        "description": "Set the backend service name.",
-        "value": "keyword-platform-backend",
-        "required": false
+    "CLIENT_ID": {
+      "description": "OAuth2.0 Web Client ID."
     },
-    "FRONTEND_SERVICE_NAME": {
-        "description": "Set the frontend service name.",
-        "value": "keyword-platform-frontend"
+    "CLIENT_SECRET": {
+      "description": "OAuth2.0 Web Client Secret."
+    },
+    "LOGIN_CUSTOMER_ID": {
+      "description": "The Google Ads Login Customer Id."
+    },
+    "DEVELOPER_TOKEN": {
+      "description": "The Google Ads Developer Token."
+    },
+    "REFRESH_TOKEN": {
+      "description": "The OAuth2.0 refresh token.",
     },
     "BUCKET_NAME": {
       "description": "Set a name for the bucket.",
-      "value": "keyword-platform"
-  }
-},
+    },
+    "IAP_ALLOWED_USERS": {
+      "description": "Add a list of users, whom to grant access to the app. We recommend creating a Google Group and adding it here to manage access."
+    },
+    "IAP_SUPPORT_EMAIL": {
+      "description": "Set a support Email for the OAuth Consent screen. This will only be used in case it isn't configured, yet."
+    }
+  },
   "options": {
-    "allow-unauthenticated": true,
+    "allow-unauthenticated": false,
     "memory": "2048Mi",
     "cpu": "4"
   },
@@ -26,9 +37,6 @@
   "hooks": {
       "prebuild": {
         "commands": ["chmod 775 ./setup/prebuild.sh", "./setup/prebuild.sh"]
-      },
-      "postcreate": {
-          "commands": ["chmod 775 ./setup/postcreate.sh", "./setup/postcreate.sh"]
       }
   }
 }

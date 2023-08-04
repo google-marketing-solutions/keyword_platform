@@ -12,91 +12,118 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-bucket_name="${GOOGLE_CLOUD_PROJECT}-${BUCKET_NAME}"
+# This file is executed as part of the Cloud Run Deploy flow.
+#
+# Has to be run from the root directory e.g. `chmod -x && ./setup/prebuild.sh`.
+
+terraform_state_bucket_name="${GOOGLE_CLOUD_PROJECT}-bucket-tfstate"
+backend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform/backend"
+frontend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform/frontend"
+
+cat <<EOF
+Keyword Factory requires an OAuth2.0 client Id to have access to your Google
+Ads accounts. Next to your Google Ads Developer token and Login Customer ID
+(typically the MCC ID) you will need a Client ID, Client Secret and Refresh
+Token. Follow the instructions below to obtain them before proceeding.
+
+Click the link below to go to your projects Credentials
+page and hit '+ Create Credentials' to create an OAuth Client ID, choose Web
+Application and add https://developers.google.com/oauthplayground to the
+Authorized redirect URIs. Take note of the Client ID and Client Secret.
+
+Head to https://developers.google.com/oauthplayground and add the select the
+following scopes:
+
+  * https://www.googleapis.com/auth/cloud-platform
+  * https://www.googleapis.com/auth/cloud-translation
+  * https://www.googleapis.com/auth/adwords
+
+Hit the settings/configuration button on the top right and click the box to
+use your own credentials. Enter the Client ID and Client Secret. Close the
+configuration and hit 'Authorize'. Once you have gone through the process
+exchange the access for a refresh token and take note of it.
+EOF
+
+printf '%s' "Did you take note of the mentioned credentials? [Y/n]:"
+read -r input
+if [[ ${input} == 'n' || ${input} == 'N' ]] ; then
+  echo "Must confirm having credentials."
+  exit 1
+else
+  :
+fi
 
 echo "Setting Project ID: ${GOOGLE_CLOUD_PROJECT}"
 gcloud config set project ${GOOGLE_CLOUD_PROJECT}
 
-REQUIRED_SERVICES=(
-  cloudbuild.googleapis.com
-  logging.googleapis.com
-  secretmanager.googleapis.com
-  storage-component.googleapis.com
-  googleads.googleapis.com
-  translate.googleapis.com
-  artifactregistry.googleapis.com
-  iamcredentials.googleapis.com
-)
+# Enable the Cloud Storage API.
+gcloud services enable storage.googleapis.com
 
-echo "Enabling Cloud APIs if necessary..."
-ENABLED_SERVICES=$(gcloud services list)
-for SERVICE in "${REQUIRED_SERVICES[@]}"
-do
-  if echo "$ENABLED_SERVICES" | grep -q "$SERVICE"
-  then
-    echo "$SERVICE is already enabled."
-  else
-    gcloud services enable "$SERVICE" \
-      && echo "$SERVICE has been successfully enabled."
-    sleep 1
-  fi
-done
-
-echo "Creating cloud storage bucket..."
-if [$(gsutil -q stat gs://${bucket_name}) == 0]
-then
-  gcloud alpha storage buckets create gs://${bucket_name} \
-  --project=${GOOGLE_CLOUD_PROJECT}
+# Create a GCS bucket to store terraform state files.
+gsutil -q stat gs://${terraform_state_bucket_name}/*
+return_value=$?
+if [ $return_value != 0 ]; then
+  echo "${terraform_state_bucket_name} alredy exists. Re-using..."
 else
-  printf '%s' "${bucket_name} alredy exists, do you want to reuse it? [y/N]:"
-  local input
-  read -r input
-  if [[ ${input} == 'n' || ${input} == 'N' ]]; then
-  printf '%s' "Enter a new bucket name:"
-  local input
-  bucket_name=$input
-  gcloud alpha storage buckets create gs://${bucket_name} \
-  --project=${GOOGLE_CLOUD_PROJECT}
+  do
+  echo "Creating terraform state cloud storage bucket..." 
+  gcloud storage buckets create gs://${terraform_state_bucket_name} \
+    --project=${GOOGLE_CLOUD_PROJECT}
+  # Enable versioning.
+  gcloud storage buckets update gs://${terraform_state_bucket_name} \
+    --versioning
+  done
+fi
 
-
+# Build docker images.
 echo "Building backend service."
 gcloud builds submit ./py \
---tag gcr.io/${GOOGLE_CLOUD_PROJECT}/${BACKEND_SERVICE_NAME}
-
-echo "Creating backend service account."
-gcloud iam service-accounts create ${BACKEND_SERVICE_NAME}-sa
-
-echo "Deploying backend service..."
-gcloud run deploy $BACKEND_SERVICE_NAME \
---image gcr.io/${GOOGLE_CLOUD_PROJECT}/${BACKEND_SERVICE_NAME} \
---set-env-vars GCP_PROJECT=${GOOGLE_CLOUD_PROJECT},BUCKET_NAME=${bucket_name} \
---service-account ${BACKEND_SERVICE_NAME}-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
---region ${GOOGLE_CLOUD_REGION} \
---no-allow-unauthenticated
-
-backend_url=$(gcloud run services describe $BACKEND_SERVICE_NAME \
---format='value(status.url)' \
---platform managed \
---region ${GOOGLE_CLOUD_REGION})
+--tag $backend_image
 
 echo "Building frontend service..."
 gcloud builds submit ./ui \
---tag gcr.io/${GOOGLE_CLOUD_PROJECT}/${FRONTEND_SERVICE_NAME}
+--tag $frontend_image
 
-echo "Creating frontend service account."
-gcloud iam service-accounts create ${FRONTEND_SERVICE_NAME}-sa
+echo "SUCCESS: Frontend and Backend images built successfully."
 
-gcloud run services add-iam-policy-binding $BACKEND_SERVICE_NAME \
---member serviceAccount:${FRONTEND_SERVICE_NAME}-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
---role roles/run.invoker \
---region $GOOGLE_CLOUD_REGION
+# Check if there is an existing Consent Screen.
+oauth_brands=$(gcloud iap oauth-brands list)
 
-echo "Deploying frontend service..."
-gcloud run deploy $FRONTEND_SERVICE_NAME \
---image gcr.io/${GOOGLE_CLOUD_PROJECT}/${FRONTEND_SERVICE_NAME} \
---service-account ${FRONTEND_SERVICE_NAME}-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
---set-env-vars BACKEND_URL=${backend_url} \
---region ${GOOGLE_CLOUD_REGION} \
---allow-unauthenticated
+if [ $? -eq 0 ]; then
+  iap_brand_id=$(gcloud iap oauth-brands list --format="value(name)" | sed "s:.*/::")
+  support_email=$(gcloud iap oauth-brands list --format="value(supportEmail)")
+else
+  support_email=$IAP_SUPPORT_EMAIL
+  iap_brand_id="null"
+fi
 
-echo "Frontend and Backend deployed successfully."
+# Convert the list of iap allowed users to a terraform compatible list.
+allowed_users_tf_list=$(echo "$IAP_ALLOWED_USERS" | sed 's/\([^,]\+\)/"user:\1"/g' | sed 's/,/, /g' | sed 's/.*/[&]/')
+
+# Setup & Run Terraform.
+terraform -chdir=./terraform init \
+  -backend-config="bucket=$terraform_state_bucket_name" \
+  -get=true \
+  -upgrade
+
+terraform -chdir=./terraform plan \
+  -var "bucket_name=$BUCKET_NAME" \
+  -var "frontend_image=$frontend_image" \
+  -var "backend_image=$backend_image" \
+  -var "client_id=$CLIENT_ID" \
+  -var "client_secret=$CLIENT_SECRET" \
+  -var "developer_token=$DEVELOPER_TOKEN" \
+  -var "login_customer_id=$LOGIN_CUSTOMER_ID" \
+  -var "refresh_token=$REFRESH_TOKEN" \
+  -var "project_id=$GOOGLE_CLOUD_PROJECT" \
+  -var "region=$GOOGLE_CLOUD_REGION" \
+  -var "iap_allowed_users=$allowed_users_tf_list" \
+  -var "iap_support_email=$support_email" \
+  -var "iap_brand_id=$iap_brand_id" \
+  -out="/tmp/tfplan"
+
+terraform -chdir=./terraform apply -auto-approve "/tmp/tfplan"
+
+echo "-----------------------------------------------------"
+echo "Congrats! You successfully deployed Keyword Platform."
+echo "-----------------------------------------------------"
