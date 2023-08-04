@@ -122,8 +122,8 @@ def get_campaigns() -> flask.Response:
                   'campaigns: %s', exception)
     return flask.Response(
         status=http.HTTPStatus.INTERNAL_SERVER_ERROR,
-        content=('The server encountered and error and could not complete your '
-                 'request. Developers can check the logs for details.'))
+        response=('The server encountered and error and could not complete '
+                  'your request. Developers can check the logs for details.'))
 
   logging.info('Request complete: /campaigns')
 
