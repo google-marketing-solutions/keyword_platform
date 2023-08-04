@@ -14,7 +14,22 @@
 
 # This file is executed as part of the Cloud Run Deploy flow.
 #
-# Has to be run from the root directory e.g. `chmod -x && ./setup/prebuild.sh`.
+# Has to be run from the root directory e.g. `chmod -x && ./setup/prebuild.sh`
+# as part of a Cloud Run deployment hook and expects various environment
+# variables (see below).
+#
+# Globals:
+#   GOOGLE_CLOUD_PROJECT
+#   GOOGLE_CLOUD_REGION
+#   CLIENT_ID
+#   BUCKET_NAME
+#   CLIENT_ID
+#   CLIENT_SECRET
+#   DEVELOPER_TOKEN
+#   LOGIN_CUSTOMER_ID
+#   REFRESH_TOKEN
+#   IAP_ALLOWED_USERS
+#   IAP_SUPPORT_EMAIL
 
 terraform_state_bucket_name="${GOOGLE_CLOUD_PROJECT}-bucket-tfstate"
 backend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform/backend"
