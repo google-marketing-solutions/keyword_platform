@@ -80,14 +80,12 @@ return_value=$?
 if [ $return_value != 0 ]; then
   echo "${terraform_state_bucket_name} alredy exists. Re-using..."
 else
-  do
   echo "Creating terraform state cloud storage bucket..." 
   gcloud storage buckets create gs://${terraform_state_bucket_name} \
     --project=${GOOGLE_CLOUD_PROJECT}
   # Enable versioning.
   gcloud storage buckets update gs://${terraform_state_bucket_name} \
     --versioning
-  done
 fi
 
 # Build docker images.
