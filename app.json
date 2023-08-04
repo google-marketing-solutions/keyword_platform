@@ -14,10 +14,10 @@
       "description": "The Google Ads Developer Token."
     },
     "REFRESH_TOKEN": {
-      "description": "The OAuth2.0 refresh token.",
+      "description": "The OAuth2.0 refresh token."
     },
     "BUCKET_NAME": {
-      "description": "Set a name for the bucket.",
+      "description": "Set a name for the bucket."
     },
     "IAP_ALLOWED_USERS": {
       "description": "Add a list of users, whom to grant access to the app. We recommend creating a Google Group and adding it here to manage access."
