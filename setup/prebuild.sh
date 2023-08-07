@@ -35,40 +35,8 @@ terraform_state_bucket_name="${GOOGLE_CLOUD_PROJECT}-bucket-tfstate"
 backend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform/backend"
 frontend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform/frontend"
 
-cat <<EOF
-Keyword Factory requires an OAuth2.0 client Id to have access to your Google
-Ads accounts. Next to your Google Ads Developer token and Login Customer ID
-(typically the MCC ID) you will need a Client ID, Client Secret and Refresh
-Token. Follow the instructions below to obtain them before proceeding.
-
-Click the link below to go to your projects Credentials
-page and hit '+ Create Credentials' to create an OAuth Client ID, choose Web
-Application and add https://developers.google.com/oauthplayground to the
-Authorized redirect URIs. Take note of the Client ID and Client Secret.
-
-Head to https://developers.google.com/oauthplayground and add the select the
-following scopes:
-
-  * https://www.googleapis.com/auth/cloud-platform
-  * https://www.googleapis.com/auth/cloud-translation
-  * https://www.googleapis.com/auth/adwords
-
-Hit the settings/configuration button on the top right and click the box to
-use your own credentials. Enter the Client ID and Client Secret. Close the
-configuration and hit 'Authorize'. Once you have gone through the process
-exchange the access for a refresh token and take note of it.
-EOF
-
-printf '%s' "Did you take note of the mentioned credentials? [Y/n]:"
-read -r input
-if [[ ${input} == 'n' || ${input} == 'N' ]] ; then
-  echo "Must confirm having credentials."
-  exit 1
-else
-  :
-fi
-
 echo "Setting Project ID: ${GOOGLE_CLOUD_PROJECT}"
+gcloud auth application-default login --project $GOOGLE_CLOUD_PROJECT
 gcloud config set project ${GOOGLE_CLOUD_PROJECT}
 
 # Enable the Cloud Storage API.
