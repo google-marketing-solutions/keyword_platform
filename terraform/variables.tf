@@ -58,10 +58,6 @@ variable "developer_token" {
   description = "The Google Ads Developer Token."
 }
 
-variable "refresh_token" {
-  description = "The OAuth2.0 refresh token."
-}
-
 ##
 # Google Cloud Project
 
