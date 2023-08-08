@@ -205,23 +205,3 @@ resource "google_secret_manager_secret_iam_member" "developer_token-access" {
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.backend_sa.email}"
 }
-
-resource "google_secret_manager_secret" "refresh_token" {
-  secret_id = "refresh_token"
-  replication {
-    automatic = true
-  }
-
-  depends_on = [google_project_service.apis]
-}
-
-resource "google_secret_manager_secret_version" "refresh_token-latest" {
-  secret = google_secret_manager_secret.refresh_token.name
-  secret_data = var.refresh_token
-}
-
-resource "google_secret_manager_secret_iam_member" "refresh_token-access" {
-  secret_id = google_secret_manager_secret.refresh_token.id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.backend_sa.email}"
-}

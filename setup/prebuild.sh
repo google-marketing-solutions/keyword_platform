@@ -95,7 +95,6 @@ terraform -chdir=./terraform plan \
   -var "client_secret=$CLIENT_SECRET" \
   -var "developer_token=$DEVELOPER_TOKEN" \
   -var "login_customer_id=$LOGIN_CUSTOMER_ID" \
-  -var "refresh_token=$REFRESH_TOKEN" \
   -var "project_id=$GOOGLE_CLOUD_PROJECT" \
   -var "region=$GOOGLE_CLOUD_REGION" \
   -var "iap_allowed_users=$allowed_users_tf_list" \

@@ -35,9 +35,9 @@ have the required information ready in advance.
 
 To install and run the application the following information is required:
 
-*   [Google Cloud Project(GCP) with a billing account](#create-gcp)
-*   [Google Ads Developer token](#obtain-dev-token)
-*   [OAuth2.0 Credentials](#oauth-creds)
+*   [Google Cloud Project(GCP) with a billing account](#22-createuse-a-google-cloud-projectgcp-with-a-billing-account)
+*   [Google Ads Developer token](#23-retrieve-a-google-ads-developer-token)
+*   [OAuth2.0 Credentials](#24-generate-oauth20-credentials)
 
 The user deploying the application to Google Cloud must either be a
 `Project Owner` or have the following set of permissions:
@@ -55,7 +55,7 @@ The user deploying the application to Google Cloud must either be a
 *   Service Usage Admin (to activate APIs)
 
 
-### 2.2. Create/use a Google Cloud Project(GCP) with a billing account {#create-gcp}
+### 2.2. Create/use a Google Cloud Project(GCP) with a billing account
 
 1.  How to [Creating and Managing Projects][create_gcp]
 2.  How to [Create, Modify, or Close Your Billing Account][billing_gcp]
@@ -63,40 +63,27 @@ The user deploying the application to Google Cloud must either be a
 [create_gcp]: https://cloud.google.com/resource-manager/docs/creating-managing-projects
 [billing_gcp]: https://cloud.google.com/billing/docs/how-to/manage-billing-account
 
-### 2.3. Retrieve a Google Ads Developer token {#obtain-dev-token}
+### 2.3. Retrieve a Google Ads Developer token
 
 How to [Obtain Your Developer Token][obtain_dev_token]
 
 [obtain_dev_token]: https://developers.google.com/google-ads/api/docs/first-call/dev-token
 
-### 2.4. Generate OAuth2.0 credentials {#oauth-creds}
+### 2.4. Generate OAuth2.0 credentials
 
-Keyword Platform requires an OAuth2.0 Client ID to have access to your Google
+Keyword Platform requires an OAuth2.0 Client to have access to your Google
 Ads accounts. Next to your Google Ads Developer token and Login Customer ID
 (typically the MCC ID) you will need a Client ID, Client Secret and Refresh
 Token. Follow the instructions below to obtain them before proceeding.
 
-Click the link below to go to your projects Credentials
-page and hit `+ Create Credentials` to create an OAuth Client ID, choose Web
-Application and add https://developers.google.com/oauthplayground to the
-Authorized redirect URIs. Take note of the Client ID and Client Secret.
-
-Head to https://developers.google.com/oauthplayground and add the select the
-following scopes:
-
-  * https://www.googleapis.com/auth/cloud-platform
-  * https://www.googleapis.com/auth/cloud-translation
-  * https://www.googleapis.com/auth/adwords
-
-Hit the settings/configuration button on the top right and click the box to
-**use your own credentials**. Enter the Client ID and Client Secret. Close the
-configuration and hit `Authorize`. Once you have gone through the process
-exchange the access for a refresh token and take note of it.
-
+Head to the [Credentials Page](https://console.cloud.google.com/apis/credentials)
+in your Google Cloud project. Hit `+ Create Credentials` to create an OAuth
+Client, choose Web Application and add `http://localhost:8080` to the
+authorized redirect URIs. Take note of the Client ID and Client Secret.
 
 ## Installation
 
-Once you have completed the above mentioned steps proceed by clicking the Cloud
+Once you have completed the above mentioned steps, proceed by clicking the Cloud
 Run button below.
 
 1.  Click the button to deploy:

@@ -13,9 +13,6 @@
     "DEVELOPER_TOKEN": {
       "description": "The Google Ads Developer Token."
     },
-    "REFRESH_TOKEN": {
-      "description": "The OAuth2.0 refresh token."
-    },
     "BUCKET_NAME": {
       "description": "Set a name for the bucket."
     },
@@ -37,6 +34,9 @@
   "hooks": {
       "prebuild": {
         "commands": ["chmod 775 ./setup/prebuild.sh", "./setup/prebuild.sh"]
+      },
+      "postcreate": {
+        "commands": ["chmod 775 ./setup/postcreate.sh", "./setup/postcreate.sh"]
       }
   }
 }
