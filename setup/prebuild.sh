@@ -36,7 +36,7 @@ backend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform/backend"
 frontend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform/frontend"
 
 echo "Setting Project ID: ${GOOGLE_CLOUD_PROJECT}"
-gcloud auth application-default login --project $GOOGLE_CLOUD_PROJECT
+gcloud auth login --project $GOOGLE_CLOUD_PROJECT
 gcloud config set project ${GOOGLE_CLOUD_PROJECT}
 
 # Enable the Cloud Storage API.
