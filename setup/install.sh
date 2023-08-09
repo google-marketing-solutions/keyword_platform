@@ -31,6 +31,8 @@
 #   IAP_ALLOWED_USERS
 #   IAP_SUPPORT_EMAIL
 
+# Supress apt-get warnings if run in an ephemeral cloud shell.
+mkdir ~/.cloudshell touch ~/.cloudshell/no-apt-get-warning
 sudo apt-get install fzf
 # Get a list of accessible gcloud projects and store them in an array
 projects=($(gcloud projects list --format="value(projectId)"))
