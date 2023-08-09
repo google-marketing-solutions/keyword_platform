@@ -22,6 +22,7 @@ the shell script.
 
 from collections.abc import Sequence
 import os
+from typing import Union
 import urllib
 
 from absl import app
@@ -62,7 +63,7 @@ class OAuthFlow:
   """
 
   def __init__(
-      self, client_id: str, client_secret: str, state: str | None
+      self, client_id: str, client_secret: str, state: Union[str, None] = None
   ) -> None:
     """Constructor.
 

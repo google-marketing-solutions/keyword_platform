@@ -31,13 +31,73 @@
 #   IAP_ALLOWED_USERS
 #   IAP_SUPPORT_EMAIL
 
+sudo apt-get install fzf
+# Get a list of accessible gcloud projects and store them in an array
+projects=($(gcloud projects list --format="value(projectId)"))
+
+# Use fzf to interactively select a project
+selected_project=$(printf "%s\n" "${projects[@]}" | fzf --prompt="Select a project: ")
+
+# Check if a project was selected
+if [[ -n $selected_project ]]; then
+    echo "Selected project: $selected_project"
+    # Pass the selected project to a variable or use it directly in your script
+    # For example, you can export it to make it available in the environment
+    export GOOGLE_CLOUD_PROJECT="$selected_project"
+else
+    echo "No project selected."
+fi
+
+echo "Setting Project ID: ${GOOGLE_CLOUD_PROJECT}"
+gcloud config set project ${GOOGLE_CLOUD_PROJECT}
+
+regions=($(gcloud compute regions list --format="value(name)"))
+
+# Display a select menu for the user to choose a region
+PS3="Select a region: "
+select selected_region in "${regions[@]}"; do
+    if [[ -n $selected_region ]]; then
+        echo "Selected region: $selected_region"
+        # Pass the selected region to a variable or use it directly in your script
+        # For example, you can export it to make it available in the environment
+        export GOOGLE_CLOUD_REGION="$selected_region"
+        break
+    else
+        echo "Invalid choice, please select a valid region."
+    fi
+done
+
+echo "Enter a name for a bucket used to store Keyword Platform files:"
+read bucket_name
+BUCKET_NAME=$bucket_name
+
+echo "Enter an OAuth2.0 Web Client ID"
+read client_id
+CLIENT_ID=$client_id
+
+echo "Enter an OAuth2.0 Web Client Secret"
+read client_secret
+CLIENT_SECRET=$client_secret
+
+echo "Enter a Google Ads Developer Token:"
+read developer_token
+DEVELOPER_TOKEN=$developer_token
+
+echo "Enter your Google Ads Login Customer ID (wihtout hyphens):"
+read login_customer_id
+LOGIN_CUSTOMER_ID=$login_customer_id
+
+echo "Enter a support Email for the OAuth Consent Screen:"
+read iap_support_email
+IAP_SUPPORT_EMAIL=$iap_support_email
+
+echo "Enter a comma-separated list of users to grant access to the solution:"
+read iap_allowed_users
+IAP_ALLOWED_USERS=$iap_allowed_users
+
 terraform_state_bucket_name="${GOOGLE_CLOUD_PROJECT}-bucket-tfstate"
 backend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform/backend"
 frontend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform/frontend"
-
-echo "Setting Project ID: ${GOOGLE_CLOUD_PROJECT}"
-gcloud auth login --project $GOOGLE_CLOUD_PROJECT
-gcloud config set project ${GOOGLE_CLOUD_PROJECT}
 
 # Enable the Cloud Storage API.
 gcloud services enable storage.googleapis.com
@@ -98,6 +158,18 @@ terraform -chdir=./terraform plan \
 
 terraform -chdir=./terraform apply -auto-approve "/tmp/tfplan"
 
+client_id=$(gcloud secrets versions access latest --secret=client_id)
+client_secret=$(gcloud secrets versions access latest --secret=client_secret)
+
+python ./setup/utils/oauth_flow.py --client_id="${client_id}" --client_secret="${client_secret}"
+refresh_token=$(cat refresh_token.txt)
+
+gcloud secrets create refresh_token --data-file="refresh_token.txt"
+rm -f refresh_token.txt
+
+echo "Added refresh token to Secret Manager."
+
 echo "-----------------------------------------------------"
 echo "Congrats! You successfully deployed Keyword Platform."
 echo "-----------------------------------------------------"
+

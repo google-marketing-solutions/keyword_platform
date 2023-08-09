@@ -83,15 +83,14 @@ authorized redirect URIs. Take note of the Client ID and Client Secret.
 
 ## Installation
 
-Once you have completed the above mentioned steps, proceed by clicking the Cloud
-Run button below.
+Once you have completed the above mentioned steps, proceed by clicking the Open
+in Cloud Shell button below.
 
 1.  Click the button to deploy:
 
-    [![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
+    [![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fgoogle-marketing-solutions%2Fkeyword_platform&cloudshell_git_branch=master&cloudshell_tutorial=setup%2Fdocs%2Finstall.md)
 
-1.  Choose your designated GCP project and desired region and follow the
-    instructions in the prompts.
+1.  Follow the instructions.
 
 1.  Once installation is finished you will receive the URL to access and use the
     web app.
