@@ -99,8 +99,17 @@ terraform_state_bucket_name="${GOOGLE_CLOUD_PROJECT}-bucket-tfstate"
 backend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform/backend"
 frontend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform/frontend"
 
-# Enable the Cloud Storage API.
-gcloud services enable storage.googleapis.com
+# Enable the APIs.
+REQUIRED_APIS=(
+  storage.googleapis.com
+  iap.googleapis.com
+  compute.googleapis.com
+  run.googleapis.com
+)
+
+for API in "${REQUIRED_APIS[@]}"; do
+  gcloud services enable $API
+done
 
 # Create a GCS bucket to store terraform state files.
 echo "Creating terraform state cloud storage bucket..." 
