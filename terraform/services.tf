@@ -49,7 +49,7 @@ resource "google_cloud_run_service" "backend_run" {
       service_account_name = google_service_account.backend_sa.email
 
       containers {
-        image = var.backend_image
+        image = format("%s:%s", var.backend_image, "latest")
 
         env {
           name  = "GCP_PROJECT"
@@ -102,7 +102,7 @@ resource "google_cloud_run_service" "frontend_run" {
       service_account_name = google_service_account.frontend_sa.email
 
       containers {
-        image = var.frontend_image
+        image = format("%s:%s", var.frontend_image, "latest")
 
         env {
           name  = "BACKEND_URL"
