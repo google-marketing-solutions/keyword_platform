@@ -175,10 +175,10 @@ client_secret=$(gcloud secrets versions access latest --secret=client_secret)
 python ./setup/utils/oauth_flow.py --client_id="${client_id}" --client_secret="${client_secret}"
 refresh_token=$(cat refresh_token.txt)
 
-gcloud secrets create refresh_token --data-file="refresh_token.txt"
+gcloud secrets versions add refresh_token --data-file="refresh_token.txt"
 rm -f refresh_token.txt
 
-echo "Added refresh token to Secret Manager."
+echo "Added refresh token: $refresh_token to Secret Manager."
 
 echo "-----------------------------------------------------"
 echo "Congrats! You successfully deployed Keyword Platform."

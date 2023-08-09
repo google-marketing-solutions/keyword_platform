@@ -58,6 +58,11 @@ variable "developer_token" {
   description = "The Google Ads Developer Token."
 }
 
+variable "refresh_token" {
+  description = "The Google Ads OAuth2 Refresh Token"
+  default = null
+}
+
 ##
 # Google Cloud Project
 
