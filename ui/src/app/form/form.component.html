@@ -14,87 +14,101 @@
  limitations under the License.
 -->
 
-<mat-tab-group
-    fitInkBarToContent
-    mat-stretch-tabs="false"
-    animationDuration="0ms"
-    [selectedIndex]="1">
-  <!-- TODO() Confirm header label. -->
-  <mat-tab
-      label="Keyword Platform"
-      disabled
-      labelClass="label">
-  </mat-tab>
-  <mat-tab label="Translate Keywords & Ads" labelClass="label">
-  <div class="tab">
-    <div class="margin"></div>
-    <form
-      (ngSubmit)="onSubmit()"
-      [formGroup]="form"
-      class="fade form">
-      <p class="title">Accounts</p>
-      <div class="component">
-        <app-drop-down
-            #component
-            [controllerName]="'accounts'"
-            [className]="'responsive'"
-            [values]="accounts"
-            [label]="'Select accounts'"
-            [isMultiple]=true
-            [isRequired]=true
-            (selectionEvent)="accountSelection($event)">
-        </app-drop-down>
-      </div>
-      <p class="title">Campaigns</p>
-      <div class="component">
-        <app-drop-down
-            #component
-            [controllerName]="'campaigns'"
-            [className]="'responsive'"
-            [values]="campaigns"
-            [label]="'Select campaigns'"
-            [isMultiple]=true
-            [isRequired]=true
-            (selectionEvent)="campaignSelection($event)">
-        </app-drop-down>
-      </div>
-      <p class="title">Translate Keywords & Ads</p>
-      <div class="component">
-        <div class="juxtapose">
+<div class="content">
+  <div *ngIf="isRequestSubmitStatus()" class="spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+  <mat-tab-group
+      fitInkBarToContent
+      mat-stretch-tabs="false"
+      animationDuration="0ms"
+      [selectedIndex]="1">
+    <!-- TODO() Confirm header label. -->
+    <mat-tab
+        label="Keyword Platform Beta"
+        disabled
+        labelClass="label">
+    </mat-tab>
+    <mat-tab label="Translate Keywords & Ads" labelClass="label">
+    <div class="tab">
+      <p class="disclaimer">Usage generates Google Cloud costs as it translates keywords and ads
+        utilizing the Google Cloud Translation API. <br>Costs depend on the size of translation
+        requests, see <a href="https://cloud.google.com/translate/pricing" target="_blank">
+           Cloud Translation Pricing</a> for details.</p>
+      <div class="margin"></div>
+      <form
+        (ngSubmit)="onSubmit()"
+        [formGroup]="form"
+        class="fade form">
+        <p class="title">Accounts</p>
+        <p class="sub-title">
+            Select the accounts that contain the campaigns you want to translate.</p>
+        <div class="component">
           <app-drop-down
               #component
-              [controllerName]="'source-language'"
-              [className]="'static'"
-              [values]="languages"
-              [label]="'Select source language'"
-              [isMultiple]=false
+              [controllerName]="'accounts'"
+              [className]="'responsive'"
+              [values]="accounts"
+              [label]="'Select accounts'"
+              [isMultiple]=true
               [isRequired]=true
-              (selectionEvent)="sourceLanguageSelection($event)">
+              (selectionEvent)="accountSelection($event)">
           </app-drop-down>
         </div>
-        <div>
+        <p class="title">Campaigns</p>
+        <p class="sub-title">Select the campaigns with keywords and ads to translate. All enabled
+          ad groups will be pulled in automatically.</p>
+        <div class="component">
           <app-drop-down
               #component
-              [controllerName]="'target-language'"
-              [className]="'static'"
-              [values]="languages"
-              [label]="'Select target language'"
-              [isMultiple]=false
+              [controllerName]="'campaigns'"
+              [className]="'responsive'"
+              [values]="campaigns"
+              [label]="'Select campaigns'"
+              [isMultiple]=true
               [isRequired]=true
-              (selectionEvent)="targetLanguageSelection($event)">
-            </app-drop-down>
+              (selectionEvent)="campaignSelection($event)">
+          </app-drop-down>
         </div>
-      </div>
-      <div class="component">
-        <button
-            mat-raised-button
-            color="primary"
-            type="submit"
-            [disabled]="hasFormError()">
-          Run
-        </button>
-      </div>
-    </form>
-  </div>
-  </mat-tab>
-</mat-tab-group>
+        <p class="title">Translate Keywords & Ads</p>
+        <p class="sub-title">Select the source and target language for translation.</p>
+        <div class="component">
+          <div class="juxtapose">
+            <app-drop-down
+                #component
+                [controllerName]="'source-language'"
+                [className]="'static'"
+                [values]="languages"
+                [label]="'Select source language'"
+                [isMultiple]=false
+                [isRequired]=true
+                (selectionEvent)="sourceLanguageSelection($event)">
+            </app-drop-down>
+          </div>
+          <div>
+            <app-drop-down
+                #component
+                [controllerName]="'target-language'"
+                [className]="'static'"
+                [values]="languages"
+                [label]="'Select target language'"
+                [isMultiple]=false
+                [isRequired]=true
+                (selectionEvent)="targetLanguageSelection($event)">
+              </app-drop-down>
+          </div>
+        </div>
+        <div class="component">
+          <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="hasFormError() || isRequestSubmitStatus()">
+            Run
+          </button>
+        </div>
+      </form>
+    </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

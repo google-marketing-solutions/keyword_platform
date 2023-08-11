@@ -15,13 +15,27 @@
  * limitations under the License.
  */
 
+@media (min-width:961px) {
+  .content {
+    margin: auto;
+    width: 961px;
+  }
+}
+
 .component {
   margin-bottom: 35px;
 }
 
+.disclaimer {
+  font-family: Roboto, sans-serif;
+  opacity: .80;
+  padding-left: 45px;
+  padding-right: 45px;
+}
+
 .form {
-  padding-left: 62px;
-  padding-right: 62px;
+  padding-left: 45px;
+  padding-right: 45px;
 }
 
 .juxtapose {
@@ -33,8 +47,19 @@
   margin-bottom: 50px;
 }
 
+.spinner {
+  position: absolute;
+  left: 45%;
+  top: 80%;
+}
+
 .tab {
   border-top: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.sub-title {
+  font-family: Roboto, sans-serif;
+  opacity: .80;
 }
 
 .title {

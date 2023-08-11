@@ -15,53 +15,40 @@
  * limitations under the License.
  */
 
-import { HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { BrowserModule } from '@angular/platform-browser';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatTabsModule } from '@angular/material/tabs';
+import {HttpClientModule} from '@angular/common/http';
+import {NgModule} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {MatDialogModule} from '@angular/material/dialog';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {MatInputModule} from '@angular/material/input';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSelectModule} from '@angular/material/select';
+import {MatTabsModule} from '@angular/material/tabs';
+import {BrowserModule} from '@angular/platform-browser';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {RouterModule} from '@angular/router';
 
-import { ServicesModule } from './services/services_module';
-
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { DropDownComponent } from './drop-down/drop-down.component';
-import { DialogComponent } from './dialog/dialog.component';
-import { FormComponent } from './form/form.component';
+import {AppRoutingModule} from './app-routing.module';
+import {AppComponent} from './app.component';
+import {DialogComponent} from './dialog/dialog.component';
+import {DropDownComponent} from './drop-down/drop-down.component';
+import {FormComponent} from './form/form.component';
+import {ServicesModule} from './services/services_module';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    DropDownComponent,
-    DialogComponent,
-    FormComponent
-  ],
+  declarations:
+      [AppComponent, DropDownComponent, DialogComponent, FormComponent],
   imports: [
-    BrowserAnimationsModule,
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    MatButtonModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatSelectModule,
-    ReactiveFormsModule,
-    FormsModule,
-    MatTabsModule,
-    RouterModule,
+    BrowserAnimationsModule, BrowserModule, AppRoutingModule, HttpClientModule,
+    MatButtonModule, MatDialogModule, MatFormFieldModule, MatIconModule,
+    MatInputModule, MatProgressSpinnerModule, MatSelectModule,
+    ReactiveFormsModule, FormsModule, MatTabsModule, RouterModule,
     ServicesModule
   ],
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}
