@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {FormControl, Validators} from '@angular/forms';
+import {MatOption} from '@angular/material/core';
+import {MatSelect} from '@angular/material/select';
+import {GoogleAds} from 'app/models/interfaces';
 
 import {SelectionData} from '../models/types';
 
@@ -46,7 +49,38 @@ export class DropDownComponent implements OnInit {
     }
   }
 
+  concatenateValue(value: SelectionData) {
+    const googleAdsValue = value as GoogleAds;
+    if (googleAdsValue.id) {
+      return googleAdsValue.id.concat(' - ', googleAdsValue.name);
+    }
+    return value.name;
+  }
+
+  toggleAllSelection(selection: MatSelect) {
+    const options = selection.options;
+    const isSelected: boolean =
+        // 'Select All' has value of 0.
+        options
+            .filter((item: MatOption) => item.value === 0)
+            // Get value of selection to determine if 'Select All' is selected
+            // or not.
+            // Get the first element as there should only be 1 option with value
+            // of 0 in the list.
+            .map((item: MatOption) => item.selected)[0];
+    if (isSelected) {
+      options.forEach((item: MatOption) => item.select());
+    } else {
+      options.forEach((item: MatOption) => item.deselect());
+    }
+  }
+
   onChange(selection: SelectionData[]) {
+    // If multi-select then make sure to remove the first element because its
+    // value is undefined due to it being 'Select All'.
+    if (this.isMultiple && !selection[0]) {
+      selection.shift();
+    }
     this.selectionEvent.emit(selection);
   }
 }

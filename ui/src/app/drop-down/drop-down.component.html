@@ -19,9 +19,14 @@
   <mat-select
     (selectionChange)="onChange($event.value)"
     [multiple]="isMultiple"
-    [formControl]="control">
+    [formControl]="control"
+    #selection>
+    <mat-option
+        *ngIf="isMultiple && values"
+        [value]="0"
+        (click)="toggleAllSelection(selection)">Select All</mat-option>
     <mat-option *ngFor="let value of values" [value]="value">
-      {{value.name}}
+      {{concatenateValue(value)}}
     </mat-option>
   </mat-select>
   <mat-error *ngIf="control.hasError('required')" class="error">
