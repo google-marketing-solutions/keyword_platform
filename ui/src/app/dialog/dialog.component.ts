@@ -20,6 +20,8 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { Output } from '../models/interfaces';
 
+const CHAR_LIMIT = 75;
+
 /** The dialog component to display output. */
 @Component({
   selector: 'app-dialog',
@@ -34,5 +36,10 @@ export class DialogComponent implements OnInit {
   ngOnInit() {
     const value = this.data['value'];
     this.assetUrls = value['asset_urls'] as string[];
+  }
+
+  /** Truncates long URLs for the dialog container. */
+  truncateUrl(url: string): string {
+    return url.length > CHAR_LIMIT ? url.substring(0, CHAR_LIMIT) + '...' : url;
   }
 }

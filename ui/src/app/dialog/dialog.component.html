@@ -25,7 +25,7 @@
   </div>
 </div>
 <div mat-dialog-content class="content">
-  <div *ngFor="let url of assetUrls">
-    <span><a href="{{url}}" target="_blank">{{url}}</a></span>
+  <div *ngFor="let assetUrl of assetUrls">
+    <p><a href="{{assetUrl}}" target="_blank">{{truncateUrl(assetUrl)}}</a></p>
   </div>
 </div>
