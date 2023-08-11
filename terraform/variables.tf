@@ -60,7 +60,6 @@ variable "developer_token" {
 
 variable "refresh_token" {
   description = "The Google Ads OAuth2 Refresh Token"
-  default = null
 }
 
 ##

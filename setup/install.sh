@@ -146,6 +146,10 @@ fi
 # Convert the list of iap allowed users to a terraform compatible list.
 allowed_users_tf_list=$(echo "$IAP_ALLOWED_USERS" | sed 's/\([^,]\+\)/"user:\1"/g' | sed 's/,/, /g' | sed 's/.*/[&]/')
 
+python ./setup/utils/oauth_flow.py --client_id="${CLIENT_ID}" --client_secret="${CLIENT_SECRET}"
+refresh_token=$(cat refresh_token.txt)
+rm -f refresh_token.txt
+
 # Setup & Run Terraform.
 terraform -chdir=./terraform init \
   -backend-config="bucket=$terraform_state_bucket_name" \
@@ -160,6 +164,7 @@ terraform -chdir=./terraform plan \
   -var "client_secret=$CLIENT_SECRET" \
   -var "developer_token=$DEVELOPER_TOKEN" \
   -var "login_customer_id=$LOGIN_CUSTOMER_ID" \
+  -var "refresh_token=$refresh_token" \
   -var "project_id=$GOOGLE_CLOUD_PROJECT" \
   -var "region=$GOOGLE_CLOUD_REGION" \
   -var "iap_allowed_users=$allowed_users_tf_list" \
@@ -168,17 +173,6 @@ terraform -chdir=./terraform plan \
   -out="/tmp/tfplan"
 
 terraform -chdir=./terraform apply -auto-approve "/tmp/tfplan"
-
-client_id=$(gcloud secrets versions access latest --secret=client_id)
-client_secret=$(gcloud secrets versions access latest --secret=client_secret)
-
-python ./setup/utils/oauth_flow.py --client_id="${client_id}" --client_secret="${client_secret}"
-refresh_token=$(cat refresh_token.txt)
-
-gcloud secrets versions add refresh_token --data-file="refresh_token.txt"
-rm -f refresh_token.txt
-
-echo "Added refresh token: $refresh_token to Secret Manager."
 
 echo "-----------------------------------------------------"
 echo "Congrats! You successfully deployed Keyword Platform."
