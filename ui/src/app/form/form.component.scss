@@ -27,15 +27,24 @@
 }
 
 .disclaimer {
+  background-color: #e1f5fe;
+  border-left: #1a6ebb solid 3px;
+  color: #1a6ebb;
   font-family: Roboto, sans-serif;
-  opacity: .80;
-  padding-left: 45px;
-  padding-right: 45px;
+  margin-top: 20px;
+  margin-right: 40px;
+  margin-left: 40px;
+  padding: 15px;
 }
 
 .form {
   padding-left: 45px;
   padding-right: 45px;
+}
+
+.icon {
+  float: left;
+  padding-right: 5px;
 }
 
 .juxtapose {
@@ -48,9 +57,10 @@
 }
 
 .spinner {
-  position: absolute;
-  left: 45%;
-  top: 80%;
+  display:inline-block;
+  margin-right: 10px;
+  position: relative;
+  top: 5px;
 }
 
 .tab {

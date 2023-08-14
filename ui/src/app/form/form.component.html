@@ -15,9 +15,6 @@
 -->
 
 <div class="content">
-  <div *ngIf="isRequestSubmitStatus()" class="spinner">
-    <mat-spinner></mat-spinner>
-  </div>
   <mat-tab-group
       fitInkBarToContent
       mat-stretch-tabs="false"
@@ -31,10 +28,19 @@
     </mat-tab>
     <mat-tab label="Translate Keywords & Ads" labelClass="label">
     <div class="tab">
-      <p class="disclaimer">Usage generates Google Cloud costs as it translates keywords and ads
-        utilizing the Google Cloud Translation API. <br>Costs depend on the size of translation
-        requests, see <a href="https://cloud.google.com/translate/pricing" target="_blank">
-           Cloud Translation Pricing</a> for details.</p>
+      <div class="disclaimer">
+        <mat-icon
+            aria-hidden="false"
+            aria-label="Google Cloud Translation API cost and usage note."
+            fontIcon="bookmark"
+            class="icon">
+        </mat-icon>
+        <span>Usage generates Google Cloud costs as it
+        translates keywords and ads utilizing the Google Cloud Translation API.
+        Costs depend on the size of translation requests, see
+        <a href="https://cloud.google.com/translate/pricing" target="_blank">
+          Cloud Translation Pricing</a> for details.</span>
+      </div>
       <div class="margin"></div>
       <form
         (ngSubmit)="onSubmit()"
@@ -104,7 +110,10 @@
               color="primary"
               type="submit"
               [disabled]="hasFormError() || isRequestSubmitStatus()">
-            Run
+            <span *ngIf="isRequestSubmitStatus()" class="spinner">
+              <mat-spinner [diameter]="25"></mat-spinner>
+            </span>
+            <span>Run</span>
           </button>
         </div>
       </form>
