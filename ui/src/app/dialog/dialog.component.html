@@ -24,6 +24,16 @@
     </button>
   </div>
 </div>
+<div class="warning">
+  <mat-icon
+      aria-hidden="false"
+      aria-label="Keyword Platform tracking label warning"
+      fontIcon="priority_high"
+      class="icon">
+  </mat-icon>
+  <span>Do not remove the <strong>Keyword Platform</strong> tracking label from
+    the editor templates below.</span>
+</div>
 <div mat-dialog-content class="content">
   <div *ngFor="let assetUrl of assetUrls">
     <p><a href="{{assetUrl}}" target="_blank">{{truncateUrl(assetUrl)}}</a></p>

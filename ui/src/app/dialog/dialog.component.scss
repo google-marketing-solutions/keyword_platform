@@ -22,3 +22,18 @@
 .content {
   display: inline-block;
 }
+
+.icon {
+  position: relative;
+  top: 5px;
+}
+
+.warning {
+  background-color: #ffefe1;
+  border-left: #ad0303 solid 3px;
+  color: #ad0303;
+  font-family: Roboto, sans-serif;
+  margin-left: 25px;
+  margin-right: 25px;
+  padding: 15px;
+}
