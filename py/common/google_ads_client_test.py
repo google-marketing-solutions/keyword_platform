@@ -136,6 +136,7 @@ class GoogleAdsClientTest(parameterized.TestCase):
           campaign
         WHERE
           campaign.status = 'ENABLED'
+          AND campaign.advertising_channel_type = 'SEARCH'
         """
     expected_request = _expected_request_from_query(query)
     self.client.get_campaigns_for_account(_FAKE_CUSTOMER_ID)

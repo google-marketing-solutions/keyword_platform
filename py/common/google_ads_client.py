@@ -136,6 +136,7 @@ class GoogleAdsClient:
           campaign
         WHERE
           campaign.status = 'ENABLED'
+          AND campaign.advertising_channel_type = 'SEARCH'
         """
     if campaign_ids:
       campaign_ids_str = ', '.join([f"'{elem}'" for elem in campaign_ids])
