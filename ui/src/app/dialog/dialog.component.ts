@@ -15,12 +15,16 @@
  * limitations under the License.
  */
 
-import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {Component, Inject, OnInit} from '@angular/core';
+import {MAT_DIALOG_DATA} from '@angular/material/dialog';
 
-import { Output } from '../models/interfaces';
+import {Output} from '../models/interfaces';
 
 const CHAR_LIMIT = 75;
+
+interface DialogData {
+  [key: string]: Output;
+}
 
 /** The dialog component to display output. */
 @Component({
@@ -31,7 +35,7 @@ const CHAR_LIMIT = 75;
 export class DialogComponent implements OnInit {
   assetUrls?: string[];
 
-  constructor(@Inject(MAT_DIALOG_DATA) readonly data: Output) {}
+  constructor(@Inject(MAT_DIALOG_DATA) readonly data: DialogData) {}
 
   ngOnInit() {
     const value = this.data['value'];
