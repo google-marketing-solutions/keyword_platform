@@ -15,9 +15,13 @@
  * limitations under the License.
  */
 
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSelectModule} from '@angular/material/select';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-import { DropDownComponent } from './drop-down.component';
+import {DropDownComponent} from './drop-down.component';
 
 describe('DropDownComponent', () => {
   let component: DropDownComponent;
@@ -25,7 +29,11 @@ describe('DropDownComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [DropDownComponent]
+      declarations: [DropDownComponent],
+      imports: [
+        BrowserAnimationsModule, FormsModule, MatFormFieldModule,
+        MatSelectModule, ReactiveFormsModule
+      ]
     });
     fixture = TestBed.createComponent(DropDownComponent);
     component = fixture.componentInstance;

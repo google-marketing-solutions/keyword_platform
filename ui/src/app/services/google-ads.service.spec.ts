@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {HttpClientModule} from '@angular/common/http';
+import {TestBed} from '@angular/core/testing';
 
-import { GoogleAdsService } from './google-ads.service';
+import {GoogleAdsService} from './google-ads.service';
 
 describe('GoogleAdsService', () => {
   let service: GoogleAdsService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({imports: [HttpClientModule]});
     service = TestBed.inject(GoogleAdsService);
   });
 

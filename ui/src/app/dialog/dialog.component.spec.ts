@@ -16,16 +16,56 @@
  */
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {MatIconModule} from '@angular/material/icon';
+
+import {Output} from '../models/interfaces';
 
 import { DialogComponent } from './dialog.component';
+
+interface DialogData {
+  [key: string]: Output;
+}
 
 describe('DialogComponent', () => {
   let component: DialogComponent;
   let fixture: ComponentFixture<DialogComponent>;
 
+  function getDialogData() {
+    const data: DialogData = {
+      'value': {
+        'asset_urls': [
+          'http://storage.googleapis.com/bucket/file1',
+          'http://storage.googleapis.com/bucket/file2',
+          'http://storage.googleapis.com/bucket/file3'
+        ],
+        'worker_results': {
+          'miningWorker': {
+            'error_msg': '',
+            'keywords_added': 10,
+            'keywords_modified': 0,
+            'status': 'SUCCESS',
+            'warning_msg': 'Added weird words'
+          },
+          'translationWorker': {
+            'error_msg': '',
+            'keywords_added': 0,
+            'keywords_modified': 10,
+            'status': 'SUCCESS',
+            'warning_msg': ''
+          }
+        }
+      }
+    } return data;
+  }
+
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [DialogComponent]
+      declarations: [DialogComponent],
+      imports: [MatIconModule],
+      providers: [
+        {provide: MAT_DIALOG_DATA, useFactory: getDialogData},
+      ],
     });
     fixture = TestBed.createComponent(DialogComponent);
     component = fixture.componentInstance;

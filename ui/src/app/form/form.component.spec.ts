@@ -15,9 +15,19 @@
  * limitations under the License.
  */
 
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {HttpClientModule} from '@angular/common/http';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatDialogModule} from '@angular/material/dialog';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {MatSelectModule} from '@angular/material/select';
+import {MatTabsModule} from '@angular/material/tabs';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-import { FormComponent } from './form.component';
+import {DropDownComponent} from '../drop-down/drop-down.component';
+
+import {FormComponent} from './form.component';
 
 describe('FormComponent', () => {
   let component: FormComponent;
@@ -25,7 +35,12 @@ describe('FormComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [FormComponent]
+      declarations: [DropDownComponent, FormComponent],
+      imports: [
+        BrowserAnimationsModule, FormsModule, HttpClientModule, MatDialogModule,
+        MatFormFieldModule, MatIconModule, MatSelectModule, ReactiveFormsModule,
+        MatTabsModule
+      ]
     });
     fixture = TestBed.createComponent(FormComponent);
     component = fixture.componentInstance;

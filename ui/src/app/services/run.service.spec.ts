@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+import {HttpClientModule} from '@angular/common/http';
 import {TestBed} from '@angular/core/testing';
 
 import {RunService} from './run.service';
@@ -23,7 +24,7 @@ describe('RunService', () => {
   let service: RunService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({imports: [HttpClientModule]});
     service = TestBed.inject(RunService);
   });
 
