@@ -24,130 +24,197 @@ from absl.testing import absltest
 from absl.testing import parameterized
 
 _GOOGLE_ADS_RESPONSE = [
-    [{'results': [
-        {'customer':
-         {'resourceName': 'customers/123',
-          'id': '123'},
-         'campaign':
-         {'resourceName': 'customers/123/campaigns/456',
-          'name': 'Gmail Test Campaign'},
-         'adGroup':
-         {'resourceName': 'customers/123/adGroups/789',
-          'name': 'Ad group 1'},
-         'adGroupAd':
-         {'resourceName': 'customers/123/adGroupAds/789~1011',
-          'ad':
-          {'responsiveSearchAd':
-           {'headlines':
-            [{'text': 'Email Login',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}}],
-            'descriptions':
-            [{'text': 'Amazing email!',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}}]},
-           'resourceName': 'customers/123/ads/1011',
-           'finalUrls': ['https://mail.google.com/']}}}],
-      'fieldMask': ('customer.id,campaign.name,adGroup.name,'
-                    'adGroupAd.ad.responsiveSearchAd.headlines,'
-                    'adGroupAd.ad.responsiveSearchAd.descriptions,'
-                    'adGroupAd.ad.finalUrls'),
-      'requestId': 'fake_request_id'}],
-    [{'results': [
-        {'customer':
-         {'resourceName': 'customers/123',
-          'id': '123'},
-         'campaign':
-         {'resourceName': 'customers/123/campaigns/456',
-          'name': 'Gmail Test Campaign'},
-         'adGroup':
-         {'resourceName': 'customers/123/adGroups/789',
-          'name': 'Ad group 1'},
-         'adGroupAd':
-         {'resourceName': 'customers/123/adGroupAds/789~1011',
-          'ad':
-          {'responsiveSearchAd':
-           {'headlines':
-            [{'text': 'Email Login',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}},
-             {'text': 'Online Email',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}},
-             {'text': 'Sign in',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}}],
-            'descriptions':
-            [{'text': 'Email that’s intuitive, efficient, and useful',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}},
-             {'text': '15 GB of storage, less spam, and mobile access',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}}]},
-           'resourceName': 'customers/123/ads/1011',
-           'finalUrls': ['https://mail.google.com/']}}},
-        {'customer':
-         {'resourceName': 'customers/123',
-          'id': '123'},
-         'campaign':
-         {'resourceName': 'customers/123/campaigns/1213',
-          'name': 'Analytics Test Campaign'},
-         'adGroup':
-         {'resourceName': 'customers/123/adGroups/1415',
-          'name': 'Ad group 1'},
-         'adGroupAd':
-         {'resourceName':
-          'customers/123/adGroupAds/1415~1617',
-          'ad':
-          {'responsiveSearchAd':
-           {'headlines':
-            [{'text': 'Official Website',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}},
-             {'text': 'Official Site',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}},
-             {'text': 'High Quality Products',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}}],
-            'descriptions':
-            [{'text': 'Google Analytics',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}},
-             {'text': 'Try Analytics today!',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}}]},
-           'resourceName': 'customers/123/ads/1617',
-           'finalUrls': ['http://analytics.google.com']}}}],
-      'fieldMask': ('customer.id,campaign.name,adGroup.name,'
-                    'adGroupAd.ad.responsiveSearchAd.headlines,'
-                    'adGroupAd.ad.responsiveSearchAd.descriptions,'
-                    'adGroupAd.ad.finalUrls'),
-      'requestId': 'fake_request_id'}]]
+    [{
+        'results': [{
+            'customer': {'resourceName': 'customers/123', 'id': '123'},
+            'campaign': {
+                'resourceName': 'customers/123/campaigns/456',
+                'name': 'Gmail Test Campaign',
+            },
+            'adGroup': {
+                'resourceName': 'customers/123/adGroups/789',
+                'name': 'Ad group 1',
+            },
+            'adGroupAd': {
+                'resourceName': 'customers/123/adGroupAds/789~1011',
+                'ad': {
+                    'responsiveSearchAd': {
+                        'headlines': [{
+                            'text': 'Email Login',
+                            'assetPerformanceLabels': 'PENDING',
+                            'policySummaryInfo': {
+                                'reviewStatus': 'REVIEWED',
+                                'approvalStatus': 'APPROVED',
+                            },
+                        }],
+                        'descriptions': [{
+                            'text': 'Amazing email!',
+                            'assetPerformanceLabels': 'PENDING',
+                            'policySummaryInfo': {
+                                'reviewStatus': 'REVIEWED',
+                                'approvalStatus': 'APPROVED',
+                            },
+                        }],
+                    },
+                    'resourceName': 'customers/123/ads/1011',
+                    'finalUrls': ['https://mail.google.com/'],
+                },
+            },
+        }],
+        'fieldMask': (
+            'customer.id,campaign.name,adGroup.name,'
+            'adGroupAd.ad.responsiveSearchAd.headlines,'
+            'adGroupAd.ad.responsiveSearchAd.descriptions,'
+            'adGroupAd.ad.finalUrls'
+        ),
+        'requestId': 'fake_request_id',
+    }],
+    [{
+        'results': [
+            {
+                'customer': {'resourceName': 'customers/123', 'id': '123'},
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/456',
+                    'name': 'Gmail Test Campaign',
+                },
+                'adGroup': {
+                    'resourceName': 'customers/123/adGroups/789',
+                    'name': 'Ad group 1',
+                },
+                'adGroupAd': {
+                    'resourceName': 'customers/123/adGroupAds/789~1011',
+                    'ad': {
+                        'responsiveSearchAd': {
+                            'headlines': [
+                                {
+                                    'text': 'Email Login',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                                {
+                                    'text': 'Online Email',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                                {
+                                    'text': 'Sign in',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                            ],
+                            'descriptions': [
+                                {
+                                    'text': (
+                                        'Email that’s intuitive, efficient, and'
+                                        ' useful'
+                                    ),
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                                {
+                                    'text': (
+                                        '15 GB of storage, less spam, and'
+                                        ' mobile access'
+                                    ),
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                            ],
+                        },
+                        'resourceName': 'customers/123/ads/1011',
+                        'finalUrls': ['https://mail.google.com/'],
+                    },
+                },
+            },
+            {
+                'customer': {'resourceName': 'customers/123', 'id': '123'},
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/1213',
+                    'name': 'Analytics Test Campaign',
+                },
+                'adGroup': {
+                    'resourceName': 'customers/123/adGroups/1415',
+                    'name': 'Ad group 1',
+                },
+                'adGroupAd': {
+                    'resourceName': 'customers/123/adGroupAds/1415~1617',
+                    'ad': {
+                        'responsiveSearchAd': {
+                            'headlines': [
+                                {
+                                    'text': 'Official Website',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                                {
+                                    'text': 'Official Site',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                                {
+                                    'text': 'High Quality Products',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                            ],
+                            'descriptions': [
+                                {
+                                    'text': 'Google Analytics',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                                {
+                                    'text': 'Try Analytics today!',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                            ],
+                        },
+                        'resourceName': 'customers/123/ads/1617',
+                        'finalUrls': ['http://analytics.google.com'],
+                    },
+                },
+            },
+        ],
+        'fieldMask': (
+            'customer.id,campaign.name,adGroup.name,'
+            'adGroupAd.ad.responsiveSearchAd.headlines,'
+            'adGroupAd.ad.responsiveSearchAd.descriptions,'
+            'adGroupAd.ad.finalUrls'
+        ),
+        'requestId': 'fake_request_id',
+    }],
+]
 
 _EMPTY_GOOGLE_ADS_RESPONSE = [
     [{'results': [],
@@ -158,22 +225,31 @@ _EMPTY_GOOGLE_ADS_RESPONSE = [
       'requestId': 'fake_request_id'}]]
 
 _EXPECTED_DF = pd.DataFrame(
-    {'Action': ['Add', 'Add', 'Add'],
-     'Customer ID': [
-         'Enter customer ID', 'Enter customer ID', 'Enter customer ID'],
-     'Campaign': [
-         'Gmail Test Campaign',
-         'Gmail Test Campaign',
-         'Analytics Test Campaign'],
-     'Ad group': ['Ad group 1', 'Ad group 1', 'Ad group 1'],
-     'Status': ['Paused', 'Paused', 'Paused'],
-     'Label': [
-         'Keyword Translator', 'Keyword Translator', 'Keyword Translator'],
-     'Updates applied': [[], [], []]},
+    {
+        'Action': ['Add', 'Add', 'Add'],
+        'Customer ID': [
+            'Enter customer ID',
+            'Enter customer ID',
+            'Enter customer ID',
+        ],
+        'Campaign': [
+            'Gmail Test Campaign',
+            'Gmail Test Campaign',
+            'Analytics Test Campaign',
+        ],
+        'Ad group': ['Ad group 1', 'Ad group 1', 'Ad group 1'],
+        'Status': ['Paused', 'Paused', 'Paused'],
+        'Labels': [
+            'Keyword Translator',
+            'Keyword Translator',
+            'Keyword Translator',
+        ],
+        'Updates applied': [[], [], []],
+    },
 )
 
 _EXPECTED_CSV_DATA = (
-    'Action,Customer ID,Campaign,Ad group,Status,Label,Updates'
+    'Action,Customer ID,Campaign,Ad group,Status,Labels,Updates'
     ' applied\nAdd,Enter customer ID,Gmail Test Campaign,Ad group'
     ' 1,Paused,Keyword Translator,[]\nAdd,Enter customer ID,Gmail Test'
     ' Campaign,Ad group 1,Paused,Keyword Translator,[]\nAdd,Enter customer'
@@ -181,47 +257,67 @@ _EXPECTED_CSV_DATA = (
 )
 
 _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame(
-    {'Action': ['Add', 'Add', 'Add'],
-     'Customer ID': [
-         'Enter customer ID', 'Enter customer ID', 'Enter customer ID'],
-     'Campaign': [
-         'Gmail Test Campaign',
-         'Gmail Test Campaign',
-         'Analytics Test Campaign'],
-     'Ad group': ['Ad group 1', 'Ad group 1', 'Ad group 1'],
-     'Status': ['Paused', 'Paused', 'Paused'],
-     'Label': [
-         'Keyword Translator', 'Keyword Translator', 'Keyword Translator'],
-     'Updates applied': [['Translated'], ['Translated'], ['Translated']]},
+    {
+        'Action': ['Add', 'Add', 'Add'],
+        'Customer ID': [
+            'Enter customer ID',
+            'Enter customer ID',
+            'Enter customer ID',
+        ],
+        'Campaign': [
+            'Gmail Test Campaign',
+            'Gmail Test Campaign',
+            'Analytics Test Campaign',
+        ],
+        'Ad group': ['Ad group 1', 'Ad group 1', 'Ad group 1'],
+        'Status': ['Paused', 'Paused', 'Paused'],
+        'Labels': [
+            'Keyword Translator',
+            'Keyword Translator',
+            'Keyword Translator',
+        ],
+        'Updates applied': [['Translated'], ['Translated'], ['Translated']],
+    },
 )
 
 _EXPECTED_DF_AFTER_AD_GROUP_UPDATE = pd.DataFrame(
-    {'Action': ['Add', 'Add', 'Add'],
-     'Customer ID': [
-         'Enter customer ID', 'Enter customer ID', 'Enter customer ID'],
-     'Campaign': [
-         'Gmail Test Campaign',
-         'Gmail Test Campaign',
-         'Analytics Test Campaign'],
-     'Ad group': ['Ad group 1 (es)', 'Ad group 1 (es)', 'Ad group 1 (es)'],
-     'Status': ['Paused', 'Paused', 'Paused'],
-     'Label': [
-         'Keyword Translator', 'Keyword Translator', 'Keyword Translator'],
-     'Updates applied': [[], [], []]},
+    {
+        'Action': ['Add', 'Add', 'Add'],
+        'Customer ID': [
+            'Enter customer ID',
+            'Enter customer ID',
+            'Enter customer ID',
+        ],
+        'Campaign': [
+            'Gmail Test Campaign',
+            'Gmail Test Campaign',
+            'Analytics Test Campaign',
+        ],
+        'Ad group': ['Ad group 1 (es)', 'Ad group 1 (es)', 'Ad group 1 (es)'],
+        'Status': ['Paused', 'Paused', 'Paused'],
+        'Labels': [
+            'Keyword Translator',
+            'Keyword Translator',
+            'Keyword Translator',
+        ],
+        'Updates applied': [[], [], []],
+    },
 )
 
 _EXPECTED_DF_EMPTY = pd.DataFrame(
-    {'Action': pd.Series([], dtype='object'),
-     'Customer ID': pd.Series([], dtype='object'),
-     'Campaign': pd.Series([], dtype='object'),
-     'Ad group': pd.Series([], dtype='object'),
-     'Status': pd.Series([], dtype='object'),
-     'Label': pd.Series([], dtype='object'),
-     'Updates applied': pd.Series([], dtype='object')},
+    {
+        'Action': pd.Series([], dtype='object'),
+        'Customer ID': pd.Series([], dtype='object'),
+        'Campaign': pd.Series([], dtype='object'),
+        'Ad group': pd.Series([], dtype='object'),
+        'Status': pd.Series([], dtype='object'),
+        'Labels': pd.Series([], dtype='object'),
+        'Updates applied': pd.Series([], dtype='object'),
+    },
 )
 
 _EXPECTED_CSV_DATA_EMPTY = (
-    'Action,Customer ID,Campaign,Ad group,Status,Label,Updates applied\n'
+    'Action,Customer ID,Campaign,Ad group,Status,Labels,Updates applied\n'
 )
 
 
@@ -289,7 +385,7 @@ class AdGroupsTest(parameterized.TestCase):
         'Campaign',
         'Ad group',
         'Status',
-        'Label',
+        'Labels',
         'Updates applied',
     ]
 

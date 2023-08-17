@@ -33,6 +33,7 @@ KEYWORD = 'Keyword'
 ORIGINAL_KEYWORD = 'Original Keyword'
 MATCH_TYPE = 'Match Type'
 KEYWORD_STATUS = 'Keyword status'
+LABELS = 'Labels'
 UPDATES_APPLIED = 'Updates applied'
 
 _COLS = [
@@ -44,12 +45,14 @@ _COLS = [
     ORIGINAL_KEYWORD,
     MATCH_TYPE,
     KEYWORD_STATUS,
+    LABELS,
     UPDATES_APPLIED,  # Updates applied to this DataFrame / Row.
 ]
 
 _DEFAULT_ACTION = 'Add'
 _DEFAULT_STATUS = 'Paused'
 _DEFAULT_CUSTOMER_ID = 'Enter customer ID'
+_DEFAULT_LABEL = 'Keyword Translator'
 
 
 class Keywords:
@@ -117,20 +120,18 @@ class Keywords:
     for response_json in response_jsons:
       for batch in response_json:
         for result in batch['results']:
-          keywords.append(
-              {
-                  ACTION: _DEFAULT_ACTION,
-                  CUSTOMER_ID: _DEFAULT_CUSTOMER_ID,
-                  CAMPAIGN: result['campaign']['name'],
-                  AD_GROUP: result['adGroup']['name'],
-                  KEYWORD: result['adGroupCriterion']['keyword']['text'],
-                  ORIGINAL_KEYWORD: result[
-                      'adGroupCriterion']['keyword']['text'],
-                  MATCH_TYPE: result[
-                      'adGroupCriterion']['keyword']['matchType'],
-                  KEYWORD_STATUS: _DEFAULT_STATUS,
-                  UPDATES_APPLIED: [],
-              })
+          keywords.append({
+              ACTION: _DEFAULT_ACTION,
+              CUSTOMER_ID: _DEFAULT_CUSTOMER_ID,
+              CAMPAIGN: result['campaign']['name'],
+              AD_GROUP: result['adGroup']['name'],
+              KEYWORD: result['adGroupCriterion']['keyword']['text'],
+              ORIGINAL_KEYWORD: result['adGroupCriterion']['keyword']['text'],
+              MATCH_TYPE: result['adGroupCriterion']['keyword']['matchType'],
+              KEYWORD_STATUS: _DEFAULT_STATUS,
+              LABELS: _DEFAULT_LABEL,
+              UPDATES_APPLIED: [],
+          })
 
     return pd.DataFrame(keywords, columns=_COLS)
 

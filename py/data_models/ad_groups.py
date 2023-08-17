@@ -27,7 +27,7 @@ CUSTOMER_ID = 'Customer ID'
 CAMPAIGN = 'Campaign'
 AD_GROUP = 'Ad group'
 STATUS = 'Status'
-LABEL = 'Label'
+LABEL = 'Labels'
 UPDATES_APPLIED = 'Updates applied'
 
 _COLS = [

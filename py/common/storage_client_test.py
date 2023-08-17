@@ -80,9 +80,10 @@ _KEYWORDS_GOOGLE_ADS_API_RESPONSE = [[{
 
 _FAKE_KEYWORDS_CSV = (
     'Action,Customer ID,Campaign,Ad group,Keyword,Original Keyword,Match'
-    ' Type,Keyword status,Updates applied\nAdd,Enter customer ID,Gmail Test'
-    ' Campaign,Ad group 1,e mail,e mail,BROAD,Paused,[]\nAdd,Enter customer'
-    ' ID,Gmail Test Campaign,Ad group 1,fast,fast,BROAD,Paused,[]\n'
+    ' Type,Keyword status,Labels,Updates applied\nAdd,Enter customer ID,Gmail'
+    ' Test Campaign,Ad group 1,e mail,e mail,BROAD,Paused,Keyword'
+    ' Translator,[]\nAdd,Enter customer ID,Gmail Test Campaign,Ad group'
+    ' 1,fast,fast,BROAD,Paused,Keyword Translator,[]\n'
 )
 
 _FAKE_BUCKET_NAME = 'fake_bucket_name'

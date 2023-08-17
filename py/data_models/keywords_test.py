@@ -80,87 +80,106 @@ _EMPTY_GOOGLE_ADS_RESPONSE = ([
       'requestId': 'fake_req_id'}]])
 
 _EXPECTED_DF = pd.DataFrame(
-    {'Action': ['Add', 'Add'],
-     'Customer ID': ['Enter customer ID', 'Enter customer ID'],
-     'Campaign': ['Gmail Test Campaign', 'Gmail Test Campaign'],
-     'Ad group': ['Ad group 1', 'Ad group 1'],
-     'Keyword': ['e mail', 'email'],
-     'Original Keyword': ['e mail', 'email'],
-     'Match Type': ['BROAD', 'BROAD'],
-     'Keyword status': ['Paused', 'Paused'],
-     'Updates applied': [[], []]},
+    {
+        'Action': ['Add', 'Add'],
+        'Customer ID': ['Enter customer ID', 'Enter customer ID'],
+        'Campaign': ['Gmail Test Campaign', 'Gmail Test Campaign'],
+        'Ad group': ['Ad group 1', 'Ad group 1'],
+        'Keyword': ['e mail', 'email'],
+        'Original Keyword': ['e mail', 'email'],
+        'Match Type': ['BROAD', 'BROAD'],
+        'Keyword status': ['Paused', 'Paused'],
+        'Labels': ['Keyword Translator', 'Keyword Translator'],
+        'Updates applied': [[], []],
+    },
 )
 
 _EXPECTED_CSV_DATA = (
     'Action,Customer ID,Campaign,Ad group,Keyword,Original Keyword,Match'
-    ' Type,Keyword status,Updates applied\nAdd,Enter customer ID,Gmail Test'
-    ' Campaign,Ad group 1,e mail,e mail,BROAD,Paused,[]\nAdd,Enter customer'
-    ' ID,Gmail Test Campaign,Ad group 1,email,email,BROAD,Paused,[]\n'
+    ' Type,Keyword status,Labels,Updates applied\nAdd,Enter customer ID,Gmail'
+    ' Test Campaign,Ad group 1,e mail,e mail,BROAD,Paused,Keyword'
+    ' Translator,[]\nAdd,Enter customer ID,Gmail Test Campaign,Ad group'
+    ' 1,email,email,BROAD,Paused,Keyword Translator,[]\n'
 )
 
 _EXPECTED_DF_EMPTY = pd.DataFrame(
-    {'Action': pd.Series([], dtype='object'),
-     'Customer ID': pd.Series([], dtype='object'),
-     'Campaign': pd.Series([], dtype='object'),
-     'Ad group': pd.Series([], dtype='object'),
-     'Keyword': pd.Series([], dtype='object'),
-     'Original Keyword': pd.Series([], dtype='object'),
-     'Match Type': pd.Series([], dtype='object'),
-     'Keyword status': pd.Series([], dtype='object'),
-     'Updates applied': pd.Series([], dtype='object')},
+    {
+        'Action': pd.Series([], dtype='object'),
+        'Customer ID': pd.Series([], dtype='object'),
+        'Campaign': pd.Series([], dtype='object'),
+        'Ad group': pd.Series([], dtype='object'),
+        'Keyword': pd.Series([], dtype='object'),
+        'Original Keyword': pd.Series([], dtype='object'),
+        'Match Type': pd.Series([], dtype='object'),
+        'Keyword status': pd.Series([], dtype='object'),
+        'Labels': pd.Series([], dtype='object'),
+        'Updates applied': pd.Series([], dtype='object'),
+    },
 )
 
 _EXPECTED_CSV_DATA_EMPTY = (
     'Action,Customer ID,Campaign,Ad group,Keyword,Original Keyword,Match'
-    ' Type,Keyword status,Updates applied\n'
+    ' Type,Keyword status,Labels,Updates applied\n'
 )
 
 _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame(
-    {'Action': ['Add', 'Add'],
-     'Customer ID': ['Enter customer ID', 'Enter customer ID'],
-     'Campaign': ['Gmail Test Campaign', 'Gmail Test Campaign'],
-     'Ad group': ['Ad group 1', 'Ad group 1'],
-     'Keyword': ['e mail', 'email'],
-     'Original Keyword': ['e mail', 'email'],
-     'Match Type': ['BROAD', 'BROAD'],
-     'Keyword status': ['Paused', 'Paused'],
-     'Updates applied': [['Translated'], ['Translated']]},
+    {
+        'Action': ['Add', 'Add'],
+        'Customer ID': ['Enter customer ID', 'Enter customer ID'],
+        'Campaign': ['Gmail Test Campaign', 'Gmail Test Campaign'],
+        'Ad group': ['Ad group 1', 'Ad group 1'],
+        'Keyword': ['e mail', 'email'],
+        'Original Keyword': ['e mail', 'email'],
+        'Match Type': ['BROAD', 'BROAD'],
+        'Keyword status': ['Paused', 'Paused'],
+        'Labels': ['Keyword Translator', 'Keyword Translator'],
+        'Updates applied': [['Translated'], ['Translated']],
+    },
 )
 
 _EXPECTED_DF_AFTER_AD_GROUP_UPDATE = pd.DataFrame(
-    {'Action': ['Add', 'Add'],
-     'Customer ID': ['Enter customer ID', 'Enter customer ID'],
-     'Campaign': ['Gmail Test Campaign', 'Gmail Test Campaign'],
-     'Ad group': ['Ad group 1 (es)', 'Ad group 1 (es)'],
-     'Keyword': ['e mail', 'email'],
-     'Original Keyword': ['e mail', 'email'],
-     'Match Type': ['BROAD', 'BROAD'],
-     'Keyword status': ['Paused', 'Paused'],
-     'Updates applied': [[], []]},
+    {
+        'Action': ['Add', 'Add'],
+        'Customer ID': ['Enter customer ID', 'Enter customer ID'],
+        'Campaign': ['Gmail Test Campaign', 'Gmail Test Campaign'],
+        'Ad group': ['Ad group 1 (es)', 'Ad group 1 (es)'],
+        'Keyword': ['e mail', 'email'],
+        'Original Keyword': ['e mail', 'email'],
+        'Match Type': ['BROAD', 'BROAD'],
+        'Keyword status': ['Paused', 'Paused'],
+        'Labels': ['Keyword Translator', 'Keyword Translator'],
+        'Updates applied': [[], []],
+    },
 )
 
 _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame(
-    {'Action': ['Add', 'Add'],
-     'Customer ID': ['Enter customer ID', 'Enter customer ID'],
-     'Campaign': ['Gmail Test Campaign', 'Gmail Test Campaign'],
-     'Ad group': ['Ad group 1', 'Ad group 1'],
-     'Keyword': ['correo electrónico', 'c-electrónico'],
-     'Original Keyword': ['e mail', 'email'],
-     'Match Type': ['BROAD', 'BROAD'],
-     'Keyword status': ['Paused', 'Paused'],
-     'Updates applied': [[], []]},
+    {
+        'Action': ['Add', 'Add'],
+        'Customer ID': ['Enter customer ID', 'Enter customer ID'],
+        'Campaign': ['Gmail Test Campaign', 'Gmail Test Campaign'],
+        'Ad group': ['Ad group 1', 'Ad group 1'],
+        'Keyword': ['correo electrónico', 'c-electrónico'],
+        'Original Keyword': ['e mail', 'email'],
+        'Match Type': ['BROAD', 'BROAD'],
+        'Keyword status': ['Paused', 'Paused'],
+        'Labels': ['Keyword Translator', 'Keyword Translator'],
+        'Updates applied': [[], []],
+    },
 )
 
 _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame(
-    {'Action': ['Add', 'Add'],
-     'Customer ID': ['Enter customer ID', 'Enter customer ID'],
-     'Campaign': ['Gmail Test Campaign (es)', 'Gmail Test Campaign (es)'],
-     'Ad group': ['Ad group 1 (es)', 'Ad group 1 (es)'],
-     'Keyword': ['correo electrónico', 'c-electrónico'],
-     'Original Keyword': ['e mail', 'email'],
-     'Match Type': ['BROAD', 'BROAD'],
-     'Keyword status': ['Paused', 'Paused'],
-     'Updates applied': [[], []]},
+    {
+        'Action': ['Add', 'Add'],
+        'Customer ID': ['Enter customer ID', 'Enter customer ID'],
+        'Campaign': ['Gmail Test Campaign (es)', 'Gmail Test Campaign (es)'],
+        'Ad group': ['Ad group 1 (es)', 'Ad group 1 (es)'],
+        'Keyword': ['correo electrónico', 'c-electrónico'],
+        'Original Keyword': ['e mail', 'email'],
+        'Match Type': ['BROAD', 'BROAD'],
+        'Keyword status': ['Paused', 'Paused'],
+        'Labels': ['Keyword Translator', 'Keyword Translator'],
+        'Updates applied': [[], []],
+    },
 )
 
 
@@ -231,6 +250,7 @@ class KeywordsTest(parameterized.TestCase):
         'Original Keyword',
         'Match Type',
         'Keyword status',
+        'Labels',
         'Updates applied',
     ]
 

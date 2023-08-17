@@ -169,15 +169,18 @@ _ADS_DATA_GOOGLE_ADS_API_RESPONSE = [
       'requestId': 'fake_request_id'}]]
 
 _EXPECTED_KEYWORDS_DF = pd.DataFrame(
-    {'Action': ['Add', 'Add'],
-     'Customer ID': ['Enter customer ID', 'Enter customer ID'],
-     'Campaign': ['Gmail Test Campaign (es)', 'Gmail Test Campaign (es)'],
-     'Ad group': ['Ad group 1 (es)', 'Ad group 1 (es)'],
-     'Keyword': ['correo electrónico', 'rápido'],
-     'Original Keyword': ['e mail', 'fast'],
-     'Match Type': ['BROAD', 'BROAD'],
-     'Keyword status': ['Paused', 'Paused'],
-     'Updates applied': [[], []]},
+    {
+        'Action': ['Add', 'Add'],
+        'Customer ID': ['Enter customer ID', 'Enter customer ID'],
+        'Campaign': ['Gmail Test Campaign (es)', 'Gmail Test Campaign (es)'],
+        'Ad group': ['Ad group 1 (es)', 'Ad group 1 (es)'],
+        'Keyword': ['correo electrónico', 'rápido'],
+        'Original Keyword': ['e mail', 'fast'],
+        'Match Type': ['BROAD', 'BROAD'],
+        'Keyword status': ['Paused', 'Paused'],
+        'Labels': ['Keyword Translator', 'Keyword Translator'],
+        'Updates applied': [[], []],
+    },
 )
 
 _EXPECTED_ADS_DF = pd.DataFrame(
@@ -248,7 +251,7 @@ _EXPECTED_ADS_DF = pd.DataFrame(
             'https://mail.google.com/',
             'http://analytics.google.com',
         ],
-        'Label': ['Keyword Translator', 'Keyword Translator'],
+        'Labels': ['Keyword Translator', 'Keyword Translator'],
         'Updates applied': [[], []],
     },
 )

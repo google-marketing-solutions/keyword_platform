@@ -186,7 +186,7 @@ _EXPECTED_DF = pd.DataFrame(
             'https://mail.google.com/',
             'http://analytics.google.com',
         ],
-        'Label': ['Keyword Translator', 'Keyword Translator'],
+        'Labels': ['Keyword Translator', 'Keyword Translator'],
         'Updates applied': [[], []],
     },
 )
@@ -201,7 +201,7 @@ _EXPECTED_CSV_DATA = (
     ' 12,Headline 13,Original Headline 13,Headline 14,Original Headline'
     ' 14,Headline 15,Original Headline 15,Description 1,Original Description'
     ' 1,Description 2,Original Description 2,Description 3,Original Description'
-    ' 3,Description 4,Original Description 4,Final URL,Label,Updates'
+    ' 3,Description 4,Original Description 4,Final URL,Labels,Updates'
     ' applied\nAdd,Enter customer ID,Paused,Gmail Test Campaign,Ad group'
     ' 1,Responsive search ad,Email Login,Email Login,Online Email,Online'
     ' Email,Sign in,Sign in,,,,,,,,,,,,,,,,,,,,,,,,,"Email thats intuitive,'
@@ -278,7 +278,7 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame(
             'https://mail.google.com/',
             'http://analytics.google.com',
         ],
-        'Label': ['Keyword Translator', 'Keyword Translator'],
+        'Labels': ['Keyword Translator', 'Keyword Translator'],
         'Updates applied': [['Translated'], ['Translated']],
     },
 )
@@ -348,7 +348,7 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame(
             'https://mail.google.com/',
             'http://analytics.google.com',
         ],
-        'Label': ['Keyword Translator', 'Keyword Translator'],
+        'Labels': ['Keyword Translator', 'Keyword Translator'],
         'Updates applied': [[], []],
     },
 )
@@ -400,7 +400,7 @@ _EXPECTED_DF_EMPTY = pd.DataFrame(
         'Description 4': pd.Series([], dtype='object'),
         'Original Description 4': pd.Series([], dtype='object'),
         'Final URL': pd.Series([], dtype='object'),
-        'Label': pd.Series([], dtype='object'),
+        'Labels': pd.Series([], dtype='object'),
         'Updates applied': pd.Series([], dtype='object'),
     },
 )
@@ -415,7 +415,7 @@ _EXPECTED_CSV_DATA_EMPTY = (
     ' 12,Headline 13,Original Headline 13,Headline 14,Original Headline'
     ' 14,Headline 15,Original Headline 15,Description 1,Original Description'
     ' 1,Description 2,Original Description 2,Description 3,Original Description'
-    ' 3,Description 4,Original Description 4,Final URL,Label,Updates applied\n'
+    ' 3,Description 4,Original Description 4,Final URL,Labels,Updates applied\n'
 )
 
 _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame(
@@ -480,7 +480,7 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame(
             'https://mail.google.com/',
             'http://analytics.google.com',
         ],
-        'Label': ['Keyword Translator', 'Keyword Translator'],
+        'Labels': ['Keyword Translator', 'Keyword Translator'],
         'Updates applied': [[], []],
     },
 )
@@ -550,7 +550,7 @@ _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame(
             'https://mail.google.com/',
             'http://analytics.google.com',
         ],
-        'Label': ['Keyword Translator', 'Keyword Translator'],
+        'Labels': ['Keyword Translator', 'Keyword Translator'],
         'Updates applied': [[], []],
     },
 )
@@ -660,7 +660,7 @@ class AdsTest(parameterized.TestCase):
         'Description 4',
         'Original Description 4',
         'Final URL',
-        'Label',
+        'Labels',
         'Updates applied',
     ]
 

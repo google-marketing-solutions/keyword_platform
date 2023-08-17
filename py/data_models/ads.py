@@ -72,7 +72,7 @@ ORIGINAL_DESCRIPTION_3 = 'Original Description 3'
 DESCRIPTION_4 = 'Description 4'
 ORIGINAL_DESCRIPTION_4 = 'Original Description 4'
 FINAL_URL = 'Final URL'
-LABEL = 'Label'
+LABEL = 'Labels'
 UPDATES_APPLIED = 'Updates applied'
 
 _COLS = [
