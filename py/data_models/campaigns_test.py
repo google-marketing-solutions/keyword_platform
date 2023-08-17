@@ -82,56 +82,84 @@ _EMPTY_GOOGLE_ADS_RESPONSE = [[{
 }]]
 
 _EXPECTED_DF = pd.DataFrame(
-    {'Action': ['Add', 'Add', 'Add'],
-     'Campaign status': ['Paused', 'Paused', 'Paused'],
-     'Customer ID': [
-         'Enter customer ID', 'Enter customer ID', 'Enter customer ID'],
-     'Campaign': ['Test Campaign 0', 'Test Campaign 1', 'Test Campaign 2'],
-     'Campaign type': ['SEARCH', 'SEARCH', 'SEARCH'],
-     'Bid strategy type': [
-         'TARGET_SPEND', 'TARGET_SPEND', 'MAXIMIZE_CONVERSIONS'],
-     'Label': [
-         'Keyword Translator', 'Keyword Translator', 'Keyword Translator'],
-     'Updates applied': [[], [], []]},
+    {
+        'Action': ['Add', 'Add', 'Add'],
+        'Campaign status': ['Paused', 'Paused', 'Paused'],
+        'Customer ID': [
+            'Enter customer ID',
+            'Enter customer ID',
+            'Enter customer ID',
+        ],
+        'Campaign': ['Test Campaign 0', 'Test Campaign 1', 'Test Campaign 2'],
+        'Campaign type': ['SEARCH', 'SEARCH', 'SEARCH'],
+        'Bid strategy type': [
+            'TARGET_SPEND',
+            'TARGET_SPEND',
+            'MAXIMIZE_CONVERSIONS',
+        ],
+        'Budget': ['1.00', '1.00', '1.00'],
+        'Labels': [
+            'Keyword Translator',
+            'Keyword Translator',
+            'Keyword Translator',
+        ],
+        'Updates applied': [[], [], []],
+    },
 )
 
 _EXPECTED_CSV_DATA = (
     'Action,Campaign status,Customer ID,Campaign,Campaign type,Bid strategy'
-    ' type,Label,Updates applied\nAdd,Paused,Enter customer ID,Test Campaign'
-    ' 0,SEARCH,TARGET_SPEND,Keyword Translator,[]\nAdd,Paused,Enter customer'
-    ' ID,Test Campaign 1,SEARCH,TARGET_SPEND,Keyword'
+    ' type,Budget,Labels,Updates applied\nAdd,Paused,Enter customer ID,Test'
+    ' Campaign 0,SEARCH,TARGET_SPEND,1.00,Keyword'
     ' Translator,[]\nAdd,Paused,Enter customer ID,Test Campaign'
-    ' 2,SEARCH,MAXIMIZE_CONVERSIONS,Keyword Translator,[]\n'
+    ' 1,SEARCH,TARGET_SPEND,1.00,Keyword Translator,[]\nAdd,Paused,Enter'
+    ' customer ID,Test Campaign 2,SEARCH,MAXIMIZE_CONVERSIONS,1.00,Keyword'
+    ' Translator,[]\n'
 )
 
 _EXPECTED_DF_EMPTY = pd.DataFrame(
-    {'Action': pd.Series([], dtype='object'),
-     'Campaign status': pd.Series([], dtype='object'),
-     'Customer ID': pd.Series([], dtype='object'),
-     'Campaign': pd.Series([], dtype='object'),
-     'Campaign type': pd.Series([], dtype='object'),
-     'Bid strategy type': pd.Series([], dtype='object'),
-     'Label': pd.Series([], dtype='object'),
-     'Updates applied': pd.Series([], dtype='object')},
+    {
+        'Action': pd.Series([], dtype='object'),
+        'Campaign status': pd.Series([], dtype='object'),
+        'Customer ID': pd.Series([], dtype='object'),
+        'Campaign': pd.Series([], dtype='object'),
+        'Campaign type': pd.Series([], dtype='object'),
+        'Bid strategy type': pd.Series([], dtype='object'),
+        'Budget': pd.Series([], dtype='object'),
+        'Labels': pd.Series([], dtype='object'),
+        'Updates applied': pd.Series([], dtype='object'),
+    },
 )
 
 _EXPECTED_CSV_DATA_EMPTY = (
     'Action,Campaign status,Customer ID,Campaign,Campaign type,Bid strategy'
-    ' type,Label,Updates applied\n'
+    ' type,Budget,Labels,Updates applied\n'
 )
 
 _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame(
-    {'Action': ['Add', 'Add', 'Add'],
-     'Campaign status': ['Paused', 'Paused', 'Paused'],
-     'Customer ID': [
-         'Enter customer ID', 'Enter customer ID', 'Enter customer ID'],
-     'Campaign': ['Test Campaign 0', 'Test Campaign 1', 'Test Campaign 2'],
-     'Campaign type': ['SEARCH', 'SEARCH', 'SEARCH'],
-     'Bid strategy type': [
-         'TARGET_SPEND', 'TARGET_SPEND', 'MAXIMIZE_CONVERSIONS'],
-     'Label': [
-         'Keyword Translator', 'Keyword Translator', 'Keyword Translator'],
-     'Updates applied': [['Translated'], ['Translated'], ['Translated']]},
+    {
+        'Action': ['Add', 'Add', 'Add'],
+        'Campaign status': ['Paused', 'Paused', 'Paused'],
+        'Customer ID': [
+            'Enter customer ID',
+            'Enter customer ID',
+            'Enter customer ID',
+        ],
+        'Campaign': ['Test Campaign 0', 'Test Campaign 1', 'Test Campaign 2'],
+        'Campaign type': ['SEARCH', 'SEARCH', 'SEARCH'],
+        'Bid strategy type': [
+            'TARGET_SPEND',
+            'TARGET_SPEND',
+            'MAXIMIZE_CONVERSIONS',
+        ],
+        'Budget': ['1.00', '1.00', '1.00'],
+        'Labels': [
+            'Keyword Translator',
+            'Keyword Translator',
+            'Keyword Translator',
+        ],
+        'Updates applied': [['Translated'], ['Translated'], ['Translated']],
+    },
 )
 
 _EXPECTED_LIST = list([
@@ -235,7 +263,8 @@ class CampaignsTest(parameterized.TestCase):
         'Campaign',
         'Campaign type',
         'Bid strategy type',
-        'Label',
+        'Budget',
+        'Labels',
         'Updates applied',
     ]
 

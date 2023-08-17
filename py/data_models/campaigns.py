@@ -27,8 +27,9 @@ CUSTOMER_ID = 'Customer ID'
 CAMPAIGN = 'Campaign'
 CAMPAIGN_TYPE = 'Campaign type'
 BID_STRATEGY_TYPE = 'Bid strategy type'
-LABEL = 'Label'
+LABEL = 'Labels'
 UPDATES_APPLIED = 'Updates applied'
+BUDGET = 'Budget'
 
 _COLS = [
     ACTION,
@@ -37,6 +38,7 @@ _COLS = [
     CAMPAIGN,  # Campaign name
     CAMPAIGN_TYPE,
     BID_STRATEGY_TYPE,
+    BUDGET,
     LABEL,
     UPDATES_APPLIED,  # Updates applied to this DataFrame / Row.
 ]
@@ -45,6 +47,7 @@ _DEFAULT_ACTION = 'Add'
 _DEFAULT_STATUS = 'Paused'
 _DEFAULT_CUSTOMER_ID = 'Enter customer ID'
 _DEFAULT_LABEL = 'Keyword Translator'
+_DEFAULT_BUDGET = '1.00'
 
 
 class Campaigns:
@@ -123,6 +126,7 @@ class Campaigns:
                   CAMPAIGN: result['campaign']['name'],
                   CAMPAIGN_TYPE: result['campaign']['advertisingChannelType'],
                   BID_STRATEGY_TYPE: result['campaign']['biddingStrategyType'],
+                  BUDGET: _DEFAULT_BUDGET,
                   LABEL: _DEFAULT_LABEL,
                   UPDATES_APPLIED: [],
               })
