@@ -49,7 +49,7 @@ resource "google_cloud_run_service" "backend_run" {
       service_account_name = google_service_account.backend_sa.email
 
       containers {
-        image = format("%s:%s", var.backend_image, "latest")
+        image = data.google_container_registry_image.backend_latest.image_url
 
         env {
           name  = "GCP_PROJECT"
@@ -102,7 +102,7 @@ resource "google_cloud_run_service" "frontend_run" {
       service_account_name = google_service_account.frontend_sa.email
 
       containers {
-        image = format("%s:%s", var.frontend_image, "latest")
+        image = data.google_container_registry_image.frontend_latest.image_url
 
         env {
           name  = "BACKEND_URL"
@@ -121,6 +121,41 @@ resource "google_cloud_run_service" "frontend_run" {
 
   depends_on = [google_project_service.apis]
 }
+
+// In order to update the Cloud Run deployment when the underlying :latest
+// image changes, we will retrieve the sha256_digest of the image through
+// the docker provider, since the google container registry does not seem
+// to have an API.
+data "google_client_config" "default" {}
+
+provider "docker" {
+  registry_auth {
+    address  = "gcr.io"
+    username = "oauth2accesstoken"
+    password = data.google_client_config.default.access_token
+  }
+}
+
+data "docker_registry_image" "frontend_image" {
+  name = format("%s:%s", var.frontend_image, "latest")
+}
+
+data "google_container_registry_image" "frontend_latest" {
+  name    = "keywordplatform-frontend"
+  project = var.project_id
+  digest  = data.docker_registry_image.frontend_image.sha256_digest
+}
+
+data "docker_registry_image" "backend_image" {
+  name = format("%s:%s", var.backend_image, "latest")
+}
+
+data "google_container_registry_image" "backend_latest" {
+  name    = "keywordplatform-backend"
+  project = var.project_id
+  digest  = data.docker_registry_image.backend_image.sha256_digest
+}
+
 
 ##
 # Secret Manager

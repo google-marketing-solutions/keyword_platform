@@ -26,6 +26,10 @@ terraform {
       source = "hashicorp/random"
       version = "3.4.3"
     }
+    docker = {
+      source = "kreuzwerker/docker"
+      version = "3.0.2"
+    }
   }
 }
 

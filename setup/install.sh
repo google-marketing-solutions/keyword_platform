@@ -98,8 +98,8 @@ read iap_allowed_users
 IAP_ALLOWED_USERS=$iap_allowed_users
 
 terraform_state_bucket_name="${GOOGLE_CLOUD_PROJECT}-bucket-tfstate"
-backend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform/backend"
-frontend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform/frontend"
+backend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform-backend"
+frontend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform-frontend"
 
 # Enable the APIs.
 REQUIRED_APIS=(
