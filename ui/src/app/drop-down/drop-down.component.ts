@@ -43,6 +43,8 @@ export class DropDownComponent implements OnInit {
 
   control = new FormControl();
 
+  isAllSelected?: boolean;
+
   ngOnInit() {
     if (this.isRequired) {
       this.control.addValidators(Validators.required);
@@ -73,6 +75,7 @@ export class DropDownComponent implements OnInit {
     } else {
       options.forEach((item: MatOption) => item.deselect());
     }
+    this.isAllSelected = isSelected;
   }
 
   onChange(selection: SelectionData[]) {
@@ -80,7 +83,20 @@ export class DropDownComponent implements OnInit {
     // value is undefined due to it being 'Select All'.
     if (this.isMultiple && !selection[0]) {
       selection.shift();
+      // If multi-select and all options are selected then only emit event when
+      // the length of the listed options is the same as length of the selected
+      // options otherwise it will continuously trigger until the length of the
+      // selected options reaches the size of the listed options.
+      if (selection.length === this.values.length) {
+        this.selectionEvent.emit(selection);
+      }
+    } else {
+      // Toggling all selected options is always detected by this onChange event
+      // so do not emit this event when selection of all options is used or if
+      // used then do not emit when all selection options get deselected.
+      if (!this.isAllSelected) {
+        this.selectionEvent.emit(selection);
+      }
     }
-    this.selectionEvent.emit(selection);
   }
 }
