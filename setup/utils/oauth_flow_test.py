@@ -77,6 +77,11 @@ class OAuthFlowTest(absltest.TestCase):
           FLAGS.client_id, FLAGS.client_secret, FLAGS.state
       ).get_refresh_token_from_flow()
 
+      # Still expecting three attempts.
+      self.fake_flow.Flow.from_client_config.return_value.fetch_token.call_count = (
+          3
+      )
+
   @mock.patch('builtins.input', lambda _: _FAKE_AUTH_URL_RESULT)
   def test_flow_raises_missing_code_error(self):
     self.fake_flow.Flow.from_client_config.return_value.fetch_token.side_effect = (
@@ -88,6 +93,11 @@ class OAuthFlowTest(absltest.TestCase):
           FLAGS.client_id, FLAGS.client_secret, FLAGS.state
       ).get_refresh_token_from_flow()
 
+      # Still expecting three attempts.
+      self.fake_flow.Flow.from_client_config.return_value.fetch_token.call_count = (
+          3
+      )
+
   def test_write_refresh_token_to_file(self):
     mock_file_handle = mock.mock_open()
 
@@ -96,6 +106,25 @@ class OAuthFlowTest(absltest.TestCase):
 
     mock_file_handle.assert_called_once_with('refresh_token.txt', 'w')
     mock_file_handle().write.assert_called_once_with('fake_refresh_token')
+
+  @mock.patch('builtins.input', lambda _: _FAKE_AUTH_URL_RESULT)
+  def test_retry_on_failure(self):
+    self.fake_flow.Flow.from_client_config.return_value.fetch_token.side_effect = [
+        auth_errors.InvalidGrantError(),
+        auth_errors.MissingCodeError(),
+        'fake_token',
+    ]
+
+    oauth_flow.OAuthFlow(
+        FLAGS.client_id, FLAGS.client_secret, FLAGS.state
+    ).get_refresh_token_from_flow()
+
+    # Expecting three attempts.
+    self.fake_flow.Flow.from_client_config.return_value.fetch_token.assert_has_calls([
+        mock.call(code=_FAKE_CODE),
+        mock.call(code=_FAKE_CODE),
+        mock.call(code=_FAKE_CODE),
+    ])
 
 
 if __name__ == '__main__':

@@ -24,7 +24,6 @@ from collections.abc import Sequence
 import os
 from typing import Union
 import urllib
-
 from absl import app
 from absl import flags
 import google_auth_oauthlib
@@ -48,6 +47,7 @@ _SCOPES = [
 ]
 
 _REDIRECT_URI = 'http://localhost:8080'
+_ATTEMPTS = 3
 
 
 class OAuthFlow:
@@ -97,8 +97,8 @@ class OAuthFlow:
         state=self._state,
     )
 
-  def get_refresh_token_from_flow(self) -> str:
-    """Launches an interacitive process obtain an OAuth2.0 refresh token.
+  def get_refresh_token_from_flow(self) -> Union[str, None]:
+    """Launches an interacitive process to obtain an OAuth2.0 refresh token.
 
     Returns:
       A refresh token.
@@ -107,35 +107,45 @@ class OAuthFlow:
       InvalidGrantError: If the grant was invalid.
       MissingCodeError: If flow is missing the authorization code.
     """
-    authorization_url, _ = self._flow.authorization_url(
-        # Enable offline access so that you can refresh an access token without
-        # re-prompting the user for permission. Recommended for web server apps.
-        access_type='offline',
-        # Enable incremental authorization. Recommended as a best practice.
-        include_granted_scopes='true',
-        prompt='consent',
-    )
-    print('\n-----------------------------------------------------------')
-    print(
-        'Log into the Google Account you use to access your AdWords account '
-        f'and go to the following URL: \n{authorization_url}\n'
-    )
-    print('-----------------------------------------------------------')
-    print(
-        'After approving you will ecounter ERR_CONNECTION_REFUSED - This is '
-        'expected.'
-    )
-    print('Copy and paste the full URL from your browsers address bar.')
-    url = input('URL: ').strip()
-    code = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)['code'][0]
-    os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+    for i in range(_ATTEMPTS):
+      authorization_url, _ = self._flow.authorization_url(
+          # Enable offline access so that you can refresh an access token
+          # without re-prompting the user for permission. Recommended for web
+          # server apps.
+          access_type='offline',
+          # Enable incremental authorization. Recommended as a best practice.
+          include_granted_scopes='true',
+          prompt='consent',
+      )
+      print('\n-----------------------------------------------------------')
+      print(
+          'Log into the Google Account you use to access your Google Ads'
+          f' account and click the following URL: \n{authorization_url}\n'
+      )
+      print('-----------------------------------------------------------')
+      print(
+          'After approving you will ecounter ERR_CONNECTION_REFUSED - This is'
+          ' expected.'
+      )
+      print("Copy and paste the full URL from your browser's address bar.")
+      url = input('URL: ').strip()
+      code = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)['code'][0]
+      os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
-    try:
-      self._flow.fetch_token(code=code)
-    except (auth_errors.InvalidGrantError, auth_errors.MissingCodeError) as err:
-      print(f'Authentication has failed: {err}')
-      raise err
-    return self._flow.credentials.refresh_token
+      try:
+        self._flow.fetch_token(code=code)
+        return self._flow.credentials.refresh_token
+      except (
+          auth_errors.InvalidGrantError,
+          auth_errors.MissingCodeError,
+      ) as err:
+        # Only raise the error when the last attempt failes.
+        if i < _ATTEMPTS - 1:
+          print(f'Authentication has failed: {err}. Try again...')
+          continue
+        else:
+          print(f'Authentication has failed: {err}.')
+          raise err
 
 
 def _write_refresh_token_to_file(refresh_token: str) -> None:
