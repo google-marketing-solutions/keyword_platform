@@ -17,6 +17,7 @@
 See class doctring for more details.
 """
 import ast
+from absl import logging
 import google.generativeai as genai
 
 _MODEL = 'models/text-bison-001'
@@ -52,12 +53,16 @@ class PalmClient:
       char_limit: The character limit to shorten the text to.
 
     Returns:
-      The a list of strings that are under the passed character limit.
-
-    Raises:
-      ValueError: If the requested language is not supported.
+      The a list of strings that are under the passed character limit. If the
+      passed language code isn't supported the original text list is returned.
     """
-    if language_code in AVAILABLE_LANGUAGES:
+    if language_code not in AVAILABLE_LANGUAGES:
+      logging.warning(
+          'Language %s not supported. Returning original text list.',
+          language_code,
+      )
+      return text_list
+    else:
       shorten_prompt = f"""
         For each of the following list elements, shorten the sentences to be
         under {char_limit} characters only if it is above {char_limit}
@@ -75,5 +80,3 @@ class PalmClient:
           temperature=0,
       )
       return ast.literal_eval(response.result)
-    else:
-      raise ValueError(f'Language "{language_code}" not supported.')

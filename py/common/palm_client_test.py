@@ -68,14 +68,21 @@ class PalmClientTest(absltest.TestCase):
     )
     self.assertEqual(actual_result, expected_result)
 
-  def test_shorten_text_to_char_limit_raises_value_error_unsupported_language(
+  def test_shorten_text_to_char_limit_logs_warning_unsupported_language(
       self,
   ):
     palm_client = palm_client_lib.PalmClient('api_key')
 
-    with self.assertRaises(ValueError):
-      # Language is not listed under the palm_client_lib.AVAILABLE_LANGUAGES.
+    with self.assertLogs() as logs:
       palm_client.shorten_text_to_char_limit(['some_text'], 'unsupported', 50)
+
+    self.assertEqual(
+        logs.output,
+        [
+            'WARNING:absl:Language unsupported not supported.'
+            ' Returning original text list.'
+        ],
+    )
 
 
 if __name__ == '__main__':
