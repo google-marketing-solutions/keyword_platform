@@ -17,6 +17,7 @@
 See class doctring for more details.
 """
 from absl import logging
+import requests
 
 from common import api_utils
 from data_models import translation_frame as translation_frame_lib
@@ -131,8 +132,16 @@ class CloudTranslationClient:
       url = TRANSLATE_TEXT_ENDPOINT.format(
           api_version=self.api_version, gcp_project_name=self.gcp_project_name)
 
-      response = api_utils.send_api_request(
-          url, params, self._get_http_header())
+      try:
+        response = api_utils.send_api_request(
+            url, params, self._get_http_header())
+      except requests.exceptions.HTTPError as http_error:
+        # If the translation API requests still fail after retries, it's likely
+        # we may have hit project quota. In this case, exit early so we can
+        # just write the data we did get instead of losing everything.
+        logging.exception(
+            'Encountered error during calls to Translation API: %s', http_error)
+        return
 
       logging.info('Got responses for terms %d-%d of %d',
                    batch_start,

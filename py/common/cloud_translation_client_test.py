@@ -15,6 +15,7 @@
 """Tests for the CloudTranslationClient class."""
 
 from unittest import mock
+import requests
 
 import pandas as pd
 
@@ -129,6 +130,64 @@ class CloudTranslationClientTest(absltest.TestCase):
 
     # Asserts mock calls (covering batching logic)
     mock_send_api_request.assert_has_calls(expected_api_calls, any_order=True)
+
+  @mock.patch.object(api_utils, 'refresh_access_token', autospec=True)
+  @mock.patch.object(api_utils, 'send_api_request', autospec=True)
+  def test_translate_exits_early_on_api_error(
+      self, mock_send_api_request, mock_refresh_access_token):
+    credentials = {
+        'client_id': 'fake_client_id',
+        'client_secret': 'fake_client_secret',
+        'refresh_token': 'fake_refresh_token',
+    }
+    gcp_project_name = 'fake_gcp_project'
+    source_language = 'en'
+    target_language = 'es'
+    api_version = 3
+    batch_char_limit = 10  # Set to smaller size for testing
+
+    cloud_translation_client = (
+        cloud_translation_client_lib.CloudTranslationClient(
+            credentials=credentials,
+            gcp_project_name=gcp_project_name,
+            api_version=api_version,
+            batch_char_limit=batch_char_limit))
+
+    translation_frame = translation_frame_lib.TranslationFrame({
+        'email': [(0, 'Keyword'), (2, 'Keyword')],
+        'fast': [(1, 'Keyword')],
+        'efficient': [(2, 'Keyword')],
+    })
+
+    expected_translated_df = pd.DataFrame({
+        'source_term': ['email', 'fast', 'efficient'],
+        'target_terms': [{'es': 'correo electrónico'},
+                         {'es': 'rápido'},
+                         {}],
+        'dataframe_locations': [
+            [(0, 'Keyword'), (2, 'Keyword')],
+            [(1, 'Keyword')],
+            [(2, 'Keyword')]],
+        })
+
+    mock_send_api_request.side_effect = [
+        {'translations': [
+            {'translatedText': 'correo electrónico'},
+            {'translatedText': 'rápido'}]},
+        requests.exceptions.HTTPError()]
+
+    mock_refresh_access_token.return_value = 'fake_access_token'
+
+    cloud_translation_client.translate(
+        translation_frame=translation_frame,
+        source_language_code=source_language,
+        target_language_code=target_language)
+
+    actual_translated_df = translation_frame.df()
+
+    # Asserts expected translations added to translation frame
+    pd.testing.assert_frame_equal(
+        expected_translated_df, actual_translated_df, check_index_type=False)
 
 
 if __name__ == '__main__':

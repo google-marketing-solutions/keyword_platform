@@ -215,7 +215,8 @@ class Keywords:
     """
     for _, row in translation_frame.df().iterrows():
       target_row_and_columns = row[translation_frame_lib.DATAFRAME_LOCATIONS]
-      target_term = row[translation_frame_lib.TARGET_TERMS][target_language]
+      target_term = row[translation_frame_lib.TARGET_TERMS].get(
+          target_language, '')
 
       for target_row, target_column in target_row_and_columns:
         self._df.loc[target_row, target_column] = target_term
