@@ -100,7 +100,7 @@ IAP_ALLOWED_USERS=$iap_allowed_users
 echo "(Optional) Enter a PaLM API Key or press enter to continue:"
 read palm_api_key
 if [ -z "$palm_api_key" ]; then
-    PALM_API_KEY=null
+  PALM_API_KEY=null
 else
   PALM_API_KEY=$palm_api_key
 fi
