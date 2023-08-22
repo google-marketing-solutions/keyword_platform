@@ -338,6 +338,9 @@ class ExecutionRunner:
       A list URL strings to download the generated CSV files.
     """
     storage_client = storage_client_lib.StorageClient(
-        self._bucket_name, google_ads_objects)
+        bucket_name=self._bucket_name,
+        google_ads_objects=google_ads_objects,
+        multiple_templates=self._settings.multiple_templates,
+    )
 
     return storage_client.export_google_ads_objects_to_gcs()
