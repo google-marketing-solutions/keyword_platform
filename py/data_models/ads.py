@@ -26,6 +26,8 @@ from absl import logging
 import pandas as pd
 
 from data_models import translation_frame as translation_frame_lib
+from data_models import translation_metadata
+
 
 ACTION = 'Action'
 CUSTOMER_ID = 'Customer ID'
@@ -133,6 +135,10 @@ _DEFAULT_LABEL = 'Keyword Translator'
 
 _NUM_HEADLINES = 15
 _NUM_DESCRIPTIONS = 4
+
+
+_HEADLINE_CHAR_LIMIT = 30
+_DESCRIPTION_CHAR_LIMIT = 90
 
 
 class Ads:
@@ -312,7 +318,8 @@ class Ads:
     Returns:
       A TranslationFrame containing headlines and descriptions.
     """
-    terms_by_rows = collections.defaultdict(list)
+    terms_with_metadata = collections.defaultdict(
+        translation_metadata.TranslationMetadata)
 
     for index, row in self._df.iterrows():
       # Adds headlines for translation
@@ -325,7 +332,9 @@ class Ads:
         if not headline.strip():
           continue
 
-        terms_by_rows[headline].append((index, headline_field))
+        terms_with_metadata[headline].dataframe_rows_and_cols.append(
+            (index, headline_field))
+        terms_with_metadata[headline].char_limit = _HEADLINE_CHAR_LIMIT
 
       # Adds descriptions for translation
       for description_index in range(0, _NUM_DESCRIPTIONS):
@@ -337,9 +346,15 @@ class Ads:
         if not description.strip():
           continue
 
-        terms_by_rows[description].append((index, description_field))
+        terms_with_metadata[description].dataframe_rows_and_cols.append(
+            (index, description_field))
+        if not terms_with_metadata[description].char_limit:
+          # Edge case: Same term used for headlines and descriptions should use
+          # the headline char limit.
+          terms_with_metadata[description].char_limit = _DESCRIPTION_CHAR_LIMIT
 
-    return translation_frame_lib.TranslationFrame(terms_by_rows=terms_by_rows)
+    return translation_frame_lib.TranslationFrame(
+        terms_with_metadata=terms_with_metadata)
 
   def apply_translations(
       self,

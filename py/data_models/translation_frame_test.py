@@ -15,9 +15,11 @@
 """Tests for the TranslationFrame data model class."""
 
 import pandas as pd
-from data_models import translation_frame as translation_frame_lib
+
 from absl.testing import absltest
 from absl.testing import parameterized
+from data_models import translation_frame as translation_frame_lib
+from data_models import translation_metadata
 
 
 _EXPECTED_DF = pd.DataFrame(
@@ -25,7 +27,9 @@ _EXPECTED_DF = pd.DataFrame(
      'target_terms': [{}, {}],
      'dataframe_locations': [
          [(0, 'Keyword'), (2, 'Keyword')], [(1, 'Keyword')]],
+     'char_limit': [30, 30],
      },
+
 )
 
 _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame(
@@ -33,6 +37,7 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame(
      'target_terms': [{'es': 'correo electrónico'}, {'es': 'rápida'}],
      'dataframe_locations': [
          [(0, 'Keyword'), (2, 'Keyword')], [(1, 'Keyword')]],
+     'char_limit': [30, 30],
      },
 )
 
@@ -41,8 +46,13 @@ class TranslationFrameTest(parameterized.TestCase):
 
   def test_df(self):
     input_data = {
-        'email': [(0, 'Keyword'), (2, 'Keyword')],
-        'fast': [(1, 'Keyword')],
+        'email': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(0, 'Keyword'), (2, 'Keyword')],
+            char_limit=30,
+        ),
+        'fast': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=30
+        ),
     }
     expected_df = _EXPECTED_DF
 
@@ -55,8 +65,13 @@ class TranslationFrameTest(parameterized.TestCase):
 
   def test_size(self):
     input_data = {
-        'email': [(0, 'Keyword'), (2, 'Keyword')],
-        'fast': [(1, 'Keyword')],
+        'email': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(0, 'Keyword'), (2, 'Keyword')],
+            char_limit=30,
+        ),
+        'fast': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=30
+        ),
     }
     expected_size = 2
 
@@ -67,8 +82,13 @@ class TranslationFrameTest(parameterized.TestCase):
 
   def test_add_translation(self):
     input_data = {
-        'email': [(0, 'Keyword'), (2, 'Keyword')],
-        'fast': [(1, 'Keyword')],
+        'email': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(0, 'Keyword'), (2, 'Keyword')],
+            char_limit=30,
+        ),
+        'fast': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=30
+        ),
     }
     expected_df = _EXPECTED_DF_AFTER_TRANSLATION
 
@@ -84,10 +104,18 @@ class TranslationFrameTest(parameterized.TestCase):
         actual_df, expected_df, check_index_type=False)
 
   def test_get_term_batch(self):
+
     input_data = {
-        'email': [(0, 'Keyword'), (2, 'Keyword')],
-        'fast': [(1, 'Keyword')],
-        'efficient': [(2, 'Keyword')],
+        'email': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(0, 'Keyword'), (2, 'Keyword')],
+            char_limit=30,
+        ),
+        'fast': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=30
+        ),
+        'efficient': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(2, 'Keyword')], char_limit=30
+        ),
     }
 
     expected_terms = ['email', 'fast']

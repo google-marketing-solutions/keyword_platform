@@ -19,10 +19,12 @@ from unittest import mock
 
 import pandas as pd
 
-from data_models import keywords as keywords_lib
-from data_models import translation_frame as translation_frame_lib
 from absl.testing import absltest
 from absl.testing import parameterized
+from data_models import keywords as keywords_lib
+from data_models import translation_frame as translation_frame_lib
+from data_models import translation_metadata
+
 
 _GOOGLE_ADS_RESPONSE = ([
     [{'results':
@@ -292,6 +294,7 @@ class KeywordsTest(parameterized.TestCase):
             'source_term': ['e mail', 'email'],
             'target_terms': [{}, {}],
             'dataframe_locations': [[(0, 'Keyword')], [(1, 'Keyword')]],
+            'char_limit': [80, 80],
             })
 
     keywords = keywords_lib.Keywords(_GOOGLE_ADS_RESPONSE)
@@ -313,24 +316,34 @@ class KeywordsTest(parameterized.TestCase):
       },
   )
   def test_apply_translations(
-      self, update_ad_group_and_campaign_names, expected_df):
-    translation_frame = translation_frame_lib.TranslationFrame(
-        {'e mail': [(0, 'Keyword')], 'email': [(1, 'Keyword')]})
+      self, update_ad_group_and_campaign_names, expected_df
+  ):
+    translation_frame = translation_frame_lib.TranslationFrame({
+        'e mail': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(0, 'Keyword')], char_limit=80
+        ),
+        'email': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=80
+        ),
+    })
 
     translation_frame.add_translations(
         start_index=0,
         target_language_code='es',
-        translations=['correo electrónico', 'c-electrónico'])
+        translations=['correo electrónico', 'c-electrónico'],
+    )
 
     keywords = keywords_lib.Keywords(_GOOGLE_ADS_RESPONSE)
     keywords.apply_translations(
         target_language='es',
         translation_frame=translation_frame,
-        update_ad_group_and_campaign_names=update_ad_group_and_campaign_names)
+        update_ad_group_and_campaign_names=update_ad_group_and_campaign_names,
+    )
     actual_df = keywords.df()
 
     pd.testing.assert_frame_equal(
-        actual_df, expected_df, check_index_type=False)
+        actual_df, expected_df, check_index_type=False
+    )
 
 
 if __name__ == '__main__':

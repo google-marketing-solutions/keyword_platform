@@ -23,6 +23,7 @@ from absl.testing import absltest
 from common import api_utils
 from common import cloud_translation_client as cloud_translation_client_lib
 from data_models import translation_frame as translation_frame_lib
+from data_models import translation_metadata
 
 
 class CloudTranslationClientTest(absltest.TestCase):
@@ -61,9 +62,13 @@ class CloudTranslationClientTest(absltest.TestCase):
             batch_char_limit=batch_char_limit))
 
     translation_frame = translation_frame_lib.TranslationFrame({
-        'email': [(0, 'Keyword'), (2, 'Keyword')],
-        'fast': [(1, 'Keyword')],
-        'efficient': [(2, 'Keyword')],
+        'email': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(0, 'Keyword'), (2, 'Keyword')],
+            char_limit=90),
+        'fast': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=90),
+        'efficient': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(2, 'Keyword')], char_limit=90),
     })
 
     expected_translated_df = pd.DataFrame({
@@ -75,6 +80,7 @@ class CloudTranslationClientTest(absltest.TestCase):
             [(0, 'Keyword'), (2, 'Keyword')],
             [(1, 'Keyword')],
             [(2, 'Keyword')]],
+        'char_limit': [90, 90, 90],
         })
 
     mock_send_api_request.side_effect = [
@@ -154,9 +160,13 @@ class CloudTranslationClientTest(absltest.TestCase):
             batch_char_limit=batch_char_limit))
 
     translation_frame = translation_frame_lib.TranslationFrame({
-        'email': [(0, 'Keyword'), (2, 'Keyword')],
-        'fast': [(1, 'Keyword')],
-        'efficient': [(2, 'Keyword')],
+        'email': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(0, 'Keyword'), (2, 'Keyword')],
+            char_limit=90),
+        'fast': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=90),
+        'efficient': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(2, 'Keyword')], char_limit=90),
     })
 
     expected_translated_df = pd.DataFrame({
@@ -168,6 +178,7 @@ class CloudTranslationClientTest(absltest.TestCase):
             [(0, 'Keyword'), (2, 'Keyword')],
             [(1, 'Keyword')],
             [(2, 'Keyword')]],
+        'char_limit': [90, 90, 90],
         })
 
     mock_send_api_request.side_effect = [

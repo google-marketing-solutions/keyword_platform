@@ -712,6 +712,18 @@ class AdsTest(parameterized.TestCase):
                 [(1, 'Headline 3')],
                 [(1, 'Description 1')],
                 [(1, 'Description 2')]],
+            'char_limit': [
+                30,
+                30,
+                30,
+                90,
+                90,
+                30,
+                30,
+                30,
+                90,
+                90,
+            ],
             })
 
     ads = ads_lib.Ads(_GOOGLE_ADS_RESPONSE)

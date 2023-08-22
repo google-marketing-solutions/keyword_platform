@@ -17,20 +17,21 @@
 See class docstring for more details.
 """
 
-from typing import TypeAlias
 from absl import logging
 import pandas as pd
+from data_models import translation_metadata as translation_metadata_lib
 
-_DataFrameRowsAndColumns: TypeAlias = list[tuple[int, str]]
 
 SOURCE_TERM = 'source_term'
 TARGET_TERMS = 'target_terms'
 DATAFRAME_LOCATIONS = 'dataframe_locations'
+CHAR_LIMIT = 'char_limit'
 
 _COLS = [
     SOURCE_TERM,
     TARGET_TERMS,
     DATAFRAME_LOCATIONS,
+    CHAR_LIMIT,
 ]
 
 
@@ -59,16 +60,16 @@ class TranslationFrame:
 
   print(translation_frame)
 
-  source_term | target_terms    | dataframe_locations
-  ------------------------------------------------------------------
-  email       | {}              | [(0, 'Keyword'), (2, 'Keyword')]
-  fast        | {}              | [(1, 'Keyword')]
+  source_term | target_terms    | dataframe_locations               | char_limit
+  ------------------------------------------------------------------------------
+  email       | {}              | [(0, 'Keyword'), (2, 'Keyword')]  |  30
+  fast        | {}              | [(1, 'Keyword')]                  |  30
   ...
 
   > Send translation_frame to Translate API
 
-  source_term | target_terms             | dataframe_locations
-  ------------------------------------------------------------------
+  source_term | target_terms             | dataframe_locations      ...
+  ------------------------------------------------------------------------------
   email       | {es: correo electrónico} | [(0, 'Keyword'), (2, 'Keyword')]
   fast        | {es: rápida}             | [(1, 'Keyword')]
   ...
@@ -81,23 +82,26 @@ class TranslationFrame:
   1  Campaign 1 | rápida               | fast
   2  Campaign 2 | correo electrónico   | email
      ...
-
   """
 
   def __init__(
-      self, terms_by_rows: dict[str, _DataFrameRowsAndColumns]) -> None:
+      self,
+      terms_with_metadata: dict[
+          str, translation_metadata_lib.TranslationMetadata
+      ],
+  ) -> None:
     """Initiatializes the TranslationFrame class.
 
     Args:
-      terms_by_rows: A list of terms and a rows/columns in the source DataFrame
-        where they appear.
+      terms_with_metadata: Metadata for this translation string.
     """
     terms = []
-    for term, rows in terms_by_rows.items():
+    for term, metadata in terms_with_metadata.items():
       terms.append({
           SOURCE_TERM: term,
           TARGET_TERMS: {},
-          DATAFRAME_LOCATIONS: rows,
+          DATAFRAME_LOCATIONS: metadata.dataframe_rows_and_cols,
+          CHAR_LIMIT: metadata.char_limit,
       })
 
     self._df = pd.DataFrame(terms, columns=_COLS)

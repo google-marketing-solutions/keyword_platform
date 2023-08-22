@@ -24,6 +24,8 @@ from absl import logging
 import pandas as pd
 
 from data_models import translation_frame as translation_frame_lib
+from data_models import translation_metadata
+
 
 ACTION = 'Action'
 CUSTOMER_ID = 'Customer ID'
@@ -53,6 +55,8 @@ _DEFAULT_ACTION = 'Add'
 _DEFAULT_STATUS = 'Paused'
 _DEFAULT_CUSTOMER_ID = 'Enter customer ID'
 _DEFAULT_LABEL = 'Keyword Translator'
+
+_CHAR_LIMIT = 80
 
 
 class Keywords:
@@ -193,12 +197,16 @@ class Keywords:
     Returns:
       A TranslationFrame containing Keywords data.
     """
-    terms_by_rows = collections.defaultdict(list)
+    terms_with_metadata = collections.defaultdict(
+        translation_metadata.TranslationMetadata)
 
     for index, row in self._df.iterrows():
-      terms_by_rows[row[KEYWORD]].append((index, KEYWORD))
+      terms_with_metadata[
+          row[KEYWORD]].dataframe_rows_and_cols.append((index, KEYWORD))
+      terms_with_metadata[row[KEYWORD]].char_limit = _CHAR_LIMIT
 
-    return translation_frame_lib.TranslationFrame(terms_by_rows=terms_by_rows)
+    return translation_frame_lib.TranslationFrame(
+        terms_with_metadata=terms_with_metadata)
 
   def apply_translations(
       self,
