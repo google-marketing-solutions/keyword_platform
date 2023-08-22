@@ -40,8 +40,9 @@ def main() -> flask.Response:
   campaigns = flask.request.args.get('campaigns').split(',')
   workers_to_run = flask.request.args.get('workers_to_run').split(',')
   multiple_templates = flask.request.args.get(
-      'multiple_templates', default=False, type=bool
+      'multiple_templates', default=False, type=lambda v: v.lower() == 'true'
   )
+
   settings = settings_lib.Settings(
       source_language_code=source_language_code,
       target_language_codes=target_language_codes,
