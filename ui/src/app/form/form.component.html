@@ -76,9 +76,9 @@
               (selectionEvent)="campaignSelection($event)">
           </app-drop-down>
         </div>
-        <p class="title">Translate Keywords & Ads</p>
+        <p class="title">Settings</p>
         <p class="sub-title">Select the source and target language for translation.</p>
-        <div class="component">
+        <div>
           <div class="juxtapose">
             <app-drop-down
                 #component
@@ -106,12 +106,13 @@
         </div>
         <div class="component">
           <p class="sub-title">
-              Toggle to output a single Google Ads Aditor template as opposed to seperate ones for
-              campaigns, ad groups, keywords and ads.</p>
+              Toggle to output multiple Google Ads Editor templates for
+              campaigns, ad groups, keywords, and ads as opposed to
+              consolidating them into a single one.</p>
           <mat-slide-toggle
-              [(ngModel)]="combineTemplates"
-              color="primary">
-              Single Google Ads Editor Template
+              color="primary"
+              (change)="templatesTogglechange($event)">
+              Multiple Google Ads Editor Templates
           </mat-slide-toggle>
         </div>
         <div class="component">

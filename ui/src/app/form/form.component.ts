@@ -18,6 +18,7 @@
 import {AfterViewInit, ChangeDetectorRef, Component, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {FormControl, FormGroup} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
+import {MatSlideToggleChange} from '@angular/material/slide-toggle';
 
 import {DialogComponent} from '../dialog/dialog.component';
 import {DropDownComponent} from '../drop-down/drop-down.component';
@@ -51,7 +52,7 @@ export class FormComponent implements OnInit, AfterViewInit {
   languages!: Language[];
   sourceLanguageCode?: string;
   targetLanguageCode?: string;
-  combineTemplates = true;
+  multipleTemplates = false;
 
   private accountIds: string[] = [];
   private campaignIds: string[] = [];
@@ -116,6 +117,10 @@ export class FormComponent implements OnInit, AfterViewInit {
     this.targetLanguageCode = language.code;
   }
 
+  templatesTogglechange(event: MatSlideToggleChange) {
+    this.multipleTemplates = event.checked;
+  }
+
   onSubmit() {
     const workers = [];
     if (this.sourceLanguageCode && this.targetLanguageCode) {
@@ -127,7 +132,7 @@ export class FormComponent implements OnInit, AfterViewInit {
     this.runService
         .run(
             this.accountIds, this.campaignIds, this.sourceLanguageCode!,
-            this.targetLanguageCode!, this.combineTemplates, workers)
+            this.targetLanguageCode!, this.multipleTemplates, workers)
         .subscribe(
             (response => {
               this.status = SubmitStatus.SUCCESS;
