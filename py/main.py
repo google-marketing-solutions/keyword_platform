@@ -39,8 +39,8 @@ def main() -> flask.Response:
   customer_ids = flask.request.args.get('customer_ids').split(',')
   campaigns = flask.request.args.get('campaigns').split(',')
   workers_to_run = flask.request.args.get('workers_to_run').split(',')
-  combine_templates = flask.request.args.get(
-      'combine_templates', default=False, type=bool
+  multiple_templates = flask.request.args.get(
+      'multiple_templates', default=False, type=bool
   )
   settings = settings_lib.Settings(
       source_language_code=source_language_code,
@@ -48,7 +48,7 @@ def main() -> flask.Response:
       customer_ids=customer_ids,
       campaigns=campaigns,
       workers_to_run=workers_to_run,
-      combine_templates=combine_templates,
+      multiple_templates=multiple_templates,
   )
 
   logging.info('Built run settings: %s', settings)

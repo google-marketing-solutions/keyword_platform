@@ -32,7 +32,7 @@ class GoogleAdsObjects:
   campaigns: campaigns_lib.Campaigns|None = None
   keywords: keywords_lib.Keywords|None = None
 
-  def get_uncombined_csv_data(self) -> dict[str, str]:
+  def get_multiple_csv_data(self) -> dict[str, str]:
     """Returns a dict of csv file name and data for the Google Ads objects."""
     csv_data = dict()
     if self.ads:

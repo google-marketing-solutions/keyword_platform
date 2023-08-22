@@ -51,32 +51,32 @@ class GoogleAdsObjectsTest(absltest.TestCase):
     self.mock_google_ads_object.csv_file_name.return_value = _FAKE_CSV_FILE_NAME
     self.mock_google_ads_object.csv_data.return_value = _FAKE_CSV_DATA
 
-  def test_get_uncombined_csv_data_all_objects_present(self):
+  def test_get_multiple_csv_data_all_objects_present(self):
     google_ads_objects = google_ads_objects_lib.GoogleAdsObjects(
         self.mock_google_ads_object,
         self.mock_google_ads_object,
         self.mock_google_ads_object,
         self.mock_google_ads_object,
     )
-    csv_data = google_ads_objects.get_uncombined_csv_data()
+    csv_data = google_ads_objects.get_multiple_csv_data()
 
     self.assertEqual(self.mock_google_ads_object.csv_data.call_count, 4)
     self.assertEqual(csv_data, _EXPECTED_CSV_DATA)
 
-  def test_get_uncombined_csv_data_missing_object(self):
+  def test_get_multiple_csv_data_missing_object(self):
     google_ads_objects = google_ads_objects_lib.GoogleAdsObjects(
         self.mock_google_ads_object,
         self.mock_google_ads_object,
         self.mock_google_ads_object,
     )
-    csv_data = google_ads_objects.get_uncombined_csv_data()
+    csv_data = google_ads_objects.get_multiple_csv_data()
 
     self.assertEqual(self.mock_google_ads_object.csv_data.call_count, 3)
     self.assertEqual(csv_data, _EXPECTED_CSV_DATA_MISSING_OBJECT)
 
-  def test_get_uncombined_csv_data_empty(self):
+  def test_get_multiple_csv_data_empty(self):
     google_ads_objects = google_ads_objects_lib.GoogleAdsObjects()
-    csv_data = google_ads_objects.get_uncombined_csv_data()
+    csv_data = google_ads_objects.get_multiple_csv_data()
 
     self.mock_google_ads_object.csv_data.assert_not_called()
     self.assertEqual(csv_data, {})
