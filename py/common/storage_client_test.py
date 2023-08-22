@@ -144,6 +144,14 @@ class StorageClientTest(absltest.TestCase):
           _FAKE_BUCKET_NAME, self.google_ads_objects
       ).export_google_ads_objects_to_gcs()
 
+  @mock.patch.object(google_ads_objects_lib, 'GoogleAdsObjects', autospec=True)
+  def test_export_google_ads_objects_combined(self, mock_google_ads_objects):
+    storage_client_lib.StorageClient(
+        _FAKE_BUCKET_NAME, mock_google_ads_objects, combine_templates=True
+    ).export_google_ads_objects_to_gcs()
+
+    mock_google_ads_objects.get_combined_csv_data.assert_called_once_with()
+
 
 if __name__ == '__main__':
   absltest.main()

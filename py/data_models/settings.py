@@ -29,3 +29,4 @@ class Settings:
       default_factory=dict
   )
   workers_to_run: list[str] = dataclasses.field(default_factory=list)
+  combine_templates: bool = False

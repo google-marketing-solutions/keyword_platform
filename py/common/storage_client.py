@@ -38,6 +38,7 @@ class StorageClient:
       bucket_name: str,
       google_ads_objects: google_ads_objects_lib.GoogleAdsObjects,
       url_expiration_seconds: int = _DEFAULT_URL_EXPIRATION_SECONDS,
+      combine_templates: bool = False,
   ):
     """Initializes the StorageClient.
 
@@ -45,6 +46,7 @@ class StorageClient:
       bucket_name: The GCS bucket to storage CSV files to.
       google_ads_objects: An instance of the GoogleAdsObjects data class.
       url_expiration_seconds: The number of seconds until download links expire.
+      combine_templates: Whether or not to combine the CSVs into a single one.
     """
     credentials, project = google.auth.default()
     self._storage_client = storage.Client(
@@ -60,6 +62,7 @@ class StorageClient:
     self._bucket = self._storage_client.bucket(bucket_name)
     self._google_ads_objects = google_ads_objects
     self._url_expiration_seconds = url_expiration_seconds
+    self._combine_templates = combine_templates
 
   def export_google_ads_objects_to_gcs(self) -> list[str]:
     """Writes Google Ads Objects to Cloud Strage and returns download URLs.
@@ -68,10 +71,12 @@ class StorageClient:
       A list URL strings to download the generated CSV files.
     """
     download_urls = []
-    for (
-        name,
-        csv_data,
-    ) in self._google_ads_objects.get_uncombined_csv_data().items():
+    csv_data = (
+        self._google_ads_objects.get_combined_csv_data()
+        if self._combine_templates
+        else self._google_ads_objects.get_uncombined_csv_data()
+    )
+    for name, csv_data in csv_data.items():
       download_url = self._write_dataframe_to_cloud_storage(name, csv_data)
       logging.info('Download URL: %s', download_url)
       download_urls.append(download_url)
