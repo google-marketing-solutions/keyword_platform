@@ -261,3 +261,16 @@ resource "google_secret_manager_secret_iam_member" "refresh_token-access" {
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.backend_sa.email}"
 }
+
+resource "google_secret_manager_secret_version" "palm_api_key_latest" {
+  count       = var.palm_api_key != null ? 1 : 0
+  secret      = google_secret_manager_secret.palm_api_key.name
+  secret_data = var.palm_api_key
+}
+
+resource "google_secret_manager_secret_iam_member" "palm_api_key-access" {
+  count     = google_secret_manager_secret_version.palm_api_key_latest[*].count
+  secret_id = google_secret_manager_secret.palm_api_key.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.backend_sa.email}"
+}
