@@ -15,10 +15,20 @@
 """Common utilities for REST HTTP clients."""
 
 from typing import Any
+
 import requests
+from requests import adapters
 
 
 _OAUTH2_TOKEN_URL = 'https://www.googleapis.com/oauth2/v3/token'
+_RETRIES = 5
+_BACKOFF_FACTOR = 1
+_CODES_TO_RETRY = [
+    429,  # Too many requests (rate limited)
+    502,  # Bad gateway
+    503,  # Temporarily unavailable
+    504,  # Did not receive timely response
+]
 
 
 def refresh_access_token(credentials: dict[str, str]) -> str:
@@ -80,8 +90,15 @@ def send_api_request(
     The JSON data from the response (this can sometimes be a list or dictionary,
       depending on the API used).
   """
+  session = requests.Session()
+
+  retries = adapters.Retry(
+      total=_RETRIES,
+      backoff_factor=_BACKOFF_FACTOR,
+      status_forcelist=_CODES_TO_RETRY)
+  session.mount('https://', adapters.HTTPAdapter(max_retries=retries))
   headers = http_header
-  response = requests.request(
+  response = session.request(
       url=url, method=method, json=params, headers=headers
   )
 
