@@ -20,6 +20,7 @@ import abc
 from absl import logging
 
 from common import cloud_translation_client as cloud_translation_client_lib
+from common import palm_client as palm_client_lib
 from data_models import google_ads_objects as google_ads_objects_lib
 from data_models import settings as settings_lib
 from workers import worker_result
@@ -48,14 +49,17 @@ class BaseWorker(abc.ABC):
   def __init__(
       self,
       cloud_translation_client:
-      cloud_translation_client_lib.CloudTranslationClient) -> None:
+      cloud_translation_client_lib.CloudTranslationClient,
+      palm_client: palm_client_lib.PalmClient | None) -> None:
     """Initializes the Google Ads worker.
 
     Args:
       cloud_translation_client: An instance of the GCP Cloud Translation API
         client.
+      palm_client: An instance of the PaLM API client.
     """
     self._cloud_translation_client = cloud_translation_client
+    self._palm_client = palm_client
     logging.info('Initialized worker: %s.', self.name)
 
   @abc.abstractmethod

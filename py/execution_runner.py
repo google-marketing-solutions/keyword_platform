@@ -314,7 +314,9 @@ class ExecutionRunner:
     results = {}
 
     for worker_id in self._settings.workers_to_run:
-      worker = _WORKERS[worker_id](self._cloud_translation_client)
+      worker = _WORKERS[worker_id](
+          self._cloud_translation_client, self._palm_client
+      )
 
       logging.info('Running %s...', worker.name)
       result = worker.execute(self._settings, google_ads_objects)

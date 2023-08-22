@@ -309,7 +309,8 @@ class TranslationWorkerTest(absltest.TestCase):
 
     # Arranges translation worker
     translation_worker = translation_worker_lib.TranslationWorker(
-        cloud_translation_client=cloud_translation_client)
+        cloud_translation_client=cloud_translation_client,
+        palm_client=None)
 
     # Act
     result = translation_worker.execute(
@@ -358,7 +359,8 @@ class TranslationWorkerTest(absltest.TestCase):
 
     # Arranges translation worker
     translation_worker = translation_worker_lib.TranslationWorker(
-        cloud_translation_client=cloud_translation_client)
+        cloud_translation_client=cloud_translation_client,
+        palm_client=None)
 
     # Act
     result = translation_worker.execute(

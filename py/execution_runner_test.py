@@ -23,6 +23,7 @@ from absl.testing import absltest
 import execution_runner as execution_runner_lib
 from common import cloud_translation_client
 from common import google_ads_client
+from common import palm_client as palm_client_lib
 from common import storage_client
 from data_models import accounts as accounts_lib
 from data_models import settings as settings_lib
@@ -153,10 +154,14 @@ class ExecutionRunnerTest(absltest.TestCase):
     self.mock_google_ads_client = self.enter_context(
         mock.patch.object(google_ads_client, 'GoogleAdsClient', autospec=True)
     )
-    self.enter_context(
+    self.mock_secret_manager = self.enter_context(
         mock.patch.object(
             secretmanager, 'SecretManagerServiceClient', autospec=True
         )
+    )
+
+    self.mock_palm_client = self.enter_context(
+        mock.patch.object(palm_client_lib, 'PalmClient', autospec=True)
     )
 
   def test_run_workers(self):
@@ -263,6 +268,66 @@ class ExecutionRunnerTest(absltest.TestCase):
     self.mock_google_ads_client.return_value.get_campaigns_for_account.assert_has_calls(
         (mock.call(customer_id='123'), mock.call(customer_id='456')),
     )
+
+  @mock.patch.object(
+      execution_runner_lib.ExecutionRunner,
+      '_get_optional_secrets',
+      autospec=True,
+      return_value={'palm_api_key': 'fake_palm_api_key'},
+  )
+  def test_palm_client_init(self, mock_get_optional_secrets):
+    del mock_get_optional_secrets  # Unused
+    settings = settings_lib.Settings(
+        source_language_code='en',
+        target_language_codes=['es'],
+        customer_ids=[123, 456],
+        campaigns=[789, 101],
+        workers_to_run=['translationWorker'],
+    )
+
+    # Due to the way workers are dynamically loaded, they need to be mocked
+    # using mock.path.dict.
+    mock_translation_worker = mock.create_autospec(
+        translation_worker.TranslationWorker
+    )
+
+    with mock.patch.dict(
+        execution_runner_lib._WORKERS,
+        {'translationWorker': mock_translation_worker},
+    ):
+      execution_runner_lib.ExecutionRunner(settings)
+
+    self.mock_palm_client.assert_called_once_with('fake_palm_api_key')
+
+  @mock.patch.object(
+      execution_runner_lib.ExecutionRunner,
+      '_get_optional_secrets',
+      autospec=True,
+      return_value={},
+  )
+  def test_palm_client_does_not_initialize(self, mock_get_optional_secrets):
+    del mock_get_optional_secrets  # Unused
+    settings = settings_lib.Settings(
+        source_language_code='en',
+        target_language_codes=['es'],
+        customer_ids=[123, 456],
+        campaigns=[789, 101],
+        workers_to_run=['translationWorker'],
+    )
+
+    # Due to the way workers are dynamically loaded, they need to be mocked
+    # using mock.path.dict.
+    mock_translation_worker = mock.create_autospec(
+        translation_worker.TranslationWorker
+    )
+
+    with mock.patch.dict(
+        execution_runner_lib._WORKERS,
+        {'translationWorker': mock_translation_worker},
+    ):
+      execution_runner_lib.ExecutionRunner(settings)
+
+    self.mock_palm_client.assert_not_called()
 
 
 if __name__ == '__main__':
