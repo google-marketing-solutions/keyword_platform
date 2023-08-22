@@ -13,9 +13,10 @@
 # limitations under the License.
 
 """Defines the Google Ads objects class."""
-
 import dataclasses
-
+import io
+import time
+import pandas as pd
 from data_models import ad_groups as ad_groups_lib
 from data_models import ads as ads_lib
 from data_models import campaigns as campaigns_lib
@@ -31,7 +32,7 @@ class GoogleAdsObjects:
   campaigns: campaigns_lib.Campaigns|None = None
   keywords: keywords_lib.Keywords|None = None
 
-  def get_csv_data(self) -> dict[str, str]:
+  def get_uncombined_csv_data(self) -> dict[str, str]:
     """Returns a dict of csv file name and data for the Google Ads objects."""
     csv_data = dict()
     if self.ads:
@@ -43,3 +44,25 @@ class GoogleAdsObjects:
     if self.keywords:
       csv_data[self.keywords.csv_file_name()] = self.keywords.csv_data()
     return csv_data
+
+  def get_combined_csv_data(self) -> dict[str, str]:
+    """Combines all objects into a single dictionary."""
+    df_data = []
+    if self.ads:
+      df_data.append(self.ads.df())
+    if self.ad_groups:
+      df_data.append(self.ad_groups.df())
+    if self.campaigns:
+      df_data.append(self.campaigns.df())
+    if self.keywords:
+      df_data.append(self.keywords.df())
+    combined_csv_data = dict()
+    if df_data:
+      filename = self._generate_combined_csv_file_name()
+      combined_csv_data[filename] = pd.concat(df_data).to_csv(index=False)
+    return combined_csv_data
+
+  def _generate_combined_csv_file_name(self) -> str:
+    """Returns the combined CSV file name."""
+    time_str = time.strftime('%Y%m%d-%H%M%S')
+    return f'combined_{time_str}.csv'

@@ -68,7 +68,10 @@ class StorageClient:
       A list URL strings to download the generated CSV files.
     """
     download_urls = []
-    for name, csv_data in self._google_ads_objects.get_csv_data().items():
+    for (
+        name,
+        csv_data,
+    ) in self._google_ads_objects.get_uncombined_csv_data().items():
       download_url = self._write_dataframe_to_cloud_storage(name, csv_data)
       logging.info('Download URL: %s', download_url)
       download_urls.append(download_url)
