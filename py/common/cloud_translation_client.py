@@ -18,8 +18,10 @@ See class doctring for more details.
 """
 from absl import logging
 import requests
+import pandas as pd
 
 from common import api_utils
+from common import palm_client as palm_client_lib
 from data_models import translation_frame as translation_frame_lib
 
 TRANSLATE_API_BASE_URL = 'https://translate.googleapis.com'
@@ -74,6 +76,7 @@ class CloudTranslationClient:
       gcp_project_name: str,
       api_version: str = _API_VERSION,
       batch_char_limit: int = _DEFAULT_BATCH_CHAR_LIMIT,
+      palm_client: palm_client_lib.PalmClient | None = None,
   ) -> None:
     """Instantiates the Clound Translation client.
 
@@ -85,6 +88,7 @@ class CloudTranslationClient:
       api_version: The Cloud Translate API API Version.
       batch_char_limit: The size of content batches to send to the translation
         API, in chars.
+      palm_client: An instance of the PaLM client for accessing LLM APIs.
     """
     self.api_version = api_version
     self.batch_char_limit = batch_char_limit
@@ -93,6 +97,7 @@ class CloudTranslationClient:
     # The access_token be lazily loaded and cached when the API is called to
     # ensure token is fresh and won't be retrieved repeatedly.
     self.access_token = None
+    self._palm_client = palm_client
     api_utils.validate_credentials(self.credentials, _CREDENTIAL_REQUIRED_KEYS)
     logging.info('Successfully initialized CloudTranslationClient.')
 
@@ -155,6 +160,9 @@ class CloudTranslationClient:
           translations=translations,
       )
 
+      self._shorten_overflowing_translations(
+          translation_frame, target_language_code)
+
       batch_start = next_batch_index
 
     logging.info(
@@ -173,3 +181,105 @@ class CloudTranslationClient:
         'Content-Type': 'application/json',
     }
 
+  def _shorten_overflowing_translations(
+      self,
+      translation_frame: translation_frame_lib.TranslationFrame,
+      target_language_code: str) -> None:
+    """Uses PaLM API to fix overflowing translations in-place.
+
+    Args:
+      translation_frame: The translation frame to shorten overflowing
+        translations for.
+      target_language_code: The language to translate to.
+    """
+    if not self._palm_client:
+      logging.info('Skipping PaLM shortening: No client initialized.')
+      return
+
+    logging.info('Shortening translations with PaLM...')
+
+    overflowing_translations = self._get_overflowing_translations(
+        translation_frame, target_language_code)
+
+    if overflowing_translations.empty:
+      logging.info('No overflowing translations found. Returning...')
+      return
+
+    logging.info(
+        'Found %d overflowing translations.', len(overflowing_translations)
+    )
+
+    # Different rows may have different char limits, so we need to process
+    # each group of unique char limits separately.
+    unique_char_limits = overflowing_translations[
+        translation_frame_lib.CHAR_LIMIT
+    ].unique()
+
+    for char_limit in unique_char_limits:
+      logging.info('Shortening translations for char limit: %d.', char_limit)
+      translations_with_this_char_limit = overflowing_translations[
+          overflowing_translations[translation_frame_lib.CHAR_LIMIT]
+          == char_limit
+      ]
+
+      # Gets the translations to shorten as a list.
+      translations = translations_with_this_char_limit[
+          translation_frame_lib.TARGET_TERMS
+      ].tolist()
+
+      translations = [
+          translation[target_language_code] for translation in translations]
+
+      shortened_translations = self._palm_client.shorten_text_to_char_limit(
+          text_list=translations,
+          language_code=target_language_code,
+          char_limit=char_limit,
+      )
+
+      # Finally, updates the original DataFrame.
+      translation_index = 0
+      for row_number, _ in translations_with_this_char_limit.iterrows():
+        old_translation = translation_frame.df().loc[
+            row_number, translation_frame_lib.TARGET_TERMS
+        ][target_language_code]
+        new_translation = shortened_translations[translation_index]
+        logging.info(
+            'Replacing %s (%d chars) with %s (%d chars).',
+            old_translation, len(old_translation),
+            new_translation,
+            len(new_translation),
+        )
+        translation_frame.df().loc[
+            row_number, translation_frame_lib.TARGET_TERMS
+        ][target_language_code] = new_translation
+        translation_index += 1
+
+    logging.info('Finished shortening translations with PaLM.')
+
+  def _get_overflowing_translations(
+      self,
+      translation_frame: translation_frame_lib.TranslationFrame,
+      target_language_code: str,
+  ) -> pd.DataFrame:
+    """Gets a DataFrame containing translations that are > char_limit.
+
+    Args:
+      translation_frame: A frame containing translations that may be too long.
+      target_language_code: The language to translate to.
+
+    Returns:
+      A DataFrame
+    """
+    # Gets the length of translations.
+    translation_lengths = [
+        len(target_term[target_language_code])
+        for target_term in translation_frame.df()[
+            translation_frame_lib.TARGET_TERMS
+        ]
+    ]
+
+    # Gets translations that are > the char limit.
+    return translation_frame.df()[
+        translation_lengths
+        > translation_frame.df()[translation_frame_lib.CHAR_LIMIT]
+    ]

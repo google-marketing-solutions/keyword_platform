@@ -93,7 +93,9 @@ class ExecutionRunner:
 
     self._cloud_translation_client = (
         cloud_translation_client_lib.CloudTranslationClient(
-            self._settings.credentials, self._gcp_project_id)
+            credentials=self._settings.credentials,
+            gcp_project_name=self._gcp_project_id,
+            palm_client=self._palm_client)
     )
 
     logging.info('ExecutionRunner: initialized Cloud Translation client.')
@@ -315,8 +317,7 @@ class ExecutionRunner:
 
     for worker_id in self._settings.workers_to_run:
       worker = _WORKERS[worker_id](
-          self._cloud_translation_client, self._palm_client
-      )
+          self._cloud_translation_client, self._palm_client)
 
       logging.info('Running %s...', worker.name)
       result = worker.execute(self._settings, google_ads_objects)

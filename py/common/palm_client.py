@@ -67,7 +67,7 @@ class PalmClient:
 
         Return just a python list.
       """
-
+      # TODO(): Batch requests to PaLM API.
       response = genai.generate_text(
           model=_MODEL,
           prompt=shorten_prompt,

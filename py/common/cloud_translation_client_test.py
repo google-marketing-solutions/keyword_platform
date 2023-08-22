@@ -24,6 +24,7 @@ from common import api_utils
 from common import cloud_translation_client as cloud_translation_client_lib
 from data_models import translation_frame as translation_frame_lib
 from data_models import translation_metadata
+from common import palm_client
 
 
 class CloudTranslationClientTest(absltest.TestCase):
@@ -186,6 +187,90 @@ class CloudTranslationClientTest(absltest.TestCase):
             {'translatedText': 'correo electrónico'},
             {'translatedText': 'rápido'}]},
         requests.exceptions.HTTPError()]
+
+    mock_refresh_access_token.return_value = 'fake_access_token'
+
+    cloud_translation_client.translate(
+        translation_frame=translation_frame,
+        source_language_code=source_language,
+        target_language_code=target_language)
+
+    actual_translated_df = translation_frame.df()
+
+    # Asserts expected translations added to translation frame
+    pd.testing.assert_frame_equal(
+        expected_translated_df, actual_translated_df, check_index_type=False)
+
+  @mock.patch.object(api_utils, 'refresh_access_token', autospec=True)
+  @mock.patch.object(api_utils, 'send_api_request', autospec=True)
+  def test_translate_shortens_translations(
+      self, mock_send_api_request, mock_refresh_access_token):
+    credentials = {
+        'client_id': 'fake_client_id',
+        'client_secret': 'fake_client_secret',
+        'refresh_token': 'fake_refresh_token',
+    }
+    gcp_project_name = 'fake_gcp_project'
+    source_language = 'en'
+    target_language = 'es'
+    api_version = 3
+    batch_char_limit = 2500
+
+    mock_palm_client = mock.create_autospec(palm_client.PalmClient)
+    mock_palm_client.shorten_text_to_char_limit.side_effect = [
+        ['shortened1'],
+        ['shortened2', 'shortened3'],
+    ]
+
+    cloud_translation_client = (
+        cloud_translation_client_lib.CloudTranslationClient(
+            credentials=credentials,
+            gcp_project_name=gcp_project_name,
+            api_version=api_version,
+            batch_char_limit=batch_char_limit,
+            palm_client=mock_palm_client))
+
+    translation_frame = translation_frame_lib.TranslationFrame({
+        'term_to_overflow_1': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(0, 'Keyword'), (2, 'Keyword')],
+            char_limit=10),
+        'term_that_fits_1': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=90),
+        'term_to_overflow_2': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(3, 'Keyword')], char_limit=15),
+        'term_that_fits_2': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(4, 'Keyword')], char_limit=90),
+        'term_to_overflow_3': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(5, 'Keyword')], char_limit=15),
+    })
+
+    expected_translated_df = pd.DataFrame({
+        'source_term': ['term_to_overflow_1',
+                        'term_that_fits_1',
+                        'term_to_overflow_2',
+                        'term_that_fits_2',
+                        'term_to_overflow_3'],
+        'target_terms': [{'es': 'shortened1'},
+                         {'es': 'untruncated_translation_1'},
+                         {'es': 'shortened2'},
+                         {'es': 'untruncated_translation_2'},
+                         {'es': 'shortened3'}],
+        'dataframe_locations': [
+            [(0, 'Keyword'), (2, 'Keyword')],
+            [(1, 'Keyword')],
+            [(3, 'Keyword')],
+            [(4, 'Keyword')],
+            [(5, 'Keyword')]],
+        'char_limit': [10, 90, 15, 90, 15],
+        })
+
+    mock_send_api_request.side_effect = [
+        {'translations': [
+            {'translatedText': 'some long overflowing translation 1'},
+            {'translatedText': 'untruncated_translation_1'},
+            {'translatedText': 'some long overflowing translation 2'},
+            {'translatedText': 'untruncated_translation_2'},
+            {'translatedText': 'some long overflowing translation 3'}]},]
 
     mock_refresh_access_token.return_value = 'fake_access_token'
 
