@@ -105,6 +105,16 @@
           </div>
         </div>
         <div class="component">
+          <p class="sub-title">
+              Toggle to output a single Google Ads Aditor template as opposed to seperate ones for
+              campaigns, ad groups, keywords and ads.</p>
+          <mat-slide-toggle
+              [(ngModel)]="combineTemplates"
+              color="primary">
+              Single Google Ads Editor Template
+          </mat-slide-toggle>
+        </div>
+        <div class="component">
           <button
               mat-raised-button
               color="primary"

@@ -51,6 +51,7 @@ export class FormComponent implements OnInit, AfterViewInit {
   languages!: Language[];
   sourceLanguageCode?: string;
   targetLanguageCode?: string;
+  combineTemplates = true;
 
   private accountIds: string[] = [];
   private campaignIds: string[] = [];
@@ -126,7 +127,7 @@ export class FormComponent implements OnInit, AfterViewInit {
     this.runService
         .run(
             this.accountIds, this.campaignIds, this.sourceLanguageCode!,
-            this.targetLanguageCode!, workers)
+            this.targetLanguageCode!, this.combineTemplates, workers)
         .subscribe(
             (response => {
               this.status = SubmitStatus.SUCCESS;

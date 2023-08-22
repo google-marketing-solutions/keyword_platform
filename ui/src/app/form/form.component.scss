@@ -92,6 +92,11 @@
   }
 }
 
+::ng-deep.mdc-label {
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+}
+
 ::ng-deep.mat-mdc-raised-button.mat-mdc-button-base {
   height: 50px;
   width: 150px;

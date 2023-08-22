@@ -29,7 +29,7 @@ export class RunService {
 
   // TODO(): Modify HTTP request to support Cloud Run environment.
   run(accountIds: string[], campaignIds: string[], sourceLanguageCode: string,
-      targetLanguageCode: string,
+      targetLanguageCode: string, combineTemplates: boolean,
       workers: string[]): Observable<HttpResponse<Output>> {
     const params = new HttpParams({
       fromObject: {
@@ -38,6 +38,7 @@ export class RunService {
         'source_language_code': sourceLanguageCode,
         'target_language_codes': targetLanguageCode,
         'workers_to_run': workers.join(','),
+        'combine_templates': combineTemplates.toString(),
         'endpoint': 'run'
       }
     });

@@ -25,6 +25,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSelectModule} from '@angular/material/select';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatTabsModule} from '@angular/material/tabs';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -42,8 +43,8 @@ import {ServicesModule} from './services/services_module';
       [AppComponent, DropDownComponent, DialogComponent, FormComponent],
   imports: [
     BrowserAnimationsModule, BrowserModule, AppRoutingModule, HttpClientModule,
-    MatButtonModule, MatDialogModule, MatFormFieldModule, MatIconModule,
-    MatInputModule, MatProgressSpinnerModule, MatSelectModule,
+    MatButtonModule, MatSlideToggleModule, MatDialogModule, MatFormFieldModule,
+    MatIconModule, MatInputModule, MatProgressSpinnerModule, MatSelectModule,
     ReactiveFormsModule, FormsModule, MatTabsModule, RouterModule,
     ServicesModule
   ],
