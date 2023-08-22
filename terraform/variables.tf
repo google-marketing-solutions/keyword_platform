@@ -79,8 +79,6 @@ variable "bucket_name" {
 
 variable "palm_api_key" {
   description = "The PaLM API key to use."
-  type        = map(string)
-  default     = null
 }
 
 ##
