@@ -56,7 +56,8 @@ describe('DialogComponent', () => {
           }
         }
       }
-    } return data;
+    }
+    return data;
   }
 
   beforeEach(() => {
