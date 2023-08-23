@@ -100,7 +100,7 @@ IAP_ALLOWED_USERS=$iap_allowed_users
 echo "(Optional) Enter a PaLM API Key or press enter to continue:"
 read palm_api_key
 if [ -z "$palm_api_key" ]; then
-  PALM_API_KEY=null
+  PALM_API_KEY=""
 else
   PALM_API_KEY=$palm_api_key
 fi
@@ -149,7 +149,7 @@ if [ $? -eq 0 ]; then
   support_email=$(gcloud iap oauth-brands list --format="value(supportEmail)")
 else
   support_email=$IAP_SUPPORT_EMAIL
-  iap_brand_id="null"
+  iap_brand_id=""
 fi
 
 # Convert the list of iap allowed users to a terraform compatible list.

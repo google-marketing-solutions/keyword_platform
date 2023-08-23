@@ -17,7 +17,7 @@
 
 variable "iap_brand_id" {
   description = "Existing IAP Brand ID - only INTERNAL TYPE (you can obtain it using this command: `$ gcloud iap oauth-brands list --format='value(name)' | sed 's:.*/::'`)."
-  default = null
+  default = ""
 }
 
 variable "iap_support_email" {
@@ -79,6 +79,7 @@ variable "bucket_name" {
 
 variable "palm_api_key" {
   description = "The PaLM API key to use."
+  default = ""
 }
 
 ##
