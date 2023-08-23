@@ -91,11 +91,11 @@ _EXPECTED_DF = pd.DataFrame(
             'Enter customer ID',
         ],
         'Campaign': ['Test Campaign 0', 'Test Campaign 1', 'Test Campaign 2'],
-        'Campaign type': ['SEARCH', 'SEARCH', 'SEARCH'],
+        'Campaign type': ['Search', 'Search', 'Search'],
         'Bid strategy type': [
-            'TARGET_SPEND',
-            'TARGET_SPEND',
-            'MAXIMIZE_CONVERSIONS',
+            'Target spend',
+            'Target spend',
+            'Maximize conversions',
         ],
         'Budget': ['1.00', '1.00', '1.00'],
         'Labels': [
@@ -110,10 +110,10 @@ _EXPECTED_DF = pd.DataFrame(
 _EXPECTED_CSV_DATA = (
     'Action,Campaign status,Customer ID,Campaign,Campaign type,Bid strategy'
     ' type,Budget,Labels,Updates applied\nAdd,Paused,Enter customer ID,Test'
-    ' Campaign 0,SEARCH,TARGET_SPEND,1.00,Keyword'
+    ' Campaign 0,Search,Target spend,1.00,Keyword'
     ' Translator,[]\nAdd,Paused,Enter customer ID,Test Campaign'
-    ' 1,SEARCH,TARGET_SPEND,1.00,Keyword Translator,[]\nAdd,Paused,Enter'
-    ' customer ID,Test Campaign 2,SEARCH,MAXIMIZE_CONVERSIONS,1.00,Keyword'
+    ' 1,Search,Target spend,1.00,Keyword Translator,[]\nAdd,Paused,Enter'
+    ' customer ID,Test Campaign 2,Search,Maximize conversions,1.00,Keyword'
     ' Translator,[]\n'
 )
 
@@ -146,11 +146,11 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame(
             'Enter customer ID',
         ],
         'Campaign': ['Test Campaign 0', 'Test Campaign 1', 'Test Campaign 2'],
-        'Campaign type': ['SEARCH', 'SEARCH', 'SEARCH'],
+        'Campaign type': ['Search', 'Search', 'Search'],
         'Bid strategy type': [
-            'TARGET_SPEND',
-            'TARGET_SPEND',
-            'MAXIMIZE_CONVERSIONS',
+            'Target spend',
+            'Target spend',
+            'Maximize conversions',
         ],
         'Budget': ['1.00', '1.00', '1.00'],
         'Labels': [

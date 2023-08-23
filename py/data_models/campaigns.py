@@ -118,18 +118,25 @@ class Campaigns:
     for response_json in response_jsons:
       for batch in response_json:
         for result in batch['results']:
-          campaigns.append(
-              {
-                  ACTION: _DEFAULT_ACTION,
-                  CAMPAIGN_STATUS: _DEFAULT_STATUS,
-                  CUSTOMER_ID: _DEFAULT_CUSTOMER_ID,
-                  CAMPAIGN: result['campaign']['name'],
-                  CAMPAIGN_TYPE: result['campaign']['advertisingChannelType'],
-                  BID_STRATEGY_TYPE: result['campaign']['biddingStrategyType'],
-                  BUDGET: _DEFAULT_BUDGET,
-                  LABEL: _DEFAULT_LABEL,
-                  UPDATES_APPLIED: [],
-              })
+          campaigns.append({
+              ACTION: _DEFAULT_ACTION,
+              CAMPAIGN_STATUS: _DEFAULT_STATUS,
+              CUSTOMER_ID: _DEFAULT_CUSTOMER_ID,
+              CAMPAIGN: result['campaign']['name'],
+              CAMPAIGN_TYPE: (
+                  result['campaign']['advertisingChannelType']
+                  .capitalize()
+                  .replace('_', ' ')
+              ),
+              BID_STRATEGY_TYPE: (
+                  result['campaign']['biddingStrategyType']
+                  .capitalize()
+                  .replace('_', ' ')
+              ),
+              BUDGET: _DEFAULT_BUDGET,
+              LABEL: _DEFAULT_LABEL,
+              UPDATES_APPLIED: [],
+          })
 
     return pd.DataFrame(campaigns, columns=_COLS)
 
