@@ -17,9 +17,11 @@
 import os
 from unittest import mock
 
+import google.auth
 from google.cloud import secretmanager
 
 from absl.testing import absltest
+from absl.testing import parameterized
 import execution_runner as execution_runner_lib
 from common import cloud_translation_client
 from common import google_ads_client
@@ -132,7 +134,7 @@ _EXPECTED_CAMPAIGNS_LIST = list([
 ])
 
 
-class ExecutionRunnerTest(absltest.TestCase):
+class ExecutionRunnerTest(parameterized.TestCase):
 
   def setUp(self):
     super().setUp()
@@ -328,6 +330,62 @@ class ExecutionRunnerTest(absltest.TestCase):
       execution_runner_lib.ExecutionRunner(settings)
 
     self.mock_palm_client.assert_not_called()
+
+  @parameterized.named_parameters(
+      {
+          'testcase_name': 'palm_api_secret_does_not_exist',
+          'error': google.api_core.exceptions.NotFound(message='fake_message'),
+      },
+      {
+          'testcase_name': 'palm_api_secret_not_accessible',
+          'error': google.api_core.exceptions.PermissionDenied(
+              message='fake_message'
+          ),
+      },
+      {
+          'testcase_name': 'palm_api_secret_type_error',
+          'error': TypeError('fake_message'),
+      },
+      {
+          'testcase_name': 'palm_api_secret_attribute_error',
+          'error': AttributeError('fake_message'),
+      },
+  )
+  def test_palm_api_secret_not_available(self, error):
+    self.mock_secret_manager.return_value.access_secret_version.side_effect = (
+        error
+    )
+
+    mock_translation_worker = mock.create_autospec(
+        translation_worker.TranslationWorker
+    )
+
+    settings = settings_lib.Settings(
+        source_language_code='en',
+        target_language_codes=['es'],
+        customer_ids=[123, 456],
+        campaigns=[789, 101],
+        workers_to_run=['translationWorker'],
+    )
+
+    with self.assertLogs() as logs:
+      with mock.patch.dict(
+          execution_runner_lib._WORKERS,
+          {'translationWorker': mock_translation_worker},
+      ):
+        with mock.patch.object(
+            execution_runner_lib.ExecutionRunner,
+            '_get_credentials',
+            autospec=True,
+            return_value=_FAKE_CREDENTIALS,
+        ):
+          execution_runner = execution_runner_lib.ExecutionRunner(settings)
+
+    self.assertContainsSubset(
+        'INFO:absl:Optional secret not set or not accessible: palm_api_key',
+        logs.output[2],
+    )
+    self.assertIsNone(execution_runner._palm_client)
 
 
 if __name__ == '__main__':

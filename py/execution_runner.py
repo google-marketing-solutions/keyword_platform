@@ -19,6 +19,7 @@ import os
 from typing import Any
 
 from absl import logging
+import google.auth
 from google.cloud import secretmanager
 
 from common import cloud_translation_client as cloud_translation_client_lib
@@ -145,8 +146,20 @@ class ExecutionRunner:
         )
         optional_keys[
             secret_key] = secret_response.payload.data.decode('UTF-8').strip()
-      except TypeError:
-        logging.info('Optional secret not set: %s', secret_key)
+      except (
+          google.api_core.exceptions.PermissionDenied,
+          google.api_core.exceptions.NotFound,
+          TypeError,
+          AttributeError,
+      ) as err:
+        # Secret manager errors are rather arbitrary, e.g. a PermissionDenied
+        # error will be raised if the secret does not exist. Hence, we default
+        # to catching all possible errors in a single except block.
+        logging.info(
+            'Optional secret not set or not accessible: %s - %s',
+            secret_key,
+            err,
+        )
 
     return optional_keys
 
