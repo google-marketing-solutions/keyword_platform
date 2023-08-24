@@ -22,7 +22,7 @@ import google.generativeai as genai
 
 _MODEL = 'models/text-bison-001'
 
-AVAILABLE_LANGUAGES = frozenset(['en', 'es', 'ko', 'hi', 'zh'])
+AVAILABLE_LANGUAGES = frozenset(['en'])
 
 
 class PalmClient:
@@ -79,4 +79,4 @@ class PalmClient:
           candidate_count=1,
           temperature=0,
       )
-      return ast.literal_eval(response.result)
+      return ast.literal_eval(response.result) if response.result else text_list
