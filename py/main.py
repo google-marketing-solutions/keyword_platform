@@ -19,9 +19,13 @@ import os
 
 import flask
 import flask_cors
+import google.cloud.logging
 
 import execution_runner as execution_runner_lib
 from data_models import settings as settings_lib
+
+client = google.cloud.logging.Client()
+client.setup_logging()
 
 app = flask.Flask(__name__)
 flask_cors.CORS(app)
