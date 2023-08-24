@@ -64,13 +64,12 @@ class PalmClient:
       return text_list
     else:
       shorten_prompt = f"""
-        For each of the following list elements, shorten the sentences to be
-        under {char_limit} characters only if it is above {char_limit}
-        characters, retain the given sentence otherwise:
+        Summarize the sentences in the following list to be
+        under {char_limit} characters:
 
           {text_list}
 
-        Return just a python list.
+        Return a python list.
       """
       # TODO(): Batch requests to PaLM API.
       response = genai.generate_text(
