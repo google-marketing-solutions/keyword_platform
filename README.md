@@ -22,10 +22,11 @@ will be provided by Google.
 A web application to translate Google Ads keywords and ads across large Google
 Ads accounts at scale.
 
-__WARNING:__ This solution uses the Google Cloud Translation API. Once your free
-quota has been exhausted, this API will incur additional charges to your
-account. See [Cloud Translation Pricing](https://cloud.google.com/translate/pricing)
-for details.
+> [!WARNING]
+> This solution uses the Google Cloud Translation API. Once your free quota has
+> been exhausted, this API will incur additional charges to your account.
+> See [Cloud Translation Pricing](https://cloud.google.com/translate/pricing)
+> for details.
 
 ## Prerequisites
 Before running the install script, go through sections 2.1-2.4 to make sure you
@@ -81,6 +82,10 @@ in your Google Cloud project. Hit `+ Create Credentials` to create an OAuth
 Client, choose Web Application and add `http://localhost:8080` to the
 authorized redirect URIs. Take note of the Client ID and Client Secret.
 
+> [!IMPORTANT]
+> Ensure the user going through the OAuth flow has standard access to the Google
+> Ads accounts you want to use from within the web app.
+
 ## Installation
 
 Once you have completed the above mentioned steps, proceed by clicking the Open
@@ -110,8 +115,9 @@ Keywords, Ad Groups and Campaign for download as CSV files.
 
 Use these files to upload to Google Ads via Google Ads Editor.
 
-> IMPORTANT: It is important you use Google Ads Editor instead of uploading via
-> Bulk Actions in the Google Ads UI.
+> [!IMPORTANT]
+> It is important you use Google Ads Editor instead of uploading via Bulk
+> Actions in the Google Ads UI.
 
 ## Workers & Costs
 The solution uses a set of workers (as of Aug 2023 only one worker is available)
