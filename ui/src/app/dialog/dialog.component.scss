@@ -15,8 +15,19 @@
  * limitations under the License.
  */
 
-.juxtapose {
-  float: left;
+@mixin callouts(
+  $background-color: #ffffff,
+  $border-left-color: #ffffff,
+  $color: #000000
+) {
+  background-color: $background-color;
+  border-left: $border-left-color solid 3px;
+  color: $color;
+  font-family: Roboto, sans-serif;
+  margin-left: 40px;
+  margin-right: 40px;
+  margin-top: 20px;
+  padding: 15px 15px 20px;
 }
 
 .content {
@@ -24,17 +35,19 @@
 }
 
 .icon {
+  margin-right: 2px;
   position: relative;
   top: 5px;
 }
 
-.warning {
-  background-color: #ffefe1;
-  border-left: #ad0303 solid 3px;
-  color: #ad0303;
-  font-family: Roboto, sans-serif;
-  margin-left: 25px;
-  margin-right: 25px;
-  margin-bottom: 10px;
-  padding: 15px;
+.juxtapose {
+  float: left;
+}
+
+.note {
+  @include callouts(#e1f5fe, #1a6ebb, #1a6ebb);
+}
+
+.priority {
+  @include callouts(#ffedcc, #8d5b00 , #8d5b00);
 }
