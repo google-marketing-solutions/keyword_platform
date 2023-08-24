@@ -17,7 +17,9 @@
 
 from absl import logging
 
+from data_models import ad_groups as ad_groups_lib
 from data_models import ads as ads_lib
+from data_models import campaigns as campaigns_lib
 from data_models import google_ads_objects as google_ads_objects_lib
 from data_models import keywords as keywords_lib
 from data_models import settings as settings_lib
@@ -59,6 +61,12 @@ class TranslationWorker(base_worker.BaseWorker):
         ads=google_ads_objects.ads,
         source_language_code=settings.source_language_code,
         target_language_code=settings.target_language_codes[0])
+
+    self._apply_translation_suffix_to_campaigns_and_ad_groups(
+        campaigns=google_ads_objects.campaigns,
+        ad_groups=google_ads_objects.ad_groups,
+        target_language_code=settings.target_language_codes[0],
+    )
 
     logging.info('Finished execution: %s', self.name)
 
@@ -126,3 +134,13 @@ class TranslationWorker(base_worker.BaseWorker):
     )
 
     logging.info('Finished ad translation.')
+
+  def _apply_translation_suffix_to_campaigns_and_ad_groups(
+      self,
+      campaigns: campaigns_lib.Campaigns,
+      ad_groups: ad_groups_lib.AdGroups,
+      target_language_code: str,
+  ) -> None:
+    """Adds traget language code suffix to campaign and ad group names."""
+    campaigns.add_suffix(f'({target_language_code})')
+    ad_groups.add_suffix(f'({target_language_code})')

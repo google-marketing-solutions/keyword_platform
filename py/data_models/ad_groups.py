@@ -155,14 +155,15 @@ class AdGroups:
     """Returns a list of unique Ad Group names."""
     return list(self._df[AD_GROUP].unique())
 
-  def add_ad_group_suffix(self, suffix: str) -> None:
-    """Adds a new suffix to the ad group name.
+  def add_suffix(self, suffix: str) -> None:
+    """Adds a new suffix to the campaign and ad group name.
 
     For example, you could add '(es)' to the ad group name to label it as the
     ad group that was translated to Spanish.
 
     Args:
-      suffix: The suffix to add to the ad group.
+      suffix: The suffix to add to the ad group and campaign
     """
     for index in range(self.size()):
       self._df.loc[index, AD_GROUP] += f' {suffix}'
+      self._df.loc[index, CAMPAIGN] += f' {suffix}'

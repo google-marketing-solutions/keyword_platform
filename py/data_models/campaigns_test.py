@@ -162,6 +162,36 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame(
     },
 )
 
+_EXPECTED_DF_AFTER_ADD_SUFFIX = pd.DataFrame(
+    {
+        'Action': ['Add', 'Add', 'Add'],
+        'Campaign status': ['Paused', 'Paused', 'Paused'],
+        'Customer ID': [
+            'Enter customer ID',
+            'Enter customer ID',
+            'Enter customer ID',
+        ],
+        'Campaign': [
+            'Test Campaign 0 (es)',
+            'Test Campaign 1 (es)',
+            'Test Campaign 2 (es)',
+        ],
+        'Campaign type': ['Search', 'Search', 'Search'],
+        'Bid strategy type': [
+            'Target spend',
+            'Target spend',
+            'Maximize conversions',
+        ],
+        'Budget': ['1.00', '1.00', '1.00'],
+        'Labels': [
+            'Keyword Translator',
+            'Keyword Translator',
+            'Keyword Translator',
+        ],
+        'Updates applied': [[], [], []],
+    },
+)
+
 _EXPECTED_LIST = list([
     {
         'id': '11123',
@@ -289,6 +319,17 @@ class CampaignsTest(parameterized.TestCase):
     actual_campaign_names = campaigns.campaign_names()
 
     self.assertEqual(actual_campaign_names, expected_campaign_names)
+
+  def test_add_suffix(self):
+    expected_df = _EXPECTED_DF_AFTER_ADD_SUFFIX
+
+    campaigns = campaigns_lib.Campaigns(_GOOGLE_ADS_RESPONSE)
+    campaigns.add_suffix(suffix='(es)')
+    actual_df = campaigns.df()
+
+    pd.testing.assert_frame_equal(
+        actual_df, expected_df, check_index_type=False
+    )
 
 
 if __name__ == '__main__':

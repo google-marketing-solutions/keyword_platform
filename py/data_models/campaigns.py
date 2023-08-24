@@ -80,7 +80,7 @@ class Campaigns:
   campaigns.add_update(update='translated', campaigns='campaign 1')
 
   # Writes campaign data to CSV.
-  campaigns.to_csv()
+  campaigns.csv_data()
   """
 
   def __init__(self, response_jsons: list[list[Any]]) -> None:
@@ -200,3 +200,15 @@ class Campaigns:
   def campaign_names(self) -> list[str]:
     """Returns a list of unique Campaign names."""
     return list(self._df[CAMPAIGN].unique())
+
+  def add_suffix(self, suffix: str) -> None:
+    """Adds a new suffix to the campaign name.
+
+    For example, you could add '(es)' to the campaign name to label it as the
+    campaignthat was translated to Spanish.
+
+    Args:
+      suffix: The suffix to add to the campaign.
+    """
+    for index in range(self.size()):
+      self._df.loc[index, CAMPAIGN] += f' {suffix}'

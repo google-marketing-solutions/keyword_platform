@@ -280,7 +280,7 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame(
     },
 )
 
-_EXPECTED_DF_AFTER_AD_GROUP_UPDATE = pd.DataFrame(
+_EXPECTED_DF_AFTER_ADD_SUFFIX = pd.DataFrame(
     {
         'Action': ['Add', 'Add', 'Add'],
         'Customer ID': [
@@ -289,9 +289,9 @@ _EXPECTED_DF_AFTER_AD_GROUP_UPDATE = pd.DataFrame(
             'Enter customer ID',
         ],
         'Campaign': [
-            'Gmail Test Campaign',
-            'Gmail Test Campaign',
-            'Analytics Test Campaign',
+            'Gmail Test Campaign (es)',
+            'Gmail Test Campaign (es)',
+            'Analytics Test Campaign (es)',
         ],
         'Ad group': ['Ad group 1 (es)', 'Ad group 1 (es)', 'Ad group 1 (es)'],
         'Status': ['Paused', 'Paused', 'Paused'],
@@ -402,11 +402,11 @@ class AdGroupsTest(parameterized.TestCase):
 
     self.assertEqual(actual_size, expected_size)
 
-  def test_add_ad_group_suffix(self):
-    expected_df = _EXPECTED_DF_AFTER_AD_GROUP_UPDATE
+  def test_add_suffix(self):
+    expected_df = _EXPECTED_DF_AFTER_ADD_SUFFIX
 
     ad_groups = ad_groups_lib.AdGroups(_GOOGLE_ADS_RESPONSE)
-    ad_groups.add_ad_group_suffix(suffix='(es)')
+    ad_groups.add_suffix(suffix='(es)')
     actual_df = ad_groups.df()
 
     pd.testing.assert_frame_equal(

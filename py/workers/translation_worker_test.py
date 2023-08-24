@@ -23,6 +23,8 @@ from common import cloud_translation_client as cloud_translation_client_lib
 from data_models import ads as ads_lib
 from data_models import google_ads_objects as google_ads_objects_lib
 from data_models import keywords as keywords_lib
+from data_models import ad_groups as ad_groups_lib
+from data_models import campaigns as campaigns_lib
 from data_models import settings as settings_lib
 from workers import translation_worker as translation_worker_lib
 from workers import worker_result
@@ -168,6 +170,249 @@ _ADS_DATA_GOOGLE_ADS_API_RESPONSE = [
                     'adGroupAd.ad.finalUrls'),
       'requestId': 'fake_request_id'}]]
 
+
+_CAMPAIGNS_GOOGLE_ADS_API_RESPONSE = [
+    [{
+        'results': [
+            {
+                'campaign': {
+                    'resourceName': 'customers/1234456789/campaigns/11123',
+                    'advertisingChannelType': 'SEARCH',
+                    'biddingStrategyType': 'TARGET_SPEND',
+                    'name': 'Test Campaign 0',
+                    'id': '11123',
+                }
+            }
+        ],
+        'fieldMask': (
+            'campaign.id,campaign.name,campaign.advertisingChannelType,'
+            'campaign.biddingStrategyType'
+        ),
+        'requestId': 'fake_req_id',
+    }],
+    [{
+        'results': [
+            {
+                'campaign': {
+                    'resourceName': 'customers/1234456789/campaigns/12345',
+                    'advertisingChannelType': 'SEARCH',
+                    'biddingStrategyType': 'TARGET_SPEND',
+                    'name': 'Test Campaign 1',
+                    'id': '11124',
+                }
+            },
+            {
+                'campaign': {
+                    'resourceName': 'customers/1234456789/campaigns/67890',
+                    'advertisingChannelType': 'SEARCH',
+                    'biddingStrategyType': 'MAXIMIZE_CONVERSIONS',
+                    'name': 'Test Campaign 2',
+                    'id': '11125',
+                }
+            },
+        ],
+        'fieldMask': (
+            'campaign.id,campaign.name,campaign.advertisingChannelType,'
+            'campaign.biddingStrategyType'
+        ),
+        'requestId': 'fake_req_id',
+    }],
+]
+
+_AD_GROUPS_GOOGLE_ADS_RESPONSE = [
+    [{
+        'results': [{
+            'customer': {'resourceName': 'customers/123', 'id': '123'},
+            'campaign': {
+                'resourceName': 'customers/123/campaigns/456',
+                'name': 'Gmail Test Campaign',
+            },
+            'adGroup': {
+                'resourceName': 'customers/123/adGroups/789',
+                'name': 'Ad group 1',
+            },
+            'adGroupAd': {
+                'resourceName': 'customers/123/adGroupAds/789~1011',
+                'ad': {
+                    'responsiveSearchAd': {
+                        'headlines': [{
+                            'text': 'Email Login',
+                            'assetPerformanceLabels': 'PENDING',
+                            'policySummaryInfo': {
+                                'reviewStatus': 'REVIEWED',
+                                'approvalStatus': 'APPROVED',
+                            },
+                        }],
+                        'descriptions': [{
+                            'text': 'Amazing email!',
+                            'assetPerformanceLabels': 'PENDING',
+                            'policySummaryInfo': {
+                                'reviewStatus': 'REVIEWED',
+                                'approvalStatus': 'APPROVED',
+                            },
+                        }],
+                    },
+                    'resourceName': 'customers/123/ads/1011',
+                    'finalUrls': ['https://mail.google.com/'],
+                },
+            },
+        }],
+        'fieldMask': (
+            'customer.id,campaign.name,adGroup.name,'
+            'adGroupAd.ad.responsiveSearchAd.headlines,'
+            'adGroupAd.ad.responsiveSearchAd.descriptions,'
+            'adGroupAd.ad.finalUrls'
+        ),
+        'requestId': 'fake_request_id',
+    }],
+    [{
+        'results': [
+            {
+                'customer': {'resourceName': 'customers/123', 'id': '123'},
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/456',
+                    'name': 'Gmail Test Campaign',
+                },
+                'adGroup': {
+                    'resourceName': 'customers/123/adGroups/789',
+                    'name': 'Ad group 1',
+                },
+                'adGroupAd': {
+                    'resourceName': 'customers/123/adGroupAds/789~1011',
+                    'ad': {
+                        'responsiveSearchAd': {
+                            'headlines': [
+                                {
+                                    'text': 'Email Login',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                                {
+                                    'text': 'Online Email',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                                {
+                                    'text': 'Sign in',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                            ],
+                            'descriptions': [
+                                {
+                                    'text': (
+                                        'Email that’s intuitive, efficient, and'
+                                        ' useful'
+                                    ),
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                                {
+                                    'text': (
+                                        '15 GB of storage, less spam, and'
+                                        ' mobile access'
+                                    ),
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                            ],
+                        },
+                        'resourceName': 'customers/123/ads/1011',
+                        'finalUrls': ['https://mail.google.com/'],
+                    },
+                },
+            },
+            {
+                'customer': {'resourceName': 'customers/123', 'id': '123'},
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/1213',
+                    'name': 'Analytics Test Campaign',
+                },
+                'adGroup': {
+                    'resourceName': 'customers/123/adGroups/1415',
+                    'name': 'Ad group 1',
+                },
+                'adGroupAd': {
+                    'resourceName': 'customers/123/adGroupAds/1415~1617',
+                    'ad': {
+                        'responsiveSearchAd': {
+                            'headlines': [
+                                {
+                                    'text': 'Official Website',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                                {
+                                    'text': 'Official Site',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                                {
+                                    'text': 'High Quality Products',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                            ],
+                            'descriptions': [
+                                {
+                                    'text': 'Google Analytics',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                                {
+                                    'text': 'Try Analytics today!',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                            ],
+                        },
+                        'resourceName': 'customers/123/ads/1617',
+                        'finalUrls': ['http://analytics.google.com'],
+                    },
+                },
+            },
+        ],
+        'fieldMask': (
+            'customer.id,campaign.name,adGroup.name,'
+            'adGroupAd.ad.responsiveSearchAd.headlines,'
+            'adGroupAd.ad.responsiveSearchAd.descriptions,'
+            'adGroupAd.ad.finalUrls'
+        ),
+        'requestId': 'fake_request_id',
+    }],
+]
+
+
 _EXPECTED_KEYWORDS_DF = pd.DataFrame(
     {
         'Action': ['Add', 'Add'],
@@ -256,6 +501,60 @@ _EXPECTED_ADS_DF = pd.DataFrame(
     },
 )
 
+_EXPECTED_CAMPAIGNS_DF = pd.DataFrame(
+    {
+        'Action': ['Add', 'Add', 'Add'],
+        'Campaign status': ['Paused', 'Paused', 'Paused'],
+        'Customer ID': [
+            'Enter customer ID',
+            'Enter customer ID',
+            'Enter customer ID',
+        ],
+        'Campaign': [
+            'Test Campaign 0 (es)',
+            'Test Campaign 1 (es)',
+            'Test Campaign 2 (es)',
+        ],
+        'Campaign type': ['Search', 'Search', 'Search'],
+        'Bid strategy type': [
+            'Target spend',
+            'Target spend',
+            'Maximize conversions',
+        ],
+        'Budget': ['1.00', '1.00', '1.00'],
+        'Labels': [
+            'Keyword Translator',
+            'Keyword Translator',
+            'Keyword Translator',
+        ],
+        'Updates applied': [[], [], []],
+    },
+)
+
+_EXPECTED_AD_GROUPS_DF = pd.DataFrame(
+    {
+        'Action': ['Add', 'Add', 'Add'],
+        'Customer ID': [
+            'Enter customer ID',
+            'Enter customer ID',
+            'Enter customer ID',
+        ],
+        'Campaign': [
+            'Gmail Test Campaign (es)',
+            'Gmail Test Campaign (es)',
+            'Analytics Test Campaign (es)',
+        ],
+        'Ad group': ['Ad group 1 (es)', 'Ad group 1 (es)', 'Ad group 1 (es)'],
+        'Status': ['Paused', 'Paused', 'Paused'],
+        'Labels': [
+            'Keyword Translator',
+            'Keyword Translator',
+            'Keyword Translator',
+        ],
+        'Updates applied': [[], [], []],
+    },
+)
+
 
 class TranslationWorkerTest(absltest.TestCase):
 
@@ -305,7 +604,9 @@ class TranslationWorkerTest(absltest.TestCase):
     # Arranges google ads objects
     google_ads_objects = google_ads_objects_lib.GoogleAdsObjects(
         ads=ads_lib.Ads(_ADS_DATA_GOOGLE_ADS_API_RESPONSE),
-        keywords=keywords_lib.Keywords(_KEYWORDS_GOOGLE_ADS_API_RESPONSE))
+        keywords=keywords_lib.Keywords(_KEYWORDS_GOOGLE_ADS_API_RESPONSE),
+        campaigns=campaigns_lib.Campaigns(_CAMPAIGNS_GOOGLE_ADS_API_RESPONSE),
+        ad_groups=ad_groups_lib.AdGroups(_AD_GROUPS_GOOGLE_ADS_RESPONSE))
 
     # Arranges translation worker
     translation_worker = translation_worker_lib.TranslationWorker(
@@ -331,6 +632,18 @@ class TranslationWorkerTest(absltest.TestCase):
 
     pd.testing.assert_frame_equal(
         actual_ads_df, _EXPECTED_ADS_DF, check_index_type=False)
+
+    # Assert that suffixes were added to campaign and ad group names
+    actual_campaigns_df = google_ads_objects.campaigns.df()
+
+    pd.testing.assert_frame_equal(
+        actual_campaigns_df, _EXPECTED_CAMPAIGNS_DF, check_index_type=False)
+
+    actual_ad_groups_df = google_ads_objects.ad_groups.df()
+
+    pd.testing.assert_frame_equal(
+        actual_ad_groups_df, _EXPECTED_AD_GROUPS_DF, check_index_type=False)
+    
 
   def test_execute_empty_objects_returns_failure(self):
     # Arranges mock translation API
