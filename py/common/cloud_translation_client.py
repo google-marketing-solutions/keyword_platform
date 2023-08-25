@@ -160,13 +160,13 @@ class CloudTranslationClient:
           translations=translations,
       )
 
-      self._shorten_overflowing_translations(
-          translation_frame, target_language_code)
-
       batch_start = next_batch_index
 
     logging.info(
         'Completed translation for %d terms.', translation_frame.size())
+
+    self._shorten_overflowing_translations(
+        translation_frame, target_language_code)
 
   def _get_http_header(self) -> dict[str, str]:
     """Get the Authorization HTTP header.
