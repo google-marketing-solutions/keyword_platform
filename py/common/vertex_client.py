@@ -27,9 +27,7 @@ import numpy as np
 
 _MODEL = 'text-bison@001'
 
-AVAILABLE_LANGUAGES = frozenset(
-    ['en', 'es', 'de', 'fr', 'it', 'ja', 'ko', 'hi', 'zh']
-)
+AVAILABLE_LANGUAGES = frozenset(['en', 'es', 'ko', 'hi', 'zh'])
 
 
 def split_list(input_list: list[str], max_len: int = 10) -> list[list[str]]:
