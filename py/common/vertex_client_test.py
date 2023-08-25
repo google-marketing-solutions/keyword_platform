@@ -15,8 +15,8 @@
 import os
 from unittest import mock
 
-from google.cloud.aiplatform import vertexai
-from google.cloud.aiplatform.vertexai.preview.language_models import TextGenerationModel
+import vertexai
+from vertexai.language_models import TextGenerationModel
 
 from absl.testing import absltest
 from common import vertex_client as vertex_client_lib

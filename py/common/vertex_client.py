@@ -21,8 +21,8 @@ from concurrent import futures
 import math
 import os
 from absl import logging
-from google.cloud.aiplatform import vertexai
-from google.cloud.aiplatform.vertexai.preview.language_models import TextGenerationModel
+import vertexai
+from vertexai.language_models import TextGenerationModel
 import numpy as np
 
 _MODEL = 'text-bison@001'
