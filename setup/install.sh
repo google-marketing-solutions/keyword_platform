@@ -97,15 +97,6 @@ echo "Enter a comma-separated list of users to grant access to the solution:"
 read iap_allowed_users
 IAP_ALLOWED_USERS=$iap_allowed_users
 
-echo "(Optional) Enter a PaLM API Key or press enter to continue:"
-read palm_api_key
-if [ -z "$palm_api_key" ]; then
-  PALM_API_KEY=""
-else
-  PALM_API_KEY=$palm_api_key
-fi
-
-
 terraform_state_bucket_name="${GOOGLE_CLOUD_PROJECT}-bucket-tfstate"
 backend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform-backend"
 frontend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform-frontend"
@@ -172,7 +163,6 @@ terraform -chdir=./terraform plan \
   -var "client_id=$CLIENT_ID" \
   -var "client_secret=$CLIENT_SECRET" \
   -var "developer_token=$DEVELOPER_TOKEN" \
-  -var "palm_api_key=$PALM_API_KEY" \
   -var "login_customer_id=$LOGIN_CUSTOMER_ID" \
   -var "refresh_token=$refresh_token" \
   -var "project_id=$GOOGLE_CLOUD_PROJECT" \

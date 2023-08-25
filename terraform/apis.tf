@@ -20,6 +20,7 @@ locals {
     "googleads.googleapis.com",
     "iamcredentials.googleapis.com",
     "iap.googleapis.com",
+    "aiplatform.googleapis.com",
     "logging.googleapis.com",
     "pubsub.googleapis.com",
     "secretmanager.googleapis.com",

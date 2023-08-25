@@ -77,10 +77,6 @@ variable "bucket_name" {
   description = "The bucket name to store Keywordplatform output files."
 }
 
-variable "palm_api_key" {
-  description = "The PaLM API key to use."
-  default = ""
-}
 
 ##
 # Test utilities

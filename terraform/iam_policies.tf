@@ -74,6 +74,12 @@ resource "google_project_iam_member" "backend_sa--storage-object-admin" {
   role    = "roles/storage.objectAdmin"
 }
 
+resource "google_project_iam_member" "backend_sa--vertexai-user" {
+  member  = "serviceAccount:${google_service_account.backend_sa.email}"
+  project = var.project_id
+  role    = "roles/aiplatform.user"
+}
+
 # Needed to access the backend image during migrations from Cloud Build.
 resource "google_project_iam_member" "cloudbuild_managed_sa--object-viewer" {
   member  = "serviceAccount:${google_project_service_identity.cloudbuild_managed_sa.email}"

@@ -25,8 +25,8 @@ from absl.testing import parameterized
 import execution_runner as execution_runner_lib
 from common import cloud_translation_client
 from common import google_ads_client
-from common import palm_client as palm_client_lib
 from common import storage_client
+from common import vertex_client as vertex_client_lib
 from data_models import accounts as accounts_lib
 from data_models import settings as settings_lib
 from workers import translation_worker
@@ -162,8 +162,8 @@ class ExecutionRunnerTest(parameterized.TestCase):
         )
     )
 
-    self.mock_palm_client = self.enter_context(
-        mock.patch.object(palm_client_lib, 'PalmClient', autospec=True)
+    self.mock_vertex_client = self.enter_context(
+        mock.patch.object(vertex_client_lib, 'VertexClient', autospec=True)
     )
 
   def test_run_workers(self):
@@ -271,14 +271,7 @@ class ExecutionRunnerTest(parameterized.TestCase):
         (mock.call(customer_id='123'), mock.call(customer_id='456')),
     )
 
-  @mock.patch.object(
-      execution_runner_lib.ExecutionRunner,
-      '_get_optional_secrets',
-      autospec=True,
-      return_value={'palm_api_key': 'fake_palm_api_key'},
-  )
-  def test_palm_client_init(self, mock_get_optional_secrets):
-    del mock_get_optional_secrets  # Unused
+  def test_vertex_client_init(self):
     settings = settings_lib.Settings(
         source_language_code='en',
         target_language_codes=['es'],
@@ -299,16 +292,12 @@ class ExecutionRunnerTest(parameterized.TestCase):
     ):
       execution_runner_lib.ExecutionRunner(settings)
 
-    self.mock_palm_client.assert_called_once_with('fake_palm_api_key')
+    self.mock_vertex_client.assert_called_once_with()
 
-  @mock.patch.object(
-      execution_runner_lib.ExecutionRunner,
-      '_get_optional_secrets',
-      autospec=True,
-      return_value={},
-  )
-  def test_palm_client_does_not_initialize(self, mock_get_optional_secrets):
-    del mock_get_optional_secrets  # Unused
+  def test_vertex_client_does_not_initialize(self):
+    self.mock_vertex_client.side_effect = (
+        google.api_core.exceptions.PermissionDenied(message='Permission denied')
+    )
     settings = settings_lib.Settings(
         source_language_code='en',
         target_language_codes=['es'],
@@ -327,65 +316,9 @@ class ExecutionRunnerTest(parameterized.TestCase):
         execution_runner_lib._WORKERS,
         {'translationWorker': mock_translation_worker},
     ):
-      execution_runner_lib.ExecutionRunner(settings)
+      execution_runner = execution_runner_lib.ExecutionRunner(settings)
 
-    self.mock_palm_client.assert_not_called()
-
-  @parameterized.named_parameters(
-      {
-          'testcase_name': 'palm_api_secret_does_not_exist',
-          'error': google.api_core.exceptions.NotFound(message='fake_message'),
-      },
-      {
-          'testcase_name': 'palm_api_secret_not_accessible',
-          'error': google.api_core.exceptions.PermissionDenied(
-              message='fake_message'
-          ),
-      },
-      {
-          'testcase_name': 'palm_api_secret_type_error',
-          'error': TypeError('fake_message'),
-      },
-      {
-          'testcase_name': 'palm_api_secret_attribute_error',
-          'error': AttributeError('fake_message'),
-      },
-  )
-  def test_palm_api_secret_not_available(self, error):
-    self.mock_secret_manager.return_value.access_secret_version.side_effect = (
-        error
-    )
-
-    mock_translation_worker = mock.create_autospec(
-        translation_worker.TranslationWorker
-    )
-
-    settings = settings_lib.Settings(
-        source_language_code='en',
-        target_language_codes=['es'],
-        customer_ids=[123, 456],
-        campaigns=[789, 101],
-        workers_to_run=['translationWorker'],
-    )
-
-    with self.assertLogs() as logs:
-      with mock.patch.dict(
-          execution_runner_lib._WORKERS,
-          {'translationWorker': mock_translation_worker},
-      ):
-        with mock.patch.object(
-            execution_runner_lib.ExecutionRunner,
-            '_get_credentials',
-            autospec=True,
-            return_value=_FAKE_CREDENTIALS,
-        ):
-          execution_runner = execution_runner_lib.ExecutionRunner(settings)
-
-    self.assertContainsSubset(
-        'INFO:absl:Optional secret not set or not accessible: palm_api_key',
-        logs.output[2],
-    )
-    self.assertIsNone(execution_runner._palm_client)
+    self.assertIsNone(execution_runner._vertex_client)
 
 
 if __name__ == '__main__':

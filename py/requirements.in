@@ -10,3 +10,4 @@ httplib2
 pandas
 requests
 google-generativeai
+google-cloud-aiplatform

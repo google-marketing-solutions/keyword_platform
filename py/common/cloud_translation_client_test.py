@@ -15,16 +15,16 @@
 """Tests for the CloudTranslationClient class."""
 
 from unittest import mock
-import requests
 
 import pandas as pd
+import requests
 
 from absl.testing import absltest
 from common import api_utils
 from common import cloud_translation_client as cloud_translation_client_lib
+from common import vertex_client
 from data_models import translation_frame as translation_frame_lib
 from data_models import translation_metadata
-from common import palm_client
 
 
 class CloudTranslationClientTest(absltest.TestCase):
@@ -216,8 +216,8 @@ class CloudTranslationClientTest(absltest.TestCase):
     api_version = 3
     batch_char_limit = 2500
 
-    mock_palm_client = mock.create_autospec(palm_client.PalmClient)
-    mock_palm_client.shorten_text_to_char_limit.side_effect = [
+    mock_vertex_client = mock.create_autospec(vertex_client.VertexClient)
+    mock_vertex_client.shorten_text_to_char_limit.side_effect = [
         ['shortened1'],
         ['shortened2', 'shortened3'],
     ]
@@ -228,7 +228,9 @@ class CloudTranslationClientTest(absltest.TestCase):
             gcp_project_name=gcp_project_name,
             api_version=api_version,
             batch_char_limit=batch_char_limit,
-            palm_client=mock_palm_client))
+            vertex_client=mock_vertex_client,
+        )
+    )
 
     translation_frame = translation_frame_lib.TranslationFrame({
         'term_to_overflow_1': translation_metadata.TranslationMetadata(

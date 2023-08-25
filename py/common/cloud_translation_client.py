@@ -17,11 +17,11 @@
 See class doctring for more details.
 """
 from absl import logging
-import requests
 import pandas as pd
+import requests
 
 from common import api_utils
-from common import palm_client as palm_client_lib
+from common import vertex_client as vertex_client_lib
 from data_models import translation_frame as translation_frame_lib
 
 TRANSLATE_API_BASE_URL = 'https://translate.googleapis.com'
@@ -76,7 +76,7 @@ class CloudTranslationClient:
       gcp_project_name: str,
       api_version: str = _API_VERSION,
       batch_char_limit: int = _DEFAULT_BATCH_CHAR_LIMIT,
-      palm_client: palm_client_lib.PalmClient | None = None,
+      vertex_client: vertex_client_lib.VertexClient | None = None,
   ) -> None:
     """Instantiates the Clound Translation client.
 
@@ -88,7 +88,7 @@ class CloudTranslationClient:
       api_version: The Cloud Translate API API Version.
       batch_char_limit: The size of content batches to send to the translation
         API, in chars.
-      palm_client: An instance of the PaLM client for accessing LLM APIs.
+      vertex_client: An instance of the Vertex client for accessing LLM APIs.
     """
     self.api_version = api_version
     self.batch_char_limit = batch_char_limit
@@ -97,7 +97,7 @@ class CloudTranslationClient:
     # The access_token be lazily loaded and cached when the API is called to
     # ensure token is fresh and won't be retrieved repeatedly.
     self.access_token = None
-    self._palm_client = palm_client
+    self._vertex_client = vertex_client
     api_utils.validate_credentials(self.credentials, _CREDENTIAL_REQUIRED_KEYS)
     logging.info('Successfully initialized CloudTranslationClient.')
 
@@ -185,18 +185,18 @@ class CloudTranslationClient:
       self,
       translation_frame: translation_frame_lib.TranslationFrame,
       target_language_code: str) -> None:
-    """Uses PaLM API to fix overflowing translations in-place.
+    """Uses VertexAI API to fix overflowing translations in-place.
 
     Args:
       translation_frame: The translation frame to shorten overflowing
         translations for.
       target_language_code: The language to translate to.
     """
-    if not self._palm_client:
-      logging.info('Skipping PaLM shortening: No client initialized.')
+    if not self._vertex_client:
+      logging.info('Skipping VertexAI shortening: No client initialized.')
       return
 
-    logging.info('Shortening translations with PaLM...')
+    logging.info('Shortening translations with VertexAI...')
 
     overflowing_translations = self._get_overflowing_translations(
         translation_frame, target_language_code)
@@ -230,7 +230,7 @@ class CloudTranslationClient:
       translations = [
           translation[target_language_code] for translation in translations]
 
-      shortened_translations = self._palm_client.shorten_text_to_char_limit(
+      shortened_translations = self._vertex_client.shorten_text_to_char_limit(
           text_list=translations,
           language_code=target_language_code,
           char_limit=char_limit,
@@ -254,7 +254,7 @@ class CloudTranslationClient:
         ][target_language_code] = new_translation
         translation_index += 1
 
-    logging.info('Finished shortening translations with PaLM.')
+    logging.info('Finished shortening translations with VertexAI.')
 
   def _get_overflowing_translations(
       self,

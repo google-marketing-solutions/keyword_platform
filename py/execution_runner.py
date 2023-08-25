@@ -24,8 +24,8 @@ from google.cloud import secretmanager
 
 from common import cloud_translation_client as cloud_translation_client_lib
 from common import google_ads_client as google_ads_client_lib
-from common import palm_client as palm_client_lib
 from common import storage_client as storage_client_lib
+from common import vertex_client as vertex_client_lib
 from data_models import accounts as accounts_lib
 from data_models import ad_groups as ad_groups_lib
 from data_models import ads as ads_lib
@@ -50,10 +50,6 @@ _REQUIRED_SECRET_KEYS = [
     'login_customer_id',
 ]
 
-_OPTIONAL_SECRET_KEYS = [
-    'palm_api_key',
-]
-
 
 class ExecutionRunner:
   """Executes workers to produce expanded / optimized Google Ads objects.
@@ -76,16 +72,16 @@ class ExecutionRunner:
 
     logging.info('ExecutionRunner: initialized credentials.')
 
-    optional_secrets = self._get_optional_secrets()
-
-    if 'palm_api_key' in optional_secrets:
-      palm_api_key = optional_secrets['palm_api_key']
-      self._palm_client = palm_client_lib.PalmClient(palm_api_key)
-      logging.info('ExecutionRunner: initialized PaLM API client.')
-    else:
-      self._palm_client = None
+    try:
+      self._vertex_client = vertex_client_lib.VertexClient()
+      logging.info('ExecutionRunner: initialized Vertex API client.')
+    except google.api_core.exceptions.PermissionDenied as err:
+      self._vertex_client = None
       logging.info(
-          'ExecutionRunner: PaLM API key missing. PaLM will not be used.')
+          'ExecutionRunner: Vertex API client could not be initialized. Vertex'
+          ' AI will not be used: %s',
+          err,
+      )
 
     self._google_ads_client = google_ads_client_lib.GoogleAdsClient(
         self._settings.credentials)
@@ -96,7 +92,7 @@ class ExecutionRunner:
         cloud_translation_client_lib.CloudTranslationClient(
             credentials=self._settings.credentials,
             gcp_project_name=self._gcp_project_id,
-            palm_client=self._palm_client)
+            vertex_client=self._vertex_client)
     )
 
     logging.info('ExecutionRunner: initialized Cloud Translation client.')
@@ -124,44 +120,6 @@ class ExecutionRunner:
           secret_key] = secret_response.payload.data.decode('UTF-8').strip()
 
     return credentials
-
-  def _get_optional_secrets(self) -> dict[str, str]:
-    """Gets optional secrets from Cloud Secret Manager.
-
-    Returns:
-      A dictionary containing API credentials.
-    """
-    logging.info('Building optional secrets...')
-
-    secret_manager_client = secretmanager.SecretManagerServiceClient()
-    optional_keys = {}
-
-    for secret_key in _OPTIONAL_SECRET_KEYS:
-      full_secret_name = (
-          f'projects/{self._gcp_project_id}/secrets/{secret_key}/versions/'
-          'latest')
-      try:
-        secret_response = secret_manager_client.access_secret_version(
-            request={'name': full_secret_name}
-        )
-        optional_keys[
-            secret_key] = secret_response.payload.data.decode('UTF-8').strip()
-      except (
-          google.api_core.exceptions.PermissionDenied,
-          google.api_core.exceptions.NotFound,
-          TypeError,
-          AttributeError,
-      ) as err:
-        # Secret manager errors are rather arbitrary, e.g. a PermissionDenied
-        # error will be raised if the secret does not exist. Hence, we default
-        # to catching all possible errors in a single except block.
-        logging.info(
-            'Optional secret not set or not accessible: %s - %s',
-            secret_key,
-            err,
-        )
-
-    return optional_keys
 
   def run_workers(self) -> dict[str, Any]:
     """Runs the selected workers and saves output as a csv.
@@ -330,7 +288,7 @@ class ExecutionRunner:
 
     for worker_id in self._settings.workers_to_run:
       worker = _WORKERS[worker_id](
-          self._cloud_translation_client, self._palm_client)
+          self._cloud_translation_client, self._vertex_client)
 
       logging.info('Running %s...', worker.name)
       result = worker.execute(self._settings, google_ads_objects)

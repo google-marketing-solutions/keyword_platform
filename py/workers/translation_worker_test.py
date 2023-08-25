@@ -610,8 +610,8 @@ class TranslationWorkerTest(absltest.TestCase):
 
     # Arranges translation worker
     translation_worker = translation_worker_lib.TranslationWorker(
-        cloud_translation_client=cloud_translation_client,
-        palm_client=None)
+        cloud_translation_client=cloud_translation_client, vertex_client=None
+    )
 
     # Act
     result = translation_worker.execute(
@@ -643,7 +643,6 @@ class TranslationWorkerTest(absltest.TestCase):
 
     pd.testing.assert_frame_equal(
         actual_ad_groups_df, _EXPECTED_AD_GROUPS_DF, check_index_type=False)
-    
 
   def test_execute_empty_objects_returns_failure(self):
     # Arranges mock translation API
@@ -672,8 +671,8 @@ class TranslationWorkerTest(absltest.TestCase):
 
     # Arranges translation worker
     translation_worker = translation_worker_lib.TranslationWorker(
-        cloud_translation_client=cloud_translation_client,
-        palm_client=None)
+        cloud_translation_client=cloud_translation_client, vertex_client=None
+    )
 
     # Act
     result = translation_worker.execute(
