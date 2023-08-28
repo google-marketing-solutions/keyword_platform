@@ -230,11 +230,15 @@ class CloudTranslationClient:
       translations = [
           translation[target_language_code] for translation in translations]
 
+      logging.info('Translations to shorten: %s', translations)
+
       shortened_translations = self._vertex_client.shorten_text_to_char_limit(
           text_list=translations,
           language_code=target_language_code,
           char_limit=char_limit,
       )
+
+      logging.info('Shortened translations: %s', shortened_translations)
 
       # Finally, updates the original DataFrame.
       translation_index = 0

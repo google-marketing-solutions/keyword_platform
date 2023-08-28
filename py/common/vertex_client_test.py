@@ -90,8 +90,9 @@ class VertexClientTest(absltest.TestCase):
     self.assertEqual(
         logs.output,
         [
-            'WARNING:absl:Language unsupported not supported.'
-            ' Returning original text list.'
+            ('WARNING:absl:Language unsupported not supported.'
+             ' Returning original text list.'),
+            "INFO:absl:shortened_batch: ['some_text']"
         ],
     )
 

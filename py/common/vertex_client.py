@@ -96,6 +96,8 @@ class VertexClient:
       )
 
     for shortened_batch in shortened_batches:
+      logging.info('shortened_batch: %s', shortened_batch)
+
       if isinstance(shortened_batch, list):
         result.extend(shortened_batch)
     return result
