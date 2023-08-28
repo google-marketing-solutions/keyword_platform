@@ -35,20 +35,16 @@
             fontIcon="bookmark"
             class="icon">
         </mat-icon>
-        <span>Usage generates Google Cloud costs as it
-        translates keywords and ads utilizing the Google Cloud Translation API.
-        Costs depend on the size of translation requests, see
-        <a href="https://cloud.google.com/translate/pricing" target="_blank">
-          Cloud Translation Pricing</a> for details.</span>
+        <span>Usage generates Google Cloud costs as it translates keywords and ads utilizing the
+          Google Cloud Translation API. Costs depend on the size of translation requests, see
+          <a href="https://cloud.google.com/translate/pricing" target="_blank">
+            Cloud Translation Pricing</a> for details.</span>
       </div>
       <div class="margin"></div>
-      <form
-        (ngSubmit)="onSubmit()"
-        [formGroup]="form"
-        class="fade form">
+      <form (ngSubmit)="onSubmit()" [formGroup]="form" class="fade form">
         <p class="title">Accounts</p>
-        <p class="sub-title">
-            Select the accounts that contain the campaigns you want to translate.</p>
+        <p class="sub-title">Select the accounts that contain the campaigns you want to
+          translate.</p>
         <div class="component">
           <app-drop-down
               #component
@@ -62,8 +58,8 @@
           </app-drop-down>
         </div>
         <p class="title">Campaigns</p>
-        <p class="sub-title">Select the campaigns with keywords and ads to translate. All enabled
-          ad groups will be pulled in automatically.</p>
+        <p class="sub-title">Select the campaigns with keywords and ads to translate. All enabled ad
+          groups will be pulled in automatically.</p>
         <div class="component">
           <app-drop-down
               #component
@@ -105,15 +101,12 @@
           </div>
         </div>
         <div class="component">
-          <p class="sub-title">
-              Toggle to output multiple Google Ads Editor templates for
-              campaigns, ad groups, keywords, and ads as opposed to
-              consolidating them into a single one.</p>
+          <p class="sub-title">Toggle to output multiple Google Ads Editor templates for campaigns,
+            ad groups, keywords, and ads as opposed to consolidating them into a single one.</p>
           <mat-slide-toggle
               color="primary"
               (change)="templatesTogglechange($event)">
-              Multiple Google Ads Editor Templates
-          </mat-slide-toggle>
+            Multiple Google Ads Editor Templates</mat-slide-toggle>
         </div>
         <div class="component">
           <button

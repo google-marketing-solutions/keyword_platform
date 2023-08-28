@@ -29,7 +29,10 @@
       {{concatenateValue(value)}}
     </mat-option>
   </mat-select>
-  <mat-error *ngIf="control.hasError('required')" class="error">
-    Field is Required.
-  </mat-error>
+  <mat-error
+      *ngIf="control.hasError('required')"
+      class="error">Field is Required.</mat-error>
+  <mat-error
+      *ngIf="control.hasError('sameLanguage')"
+      class="error">Source and target language must be different.</mat-error>
 </mat-form-field>

@@ -16,7 +16,7 @@
  */
 
 import {AfterViewInit, ChangeDetectorRef, Component, OnInit, QueryList, ViewChildren} from '@angular/core';
-import {FormControl, FormGroup} from '@angular/forms';
+import {AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSlideToggleChange} from '@angular/material/slide-toggle';
 
@@ -28,6 +28,11 @@ import {SelectionDataGroup} from '../models/types';
 import {GoogleAdsService} from '../services/google-ads.service';
 import {RunService} from '../services/run.service';
 import {TranslationService} from '../services/translation.service';
+
+enum LanguageControl {
+  SOURCE_LANGUAGE = 'source-language',
+  TARGET_LANGUAGE = 'target-language'
+}
 
 /** Enum to define the status of form submission. */
 export enum SubmitStatus {
@@ -78,6 +83,7 @@ export class FormComponent implements OnInit, AfterViewInit {
     for (const component of this.components) {
       this.form.addControl(component.controllerName!, component.control);
     }
+    this.addLanguageValidators();
     this.changeRefDetector.detectChanges();
   }
 
@@ -165,6 +171,40 @@ export class FormComponent implements OnInit, AfterViewInit {
 
   isRequestSubmitStatus(): boolean {
     return this.status === SubmitStatus.REQUEST;
+  }
+
+  private addLanguageValidators() {
+    const controls = this.getFormControls();
+
+    const sourceLanguageControl = controls[LanguageControl.SOURCE_LANGUAGE];
+    const targetLanguageControl = controls[LanguageControl.TARGET_LANGUAGE];
+
+    // See https://angular.io/api/forms/AbstractControl#addvalidators
+    sourceLanguageControl.addValidators(
+        this.isSameLanguageValidator(LanguageControl.SOURCE_LANGUAGE));
+    targetLanguageControl.addValidators(
+        this.isSameLanguageValidator(LanguageControl.TARGET_LANGUAGE));
+
+    sourceLanguageControl.updateValueAndValidity();
+    targetLanguageControl.updateValueAndValidity();
+  }
+
+  private isSameLanguageValidator(languageControl: string): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors|null => {
+      const language =
+          (languageControl === LanguageControl.SOURCE_LANGUAGE ?
+               this.targetLanguageCode :
+               this.sourceLanguageCode);
+      const value = control.value?.code;
+      // Only proceed with the validation check if the value of the language
+      // field or the value of the language to compare it to is defined.
+      // Otherwise the validation will trigger on load which is not desired.
+      if (!language || !value) {
+        return null;
+      }
+      const isSameLanguage = (value === language);
+      return isSameLanguage ? {sameLanguage: {value}} : null;
+    };
   }
 
   private disableControls(disable: boolean) {
