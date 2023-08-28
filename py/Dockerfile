@@ -23,7 +23,7 @@ WORKDIR $APP_HOME
 COPY . ./
 
 # Install production dependencies.
-RUN pip install --upgrade pip
+RUN python3 -m ensurepip --upgrade
 RUN pip install --require-hashes --no-cache-dir --no-deps -r requirements.txt
 
 # Run the web service on container startup. Here we use the gunicorn
