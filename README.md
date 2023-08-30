@@ -119,6 +119,22 @@ Use these files to upload to Google Ads via Google Ads Editor.
 > It is important you use Google Ads Editor instead of uploading via Bulk
 > Actions in the Google Ads UI.
 
+## Access Management
+
+You can provide a list of user emails during the installation to grant access
+to the web application. You can continue to manage access to the web app via
+the Cloud Console by heading to [Identity Aware Proxy](https://console.cloud.google.com/security/iap)
+in the Google Cloud Project that was used for the deployment.
+
+Under `Backend Services` click on the `keywordplatform-frontend-backend-service`
+resource. This opens a menu on the right side of your screen with the
+`ADD PRINCIPAL` button. Using this button you can add or remove users by
+granting or revoking the `Cloud IAP > IAP-secured Web App User` role.
+
+> [!TIP]
+> To make access management easier you can also grant email groups, e.g. a
+> [Google Groups](https://groups.google.com) access to the Web App.
+
 ## Workers & Costs
 The solution uses a set of workers (as of Aug 2023 only one worker is available)
 to run certain tasks. The workers themselves generate costs by sending requests
