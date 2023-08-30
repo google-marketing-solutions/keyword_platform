@@ -22,11 +22,7 @@ import { catchError, map } from 'rxjs/operators';
 
 import { GoogleAds } from '../models/interfaces';
 
-/**
- * Google Ads service.
- *
- * TODO(): Modify HTTP requests to support Cloud Run environment.
- */
+/** Google Ads service. */
 @Injectable({providedIn: 'root'})
 export class GoogleAdsService {
   constructor(private readonly http: HttpClient) {}

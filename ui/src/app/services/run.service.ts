@@ -27,7 +27,6 @@ import {Output} from '../models/interfaces';
 export class RunService {
   constructor(private readonly http: HttpClient) {}
 
-  // TODO(): Modify HTTP request to support Cloud Run environment.
   run(accountIds: string[], campaignIds: string[], sourceLanguageCode: string,
       targetLanguageCode: string, multipleTemplates: boolean,
       workers: string[]): Observable<HttpResponse<Output>> {
