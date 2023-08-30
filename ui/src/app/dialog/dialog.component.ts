@@ -18,12 +18,13 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA} from '@angular/material/dialog';
 
+import {ResponseMessage, ResponseStatus} from '../models/enums';
 import {Output} from '../models/interfaces';
 
 const CHAR_LIMIT = 75;
 
 interface DialogData {
-  [key: string]: Output;
+  [key: string]: Output|number|null;
 }
 
 /** The dialog component to display output. */
@@ -34,12 +35,25 @@ interface DialogData {
 })
 export class DialogComponent implements OnInit {
   assetUrls?: string[];
+  message?: string;
+  status?: number;
 
   constructor(@Inject(MAT_DIALOG_DATA) readonly data: DialogData) {}
 
   ngOnInit() {
-    const value = this.data['value'];
-    this.assetUrls = value['asset_urls'] as string[];
+    switch (this.data['status']) {
+      case ResponseStatus.SUCCESS:
+        this.status = ResponseStatus.SUCCESS;
+        const value = this.data['value'] as Output;
+        this.assetUrls = value['asset_urls'] as string[];
+        break;
+      case ResponseStatus.SERVER_ERROR:
+        this.status = ResponseStatus.SERVER_ERROR;
+        this.message = ResponseMessage.SERVER_ERROR;
+        break;
+      default:
+        this.message = ResponseMessage.UNKNOWN_ERROR;
+    }
   }
 
   /** Truncates long URLs for the dialog container. */

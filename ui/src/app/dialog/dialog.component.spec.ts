@@ -24,7 +24,7 @@ import {Output} from '../models/interfaces';
 import { DialogComponent } from './dialog.component';
 
 interface DialogData {
-  [key: string]: Output;
+  [key: string]: Output|number|null;
 }
 
 describe('DialogComponent', () => {
@@ -33,6 +33,7 @@ describe('DialogComponent', () => {
 
   function getDialogData() {
     const data: DialogData = {
+      'status': 200,
       'value': {
         'asset_urls': [
           'http://storage.googleapis.com/bucket/file1',
@@ -56,8 +57,7 @@ describe('DialogComponent', () => {
           }
         }
       }
-    }
-    return data;
+    } return data;
   }
 
   beforeEach(() => {

@@ -26,7 +26,6 @@
   font-family: Roboto, sans-serif;
   margin-left: 40px;
   margin-right: 40px;
-  margin-top: 20px;
   padding: 15px 15px 20px;
 }
 
@@ -42,6 +41,14 @@
 
 .juxtapose {
   float: left;
+}
+
+.separate {
+  margin-top: 20px;
+}
+
+.error {
+  @include callouts(#fbe9e7, #a52714 , #a52714);
 }
 
 .note {
