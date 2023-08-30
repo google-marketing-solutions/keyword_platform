@@ -22,8 +22,8 @@ import {MatSlideToggleChange} from '@angular/material/slide-toggle';
 
 import {DialogComponent} from '../dialog/dialog.component';
 import {DropDownComponent} from '../drop-down/drop-down.component';
-import {Worker} from '../models/enums';
-import {GoogleAds, Language} from '../models/interfaces';
+import {RequestStatus, Worker} from '../models/enums';
+import {GoogleAds, Language, Output} from '../models/interfaces';
 import {SelectionDataGroup} from '../models/types';
 import {GoogleAdsService} from '../services/google-ads.service';
 import {RunService} from '../services/run.service';
@@ -34,15 +34,14 @@ enum LanguageControl {
   TARGET_LANGUAGE = 'target-language'
 }
 
-/** Enum to define the status of form submission. */
-export enum SubmitStatus {
-  NONE = 'None',
-  REQUEST = 'Request',
-  SUCCESS = 'Success',
-  ERROR = 'Error'
-}
-
-/** The parent component of the form. */
+/**
+ * The parent component of the form.
+ *
+ * TODO(): Move translation/language logic to its own "Translate"
+ * component so that this component can be more like a parent component to child
+ * components or in other words workers. E.g., translate component/worker,
+ * classify component/worker, etc.
+ */
 @Component({
   selector: 'app-form',
   templateUrl: './form.component.html',
@@ -62,7 +61,7 @@ export class FormComponent implements OnInit, AfterViewInit {
   private accountIds: string[] = [];
   private campaignIds: string[] = [];
 
-  status = SubmitStatus.NONE;
+  requestStatus = RequestStatus.NONE;
 
   @ViewChildren('component')
   private readonly components!: QueryList<DropDownComponent>;
@@ -134,26 +133,19 @@ export class FormComponent implements OnInit, AfterViewInit {
     }
     // Disable form upon request.
     this.disableControls(true);
-    this.status = SubmitStatus.REQUEST;
+    this.requestStatus = RequestStatus.REQUESTED;
     this.runService
         .run(
             this.accountIds, this.campaignIds, this.sourceLanguageCode!,
             this.targetLanguageCode!, this.multipleTemplates, workers)
         .subscribe(
             (response => {
-              this.status = SubmitStatus.SUCCESS;
-              this.dialog.open(
-                  DialogComponent, {data: {value: response.body!}});
-              this.dialog.afterAllClosed.subscribe(() => {
-                // Enable form after the successful results rendered in the
-                // dialog container gets closed so that the form can be
-                // interacted with again.
-                this.disableControls(false);
-              });
+              this.requestStatus = RequestStatus.RESPONDED;
+              this.openDialog(response.status!, response.body!);
             }),
             (error => {
-              this.disableControls(false);
-              this.status = SubmitStatus.ERROR;
+              this.requestStatus = RequestStatus.ERROR;
+              this.openDialog(0, null);
               console.error(error);
             }));
   }
@@ -169,8 +161,8 @@ export class FormComponent implements OnInit, AfterViewInit {
     return result.length > 0;
   }
 
-  isRequestSubmitStatus(): boolean {
-    return this.status === SubmitStatus.REQUEST;
+  isRunRequestedStatus(): boolean {
+    return this.requestStatus === RequestStatus.REQUESTED;
   }
 
   private addLanguageValidators() {
@@ -237,5 +229,14 @@ export class FormComponent implements OnInit, AfterViewInit {
 
   private getFormControls(): {[key: string]: FormControl;} {
     return this.form.controls;
+  }
+
+  private openDialog(status: number, value: Output|null) {
+    this.dialog.open(DialogComponent, {data: {status, value}});
+    this.dialog.afterAllClosed.subscribe(() => {
+      // Enable form after the results rendered in the dialog container gets
+      // closed so that the form can be interacted with again.
+      this.disableControls(false);
+    });
   }
 }

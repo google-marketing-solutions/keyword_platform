@@ -20,7 +20,8 @@
       mat-stretch-tabs="false"
       animationDuration="0ms"
       [selectedIndex]="1">
-    <!-- TODO() Confirm header label. -->
+    <!-- TODO(): Confirm header label. -->
+    <!-- TODO(): Add logo. -->
     <mat-tab
         label="Keyword Platform Beta"
         disabled
@@ -28,6 +29,10 @@
     </mat-tab>
     <mat-tab label="Translate Keywords & Ads" labelClass="label">
     <div class="tab">
+      <!-- TODO(): Move Translate Keywords & Ads content to its own "Translate"
+      component so that the tabs can be more like template containers that host components
+      or in other words workers. E.g., <app-translate></app-translate> component/worker,
+      <app-classify></app-classify> component/worker, etc. -->
       <div class="disclaimer">
         <mat-icon
             aria-hidden="false"
@@ -113,8 +118,8 @@
               mat-raised-button
               color="primary"
               type="submit"
-              [disabled]="hasFormError() || isRequestSubmitStatus()">
-            <span *ngIf="isRequestSubmitStatus()" class="spinner">
+              [disabled]="hasFormError() || isRunRequestedStatus()">
+            <span *ngIf="isRunRequestedStatus()" class="spinner">
               <mat-spinner [diameter]="25"></mat-spinner>
             </span>
             <span>Run</span>
