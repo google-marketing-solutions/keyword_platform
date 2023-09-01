@@ -179,6 +179,58 @@ class MainTest(absltest.TestCase):
     self.assertEqual(expected_status_code, actual_response.status_code)
     self.assertEqual(expected_data, actual_response.text)
 
+  @mock.patch.object(main, '_setup_logging', autospec=True)
+  @mock.patch.object(execution_runner, 'ExecutionRunner', autospec=True)
+  def test_get_cost(
+      self, mock_execution_runner, mock_setup_logging):
+    del mock_setup_logging  # Unused.
+
+    expected_cost_estimate_msg = (
+        'Estimated cost: $0.30 USD. '
+        '(12000 ad chars + 3000 keyword chars) * $0.000020/char.)')
+
+    mock_execution_runner.return_value.get_cost_estimate.return_value = (
+        expected_cost_estimate_msg)
+
+    expected_status_code = 200
+
+    actual_response = main.app.test_client().post('cost', data={
+        'customer_ids': '123,567',
+        'campaigns': '987654321',
+    })
+
+    self.assertEqual(expected_status_code, actual_response.status_code)
+    self.assertEqual(expected_cost_estimate_msg, actual_response.text)
+
+  @mock.patch.object(main, '_setup_logging', autospec=True)
+  @mock.patch.object(execution_runner, 'ExecutionRunner', autospec=True)
+  def test_cost_returns_error_on_exception(
+      self, mock_execution_runner, mock_setup_logging
+  ):
+    del mock_setup_logging  # Unused.
+
+    mock_execution_runner.return_value.get_cost_estimate.side_effect = (
+        Exception('Something went wrong')
+    )
+
+    expected_status_code = 500
+
+    expected_data = (
+        'The server encountered and error and could not complete '
+        'your request. Developers can check the logs for details.'
+    )
+
+    actual_response = main.app.test_client().post(
+        'cost',
+        data={
+            'customer_ids': '123,567',
+            'campaigns': '987654321',
+        },
+    )
+
+    self.assertEqual(expected_status_code, actual_response.status_code)
+    self.assertEqual(expected_data, actual_response.text)
+
 
 if __name__ == '__main__':
   absltest.main()

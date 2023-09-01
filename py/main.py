@@ -143,6 +143,46 @@ def get_campaigns() -> flask.Response:
   return flask.make_response(flask.jsonify(campaigns_list), http.HTTPStatus.OK)
 
 
+@app.route('/cost', methods=['POST'])
+def get_cost() -> flask.Response:
+  """End point to get cost estimate for translation.
+
+  The endpoints expects a post request containing a list of selected customer
+  ids and campaign ids.
+
+  Returns:
+    A response containing a string with the cost estimate and explanation.
+  """
+  logging.info('Received request: /cost')
+
+  customer_ids = flask.request.form.get('customer_ids', '').split(',')
+  campaigns = flask.request.form.get('campaigns', '').split(',')
+
+  settings = settings_lib.Settings(
+      customer_ids=customer_ids,
+      campaigns=campaigns,
+  )
+
+  execution_runner = execution_runner_lib.ExecutionRunner(settings)
+
+  logging.info('Getting cost estimate for: %s', campaigns)
+
+  try:
+    cost_estimate = execution_runner.get_cost_estimate()
+  except Exception as exception:
+                                  # (Isolation block for server)
+    logging.error('Execution Runner raised an exception trying to get '
+                  'cost estimate: %s', exception)
+    return flask.Response(
+        ('The server encountered and error and could not complete your request.'
+         ' Developers can check the logs for details.'),
+        http.HTTPStatus.INTERNAL_SERVER_ERROR)
+
+  logging.info('Request complete: /cost')
+
+  return flask.make_response(cost_estimate, http.HTTPStatus.OK)
+
+
 if __name__ == '__main__':
   _setup_logging()
   app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
