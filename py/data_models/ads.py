@@ -386,3 +386,27 @@ class Ads:
             self._df.loc[target_row, AD_GROUP] += suffix_str
 
     logging.info('Finished applying translations to ads.')
+
+  def char_count(self) -> int:
+    """Returns a count of chars in headlines and descriptions."""
+    count = 0
+
+    for _, row in self.df().iterrows():
+      count += self._count_col_chars(row, 'Headline', _NUM_HEADLINES)
+      count += self._count_col_chars(row, 'Description', _NUM_DESCRIPTIONS)
+
+    logging.info('Char count for ads chars: %d.', count)
+
+    return count
+
+  def _count_col_chars(
+      self, row: pd.Series, col_name: str, num_cols: int) -> int:
+    """Helper function to count chars in related columns."""
+    count = 0
+
+    for col_index in range(1, num_cols+1):
+      txt = row[f'{col_name} {col_index}']
+      if txt:
+        count += len(txt.replace(' ', ''))
+
+    return count

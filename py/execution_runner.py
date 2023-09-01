@@ -36,6 +36,8 @@ from data_models import settings as settings_lib
 from workers import translation_worker as translation_worker_lib
 from workers import worker_result
 
+# Based on $20 / 1M chars https://cloud.google.com/translate/pricing
+_TRANSLATION_PRICE_PER_CHAR_USD = 20.0/1000000.0
 
 _WORKERS = {
     'translationWorker': translation_worker_lib.TranslationWorker,
@@ -192,6 +194,34 @@ class ExecutionRunner:
     logging.info('Feteched %d campaigns', len(campaigns_list))
 
     return campaigns_list
+
+  def get_cost_estimate(self) -> str:
+    """Gets an estimated cost for translation.
+
+    Returns:
+      A message with the estimated cost.
+    """
+    google_ads_objects = self._build_google_ads_objects()
+    logging.info('Finished fetching Google Ads objects')
+
+    ads_char_count = (
+        google_ads_objects.ads.char_count() if google_ads_objects.ads else 0
+    )
+    keywords_char_count = (
+        google_ads_objects.keywords.char_count()
+        if google_ads_objects.keywords
+        else 0
+    )
+
+    total_cost_usd = '{:.2f}'.format((
+        ads_char_count + keywords_char_count
+    ) * _TRANSLATION_PRICE_PER_CHAR_USD)
+
+    cost_per_char_str = '{:f}'.format(_TRANSLATION_PRICE_PER_CHAR_USD)
+
+    return (f'Estimated cost: ${total_cost_usd} USD. '
+            f'({ads_char_count} ad chars + {keywords_char_count} keyword chars)'
+            f' * ${cost_per_char_str}/char.)')
 
   def _build_google_ads_objects(
       self,

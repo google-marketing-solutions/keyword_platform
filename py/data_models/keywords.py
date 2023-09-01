@@ -234,3 +234,16 @@ class Keywords:
           self._df.loc[target_row, AD_GROUP] += f' ({target_language})'
 
     logging.info('Finished applying translations to keywords.')
+
+  def char_count(self) -> int:
+    """Returns a count of chars in keywords."""
+    count = 0
+
+    for _, row in self.df().iterrows():
+      keyword = row[ORIGINAL_KEYWORD]
+      if keyword:
+        count += len(keyword.replace(' ', ''))
+
+    logging.info('Char count for keywords: %d.', count)
+
+    return count

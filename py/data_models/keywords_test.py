@@ -345,6 +345,14 @@ class KeywordsTest(parameterized.TestCase):
         actual_df, expected_df, check_index_type=False
     )
 
+  def test_char_count(self):
+    expected_char_count = 10
+
+    keywords = keywords_lib.Keywords(_GOOGLE_ADS_RESPONSE)
+    actual_char_count = keywords.char_count()
+
+    self.assertEqual(actual_char_count, expected_char_count)
+
 
 if __name__ == '__main__':
   absltest.main()

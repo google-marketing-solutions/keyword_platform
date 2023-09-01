@@ -22,7 +22,10 @@ from google.cloud import secretmanager
 
 from absl.testing import absltest
 from absl.testing import parameterized
+from data_models import google_ads_objects as google_ads_objects_lib
 import execution_runner as execution_runner_lib
+from data_models import ads
+from data_models import keywords
 from common import cloud_translation_client
 from common import google_ads_client
 from common import storage_client
@@ -319,6 +322,41 @@ class ExecutionRunnerTest(parameterized.TestCase):
       execution_runner = execution_runner_lib.ExecutionRunner(settings)
 
     self.assertIsNone(execution_runner._vertex_client)
+
+  @mock.patch.object(
+      execution_runner_lib.ExecutionRunner,
+      '_build_google_ads_objects',
+      autospec=True)
+  def test_get_cost_estimate(self, mock_build_google_ads_objects):
+    settings = settings_lib.Settings(
+        source_language_code='en',
+        target_language_codes=['es'],
+        customer_ids=[123, 456],
+        campaigns=[789, 101],
+        workers_to_run=[''],
+    )
+
+    mock_ads = mock.create_autospec(ads.Ads)
+    mock_keywords = mock.create_autospec(keywords.Keywords)
+
+    mock_ads.char_count.return_value = 12000
+    mock_keywords.char_count.return_value = 3000
+
+    mock_build_google_ads_objects.return_value = (
+        google_ads_objects_lib.GoogleAdsObjects(
+            ads=mock_ads,
+            keywords=mock_keywords,
+        )
+    )
+
+    expected_cost_estimate_msg = (
+        'Estimated cost: $0.30 USD. '
+        '(12000 ad chars + 3000 keyword chars) * $0.000020/char.)')
+
+    execution_runner = execution_runner_lib.ExecutionRunner(settings)
+    actual_cost_estimate_msg = execution_runner.get_cost_estimate()
+
+    self.assertEqual(expected_cost_estimate_msg, actual_cost_estimate_msg)
 
 
 if __name__ == '__main__':

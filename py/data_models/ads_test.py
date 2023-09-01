@@ -19,9 +19,10 @@ from unittest import mock
 
 import pandas as pd
 
-from data_models import ads as ads_lib
 from absl.testing import absltest
 from absl.testing import parameterized
+from data_models import ads as ads_lib
+
 
 _GOOGLE_ADS_RESPONSE = [
     [{'results': [
@@ -773,6 +774,15 @@ class AdsTest(parameterized.TestCase):
 
     pd.testing.assert_frame_equal(
         actual_df, expected_df, check_index_type=False)
+
+  def test_char_count(self):
+    ads = ads_lib.Ads(_GOOGLE_ADS_RESPONSE)
+
+    expected_char_count = 183
+
+    actual_char_count = ads.char_count()
+
+    self.assertEqual(actual_char_count, expected_char_count)
 
 
 if __name__ == '__main__':
