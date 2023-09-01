@@ -24,11 +24,15 @@ import google.cloud.logging
 import execution_runner as execution_runner_lib
 from data_models import settings as settings_lib
 
-client = google.cloud.logging.Client()
-client.setup_logging()
-
+client = None
 app = flask.Flask(__name__)
 flask_cors.CORS(app)
+
+
+def _setup_logging() -> None:
+  """Sets up Cloud Logging."""
+  client = google.cloud.logging.Client()
+  client.setup_logging()
 
 
 @app.route('/run', methods=['POST', 'GET'])
@@ -68,7 +72,7 @@ def main() -> flask.Response:
     return flask.Response(
         ('The server encountered and error and could not complete your '
          'request. Developers can check the logs for details.'),
-        status=http.HTTPStatus.INTERNAL_SERVER_ERROR)
+        http.HTTPStatus.INTERNAL_SERVER_ERROR)
 
   logging.info('Request complete: run/')
 
@@ -94,9 +98,9 @@ def get_accessible_accounts() -> flask.Response:
     logging.error('Execution Runner raised an exception trying to get '
                   'accessible accounts: %s', exception)
     return flask.Response(
-        status=http.HTTPStatus.INTERNAL_SERVER_ERROR,
-        content=('The server encountered and error and could not complete your '
-                 'request. Developers can check the logs for details.'))
+        ('The server encountered and error and could not complete your '
+         'request. Developers can check the logs for details.'),
+        http.HTTPStatus.INTERNAL_SERVER_ERROR)
 
   logging.info('Request complete: /accessible_accounts')
 
@@ -130,9 +134,9 @@ def get_campaigns() -> flask.Response:
     logging.error('Execution Runner raised an exception trying to get '
                   'campaigns: %s', exception)
     return flask.Response(
-        status=http.HTTPStatus.INTERNAL_SERVER_ERROR,
-        response=('The server encountered and error and could not complete '
-                  'your request. Developers can check the logs for details.'))
+        ('The server encountered and error and could not complete your request.'
+         ' Developers can check the logs for details.'),
+        http.HTTPStatus.INTERNAL_SERVER_ERROR)
 
   logging.info('Request complete: /campaigns')
 
@@ -140,4 +144,5 @@ def get_campaigns() -> flask.Response:
 
 
 if __name__ == '__main__':
+  _setup_logging()
   app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
