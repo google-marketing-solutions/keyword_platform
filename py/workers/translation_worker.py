@@ -16,6 +16,7 @@
 
 
 from absl import logging
+import requests
 
 from data_models import ad_groups as ad_groups_lib
 from data_models import ads as ads_lib
@@ -72,6 +73,8 @@ class TranslationWorker(base_worker.BaseWorker):
 
     return worker_result.WorkerResult(
         status=worker_result.Status.SUCCESS,
+        warning_msg=self._warning_msg,
+        error_msg=self._error_msg,
         keywords_modified=google_ads_objects.keywords.size(),
     )
 
@@ -91,11 +94,21 @@ class TranslationWorker(base_worker.BaseWorker):
 
     keywords_translation_frame = keywords.get_translation_frame()
 
-    self._cloud_translation_client.translate(
-        translation_frame=keywords_translation_frame,
-        source_language_code=source_language_code,
-        target_language_code=target_language_code,
-    )
+    try:
+      self._cloud_translation_client.translate(
+          translation_frame=keywords_translation_frame,
+          source_language_code=source_language_code,
+          target_language_code=target_language_code,
+      )
+    except requests.exceptions.HTTPError as http_error:
+      # Catch the exception so we can write the data we did manage to
+      # translate.
+      logging.exception(
+          'Encountered error during calls to Translation API: %s', http_error)
+      self._warning_msg += (
+          'Encountered an error during keyword translation. Check the output '
+          'files before uploading. A developer can check logs for more details.'
+          )
 
     keywords.apply_translations(
         target_language=target_language_code,
@@ -121,11 +134,20 @@ class TranslationWorker(base_worker.BaseWorker):
 
     ads_translation_frame = ads.get_translation_frame()
 
-    self._cloud_translation_client.translate(
-        translation_frame=ads_translation_frame,
-        source_language_code=source_language_code,
-        target_language_code=target_language_code,
-    )
+    try:
+      self._cloud_translation_client.translate(
+          translation_frame=ads_translation_frame,
+          source_language_code=source_language_code,
+          target_language_code=target_language_code,
+      )
+    except requests.exceptions.HTTPError as http_error:
+      # Catch the exception so we can write the data we did manage to
+      # translate.
+      logging.exception(
+          'Encountered error during calls to Translation API: %s', http_error)
+      self._warning_msg += (
+          'Encountered an error during ad translation. Check the output files '
+          ' before uploading. A developer can check logs for more details.')
 
     ads.apply_translations(
         target_language=target_language_code,

@@ -190,10 +190,15 @@ class CloudTranslationClientTest(absltest.TestCase):
 
     mock_refresh_access_token.return_value = 'fake_access_token'
 
-    cloud_translation_client.translate(
-        translation_frame=translation_frame,
-        source_language_code=source_language,
-        target_language_code=target_language)
+    try:
+      cloud_translation_client.translate(
+          translation_frame=translation_frame,
+          source_language_code=source_language,
+          target_language_code=target_language)
+    except requests.exceptions.HTTPError:
+      # Simulating a caller catching the error and patching in the partially
+      # complete data.
+      print('Skipping exception')
 
     actual_translated_df = translation_frame.df()
 

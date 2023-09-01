@@ -14,21 +14,24 @@
 
 """Tests for the TranslationWorker class.
 """
+
 from unittest import mock
 
 import pandas as pd
+import requests
 
+from absl.testing import absltest
 from common import api_utils
 from common import cloud_translation_client as cloud_translation_client_lib
+from data_models import ad_groups as ad_groups_lib
 from data_models import ads as ads_lib
+from data_models import campaigns as campaigns_lib
 from data_models import google_ads_objects as google_ads_objects_lib
 from data_models import keywords as keywords_lib
-from data_models import ad_groups as ad_groups_lib
-from data_models import campaigns as campaigns_lib
 from data_models import settings as settings_lib
 from workers import translation_worker as translation_worker_lib
 from workers import worker_result
-from absl.testing import absltest
+
 
 _KEYWORDS_GOOGLE_ADS_API_RESPONSE = ([
     [{'results':
@@ -680,6 +683,64 @@ class TranslationWorkerTest(absltest.TestCase):
 
     # Asserts result
     self.assertEqual(worker_result.Status.FAILURE, result.status)
+
+  @mock.patch.object(api_utils, 'refresh_access_token', autospec=True)
+  @mock.patch.object(api_utils, 'send_api_request', autospec=True)
+  def test_execute_sets_warning_msg_when_exception_cause(
+          self, mock_send_api_request, mock_refresh_access_token):
+    # Arranges mock translation API
+    credentials = {
+        'client_id': 'fake_client_id',
+        'client_secret': 'fake_client_secret',
+        'refresh_token': 'fake_refresh_token',
+    }
+    gcp_project_name = 'fake_gcp_project'
+    api_version = 3
+
+    cloud_translation_client = (
+        cloud_translation_client_lib.CloudTranslationClient(
+            credentials=credentials,
+            gcp_project_name=gcp_project_name,
+            api_version=api_version))
+
+    mock_send_api_request.side_effect = [
+        {'translations': [
+            {'translatedText': 'correo electrónico'},
+            {'translatedText': 'rápido'}]},
+        requests.exceptions.HTTPError()]
+
+    mock_refresh_access_token.return_value = 'fake_access_token'
+
+    # Arranges settings
+    settings = settings_lib.Settings(
+        source_language_code='en',
+        target_language_codes=['es'],
+    )
+
+    # Arranges google ads objects
+    google_ads_objects = google_ads_objects_lib.GoogleAdsObjects(
+        ads=ads_lib.Ads(_ADS_DATA_GOOGLE_ADS_API_RESPONSE),
+        keywords=keywords_lib.Keywords(_KEYWORDS_GOOGLE_ADS_API_RESPONSE),
+        campaigns=campaigns_lib.Campaigns(_CAMPAIGNS_GOOGLE_ADS_API_RESPONSE),
+        ad_groups=ad_groups_lib.AdGroups(_AD_GROUPS_GOOGLE_ADS_RESPONSE))
+
+    # Arranges translation worker
+    translation_worker = translation_worker_lib.TranslationWorker(
+        cloud_translation_client=cloud_translation_client, vertex_client=None
+    )
+
+    expected_warning_msg = (
+        'Encountered an error during ad translation. Check the output files '
+        ' before uploading. A developer can check logs for more details.'
+    )
+
+    # Act
+    result = translation_worker.execute(
+        settings=settings, google_ads_objects=google_ads_objects
+    )
+
+    # Asserts result
+    self.assertEqual(expected_warning_msg, result.warning_msg)
 
 
 if __name__ == '__main__':

@@ -146,7 +146,7 @@ class CloudTranslationClient:
         # just write the data we did get instead of losing everything.
         logging.exception(
             'Encountered error during calls to Translation API: %s', http_error)
-        return
+        raise
 
       logging.info('Got responses for terms %d-%d of %d',
                    batch_start,

@@ -60,6 +60,8 @@ class BaseWorker(abc.ABC):
     """
     self._cloud_translation_client = cloud_translation_client
     self._vertex_client = vertex_client
+    self._error_msg = ''
+    self._warning_msg = ''
     logging.info('Initialized worker: %s.', self.name)
 
   @abc.abstractmethod
