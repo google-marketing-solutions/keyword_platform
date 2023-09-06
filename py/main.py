@@ -31,8 +31,9 @@ flask_cors.CORS(app)
 
 def _setup_logging() -> None:
   """Sets up Cloud Logging."""
-  main.client = google.cloud.logging.Client()
-  main.client.setup_logging()
+  if not main.client:
+    main.client = google.cloud.logging.Client()
+    main.client.setup_logging()
 
 
 @app.route('/run', methods=['POST', 'GET'])
