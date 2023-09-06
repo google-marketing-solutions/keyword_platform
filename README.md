@@ -28,6 +28,10 @@ Ads accounts at scale.
 > See [Cloud Translation Pricing](https://cloud.google.com/translate/pricing)
 > for details.
 
+> [!NOTE]
+> By using this solution you agree for basic usage information to be collected
+> using a gTag.
+
 ## Prerequisites
 Before running the install script, go through sections 2.1-2.4 to make sure you
 have the required information ready in advance.
