@@ -28,10 +28,6 @@ Ads accounts at scale.
 > See [Cloud Translation Pricing](https://cloud.google.com/translate/pricing)
 > for details.
 
-> [!NOTE]
-> By using this solution you agree for basic usage information to be collected
-> using a gTag.
-
 ## Prerequisites
 Before running the install script, go through sections 2.1-2.4 to make sure you
 have the required information ready in advance.
@@ -140,6 +136,7 @@ granting or revoking the `Cloud IAP > IAP-secured Web App User` role.
 > [Google Groups](https://groups.google.com) access to the Web App.
 
 ## Workers & Costs
+
 The solution uses a set of workers (as of Aug 2023 only one worker is available)
 to run certain tasks. The workers themselves generate costs by sending requests
 to various Google Cloud APIs (see the individual workers for details).
@@ -159,3 +156,57 @@ Costs depend on the size of the translation requests, see
 [Cloud Translation Pricing](https://cloud.google.com/translate/pricing) for
 details.
 
+## Privacy Notice
+
+> [!NOTE]
+> By using this solution you agree for usage, device and location data be
+> collected automatically. If you don't want this information to be collected
+> you can opt-out during installation or refrain from using the solution.
+
+We automatically collect certain information when you visit, use or navigate the
+Keyword Platform website. This information does not reveal your specific
+identity (like your name or contact information) but may include device and
+usage information, such as your IP address, browser and device characteristics,
+operating system, language preferences, referring URLs, device name, country,
+location, information about how and when you use the Keyword Platform website,
+and other technical information. This information is primarily needed to
+maintain the security and operation of the Keyword Platform solution, and for
+our internal analytics and reporting purposes.
+
+The information we collect includes:
+
+*	Log and Usage Data. Log and usage data is service-related, diagnostic,
+usage, and performance information automatically collected when you access or
+use a website created by this solution. Depending on how you interact with the
+Keyword Platform website, this log data may include your IP address, device
+information, browser type, and settings and information about your activity on
+the Keyword Platform website (such as the date/time stamps associated with your
+usage, pages, and files downloaded, and other actions you take such as which
+features you use), device event information (such as systems activity, error
+reports (sometimes called “crash dumps”), and hardware settings). We also
+collect information about Google Ads accounts and campaigns connected to the
+Keyword Platform service (such as account and campaign IDs as well as campaign
+settings such as bid strategy, target network and others). We also collect
+information about the size of the requests sent to API endpoints such as Cloud
+Translation API and VertexAI API as well as information about the originating
+Cloud Project (such as project ID and name).
+
+*	Device Data. We collect device data such as information about your computer,
+phone, tablet, or other devices you use to access the Keyword Platform website.
+Depending on the device used, this device data may include information such as
+your IP address (or proxy server), device and application identification numbers,
+location, browser type, hardware model, internet service provider and/or mobile
+carrier, operating system, and system configuration information.
+
+*	Location Data. We collect location data such as information about your
+device’s location, which can be either precise or imprecise. How much
+information we collect depends on the type and settings of the device you use
+to access the Keyword Platform website. For example, we may use GPS and other
+technologies to collect geolocation data that tells us your current location
+(based on your IP address).
+
+We do not collect and personal information such as email, name or phone number.
+
+We process your personal information to identify usage trends. We may process
+information about how you use our Services to better understand how they are
+being used so we can improve them.
