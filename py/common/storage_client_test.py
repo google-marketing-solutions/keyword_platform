@@ -119,22 +119,50 @@ class StorageClientTest(absltest.TestCase):
         keywords=keywords_lib.Keywords(_KEYWORDS_GOOGLE_ADS_API_RESPONSE),
     )
 
-  def test_export_google_ads_objects(self):
-    expected_urls = [
-        'http://keywords',
-    ]
+  @mock.patch('pandas.DataFrame.to_excel', autospec=True)
+  def test_export_google_ads_objects(self, mock_df_to_excel):
+    del mock_df_to_excel
+    expected_urls = {
+        'csv': ['http://keywords'],
+        'xlsx': ['http://keywords'],
+    }
+    with mock.patch('pandas.ExcelWriter', autospec=True):
+      actual_urls = storage_client_lib.StorageClient(
+          _FAKE_BUCKET_NAME, self.google_ads_objects
+      ).export_google_ads_objects_to_gcs()
 
-    actual_urls = storage_client_lib.StorageClient(
-        _FAKE_BUCKET_NAME, self.google_ads_objects
-    ).export_google_ads_objects_to_gcs()
+      self.mock_blob.upload_from_string.assert_has_calls([
+          mock.call(data=_FAKE_KEYWORDS_CSV, content_type='text/csv'),
+          mock.call(''),
+      ])
 
-    self.mock_blob.upload_from_string.assert_called_once_with(
-        data=_FAKE_KEYWORDS_CSV, content_type='text/csv'
+      self.assertEqual(self.mock_blob.generate_signed_url.call_count, 2)
+      self.assertEqual(actual_urls, expected_urls)
+
+  @mock.patch('pandas.DataFrame.to_excel', autospec=True)
+  def test_export_google_ads_objects_multiple_templates(self, mock_df_to_excel):
+    del mock_df_to_excel
+    mock_google_ads_objects = google_ads_objects_lib.GoogleAdsObjects(
+        keywords=mock.MagicMock(), campaigns=mock.MagicMock()
     )
-    self.mock_blob.generate_signed_url.assert_called_once_with(
-        expiration=3600, credentials=mock.ANY, version='v4'
-    )
-    self.assertEqual(actual_urls, expected_urls)
+    expected_urls = {
+        'csv': ['http://keywords', 'http://keywords'],
+        'xlsx': ['http://keywords', 'http://keywords'],
+    }
+    with mock.patch('pandas.ExcelWriter', autospec=True):
+      actual_urls = storage_client_lib.StorageClient(
+          _FAKE_BUCKET_NAME, mock_google_ads_objects, multiple_templates=True
+      ).export_google_ads_objects_to_gcs()
+
+      self.mock_blob.upload_from_string.assert_has_calls([
+          mock.call(data=mock.ANY, content_type='text/csv'),
+          mock.call(data=mock.ANY, content_type='text/csv'),
+          mock.call(''),
+          mock.call(''),
+      ])
+
+      self.assertEqual(self.mock_blob.generate_signed_url.call_count, 4)
+      self.assertEqual(actual_urls, expected_urls)
 
   def test_export_google_ads_object_raises_exception(self):
     self.mock_blob.upload_from_string.side_effect = exceptions.ClientError('')
@@ -150,7 +178,7 @@ class StorageClientTest(absltest.TestCase):
         _FAKE_BUCKET_NAME, mock_google_ads_objects, multiple_templates=False
     ).export_google_ads_objects_to_gcs()
 
-    mock_google_ads_objects.get_combined_csv_data.assert_called_once_with()
+    mock_google_ads_objects.get_combined_dataframe.assert_called_once_with()
 
 
 if __name__ == '__main__':

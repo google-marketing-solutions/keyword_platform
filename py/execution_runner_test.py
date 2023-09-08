@@ -22,17 +22,18 @@ from google.cloud import secretmanager
 
 from absl.testing import absltest
 from absl.testing import parameterized
-from data_models import google_ads_objects as google_ads_objects_lib
 import execution_runner as execution_runner_lib
-from data_models import ads
-from data_models import keywords
 from common import cloud_translation_client
 from common import google_ads_client
 from common import storage_client
 from common import vertex_client as vertex_client_lib
 from data_models import accounts as accounts_lib
+from data_models import ads
+from data_models import google_ads_objects as google_ads_objects_lib
+from data_models import keywords
 from data_models import settings as settings_lib
 from workers import translation_worker
+
 
 # TODO()
 _FAKE_CREDENTIALS = {
@@ -169,6 +170,7 @@ class ExecutionRunnerTest(parameterized.TestCase):
         mock.patch.object(vertex_client_lib, 'VertexClient', autospec=True)
     )
 
+  # TODO: b/299618202 - Test return types in worker results
   def test_run_workers(self):
     settings = settings_lib.Settings(
         source_language_code='en',
@@ -190,6 +192,19 @@ class ExecutionRunnerTest(parameterized.TestCase):
         mock.call(456, settings.campaigns),
     ]
 
+    self.mock_storage_client.return_value.export_google_ads_objects_to_gcs.return_value = {
+        'csv': ['some_url', 'some_url'],
+        'xlsx': ['some_url', 'some_url'],
+    }
+
+    expected_worker_results = {
+        'worker_results': mock.ANY,
+        'asset_urls': {
+            'csv': ['some_url', 'some_url'],
+            'xlsx': ['some_url', 'some_url'],
+        },
+    }
+
     # Due to the way workers are dynamically loaded, they need to be mocked
     # using mock.path.dict.
     mock_translation_worker = mock.create_autospec(
@@ -198,7 +213,9 @@ class ExecutionRunnerTest(parameterized.TestCase):
     with mock.patch.dict(execution_runner_lib._WORKERS, {
         'translationWorker': mock_translation_worker}):
       execution_runner = execution_runner_lib.ExecutionRunner(settings)
-      execution_runner.run_workers()
+      worker_results = execution_runner.run_workers()
+
+      self.assertEqual(worker_results, expected_worker_results)
 
       # Asserts settings were built
       self.assertNotEmpty(settings.credentials)

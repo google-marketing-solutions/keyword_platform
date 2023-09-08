@@ -147,10 +147,10 @@ class Keywords:
     """Returns the DataFrame as CSV."""
     return self._df.to_csv(index=False) or str(_COLS)
 
-  def csv_file_name(self) -> str:
-    """Returns the CSV file name."""
+  def file_name(self) -> str:
+    """Returns the file name."""
     time_str = time.strftime('%Y%m%d-%H%M%S')
-    return f'keywords_{time_str}.csv'
+    return f'keywords_{time_str}'
 
   def add_update(self, update: str) -> None:
     """Marks the row as having been updated by a processor.

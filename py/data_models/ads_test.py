@@ -597,10 +597,10 @@ class AdsTest(parameterized.TestCase):
     self.assertEqual(actual_csv_data, expected_csv_data)
 
   @mock.patch.object(time, 'strftime', return_value='19700101-000000')
-  def test_csv_file_name(self, _):
-    expected_file_name = 'ads_19700101-000000.csv'
+  def test_file_name(self, _):
+    expected_file_name = 'ads_19700101-000000'
     ads = ads_lib.Ads(_GOOGLE_ADS_RESPONSE)
-    actual_file_name = ads.csv_file_name()
+    actual_file_name = ads.file_name()
 
     self.assertEqual(actual_file_name, expected_file_name)
 

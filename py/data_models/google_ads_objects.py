@@ -32,20 +32,20 @@ class GoogleAdsObjects:
   campaigns: campaigns_lib.Campaigns|None = None
   keywords: keywords_lib.Keywords|None = None
 
-  def get_multiple_csv_data(self) -> dict[str, str]:
-    """Returns a dict of csv file name and data for the Google Ads objects."""
-    csv_data = dict()
+  def get_multiple_dataframes(self) -> dict[str, pd.DataFrame]:
+    """Returns a dict of file name and data for the Google Ads objects."""
+    data = dict()
     if self.ads:
-      csv_data[self.ads.csv_file_name()] = self.ads.csv_data()
+      data[self.ads.file_name()] = self.ads.df()
     if self.ad_groups:
-      csv_data[self.ad_groups.csv_file_name()] = self.ad_groups.csv_data()
+      data[self.ad_groups.file_name()] = self.ad_groups.df()
     if self.campaigns:
-      csv_data[self.campaigns.csv_file_name()] = self.campaigns.csv_data()
+      data[self.campaigns.file_name()] = self.campaigns.df()
     if self.keywords:
-      csv_data[self.keywords.csv_file_name()] = self.keywords.csv_data()
-    return csv_data
+      data[self.keywords.file_name()] = self.keywords.df()
+    return data
 
-  def get_combined_csv_data(self) -> dict[str, str]:
+  def get_combined_dataframe(self) -> dict[str, pd.DataFrame]:
     """Combines all objects into a single dictionary."""
     df_data = []
     if self.ads:
@@ -56,13 +56,13 @@ class GoogleAdsObjects:
       df_data.append(self.campaigns.df())
     if self.keywords:
       df_data.append(self.keywords.df())
-    combined_csv_data = dict()
+    combined_data = dict()
     if df_data:
-      filename = self._generate_combined_csv_file_name()
-      combined_csv_data[filename] = pd.concat(df_data).to_csv(index=False)
-    return combined_csv_data
+      filename = self._generate_combined_file_name()
+      combined_data[filename] = pd.concat(df_data, ignore_index=True)
+    return combined_data
 
-  def _generate_combined_csv_file_name(self) -> str:
-    """Returns the combined CSV file name."""
+  def _generate_combined_file_name(self) -> str:
+    """Returns the combined file name without extension."""
     time_str = time.strftime('%Y%m%d-%H%M%S')
-    return f'combined_{time_str}.csv'
+    return f'combined_{time_str}'

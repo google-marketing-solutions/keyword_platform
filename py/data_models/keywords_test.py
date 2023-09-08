@@ -225,10 +225,10 @@ class KeywordsTest(parameterized.TestCase):
     self.assertEqual(actual_csv_data, expected_csv_data)
 
   @mock.patch.object(time, 'strftime', return_value='19700101-000000')
-  def test_csv_file_name(self, _):
-    expected_file_name = 'keywords_19700101-000000.csv'
+  def test_file_name(self, _):
+    expected_file_name = 'keywords_19700101-000000'
     keywords = keywords_lib.Keywords(_GOOGLE_ADS_RESPONSE)
-    actual_file_name = keywords.csv_file_name()
+    actual_file_name = keywords.file_name()
 
     self.assertEqual(actual_file_name, expected_file_name)
 

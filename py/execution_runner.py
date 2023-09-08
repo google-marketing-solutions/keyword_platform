@@ -129,13 +129,14 @@ class ExecutionRunner:
     Returns:
       A dictionary consisting of:
         'worker_results': A list of results for each worker that was run.
-        'asset_urls': A list of URLs for saved assets.
+        'asset_urls': A dictionary of filetypes with list of URLs for saved
+            assets.
     """
     # UI validation should confirm at least 1 worker is selected, but in case
     # that fails, this check will exit early.
     if not self._settings.workers_to_run:
       logging.error('No workers selected. Exiting...')
-      return {'worker_results': [], 'asset_urls': []}
+      return {'worker_results': [], 'asset_urls': {}}
 
     google_ads_objects = self._build_google_ads_objects()
     logging.info('Finished fetching Google Ads objects')
@@ -328,8 +329,8 @@ class ExecutionRunner:
     return results
 
   def _save_to_bucket(
-      self,
-      google_ads_objects: google_ads_objects_lib.GoogleAdsObjects) -> list[str]:
+      self, google_ads_objects: google_ads_objects_lib.GoogleAdsObjects
+  ) -> dict[str, list[str]]:
     """Saves the Google Ads objects to a cloud storage bucket.
 
     Args:
