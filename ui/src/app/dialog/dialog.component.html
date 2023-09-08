@@ -46,8 +46,11 @@
       the editor template(s) below.</span>
   </div>
   <div mat-dialog-content class="content">
-    <div *ngFor="let assetUrl of assetUrls">
-      <p><a href="{{assetUrl}}" target="_blank">{{truncateUrl(assetUrl)}}</a></p>
+    <div *ngFor="let type of assetUrls | keyvalue">
+       <p>{{getFileTypeDescription(type.key)}}</p>
+      <div *ngFor="let assetUrl of type.value">
+        <p><a href="{{assetUrl}}" target="_blank">{{getFileNameFromUrl(assetUrl)}}</a></p>
+      </div>
     </div>
   </div>
 </div>

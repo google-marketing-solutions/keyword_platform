@@ -39,5 +39,5 @@ export interface Language {
  * Output interface for API response. Output of successful form submission.
  */
 export interface Output {
-  [key: string]: string[]|{[key: string]: {[key: string]: number | string}};
+  [key: string]: {[key: string]: string[]}|{[key: string]: {[key: string]: number | string}};
 }

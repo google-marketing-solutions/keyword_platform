@@ -35,11 +35,14 @@ describe('DialogComponent', () => {
     const data: DialogData = {
       'status': 200,
       'value': {
-        'asset_urls': [
-          'http://storage.googleapis.com/bucket/file1',
-          'http://storage.googleapis.com/bucket/file2',
-          'http://storage.googleapis.com/bucket/file3'
-        ],
+        'asset_urls': {
+          'csv': [
+            'http://storage.googleapis.com/bucket/file1.csv'
+          ],
+          'xlsx': [
+            'http://storage.googleapis.com/bucket/file1.xlsx'
+          ]
+        },
         'worker_results': {
           'miningWorker': {
             'error_msg': '',

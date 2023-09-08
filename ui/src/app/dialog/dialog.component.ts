@@ -34,7 +34,7 @@ interface DialogData {
   styleUrls: ['./dialog.component.scss']
 })
 export class DialogComponent implements OnInit {
-  assetUrls?: string[];
+  assetUrls?: {[key: string]: string[]};
   message?: string;
   status?: number;
 
@@ -45,7 +45,7 @@ export class DialogComponent implements OnInit {
       case ResponseStatus.SUCCESS:
         this.status = ResponseStatus.SUCCESS;
         const value = this.data['value'] as Output;
-        this.assetUrls = value['asset_urls'] as string[];
+        this.assetUrls = value['asset_urls'] as {[key: string]: string[]};
         break;
       case ResponseStatus.SERVER_ERROR:
         this.status = ResponseStatus.SERVER_ERROR;
@@ -56,8 +56,26 @@ export class DialogComponent implements OnInit {
     }
   }
 
-  /** Truncates long URLs for the dialog container. */
-  truncateUrl(url: string): string {
-    return url.length > CHAR_LIMIT ? url.substring(0, CHAR_LIMIT) + '...' : url;
+  /** Generates the text for the hyperlink for download urls. */
+  getFileNameFromUrl(url: string): string {
+    const regex = /\/([^\/]+\.(?:csv|xlsx))/;
+    const match = url.match(regex);
+
+    if (match) {
+      const fileName = match[1];
+      return fileName;
+    }
+    return '';
+  }
+
+  /** Gets the section description for the returned filetypes. */
+  getFileTypeDescription(key: string): string {
+    let message = 'Unknown file type:';
+    if (key === 'xlsx') {
+      message = 'Excel files (export as CSV for import into Google Ads Editor):';
+    } else if (key === 'csv') {
+      message = 'CSV files (for direct import into Google Ads Editor):';
+    }
+    return message;
   }
 }
