@@ -11,3 +11,6 @@ pandas
 requests
 google-generativeai
 google-cloud-aiplatform
+gcsfs
+XlsxWriter
+fsspec
