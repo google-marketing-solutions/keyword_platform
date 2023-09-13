@@ -30,3 +30,4 @@ class Settings:
   )
   workers_to_run: list[str] = dataclasses.field(default_factory=list)
   multiple_templates: bool = False
+  client_id: str = ''

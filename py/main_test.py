@@ -150,7 +150,8 @@ class MainTest(absltest.TestCase):
         (
             '/run?customer_ids=123,567&source_language_code=en&'
             'target_language_codes=de&campaigns=987654321&'
-            'workers_to_run=translationWorker&multiple_templates=False'
+            'workers_to_run=translationWorker&'
+            'multiple_templates=False&client_id=G-0ABCXYZ'
         )
     )
 
@@ -174,7 +175,8 @@ class MainTest(absltest.TestCase):
     actual_response = main.app.test_client().get(
         ('/run?customer_ids=123,567&source_language_code=en&'
          'target_language_codes=de&campaigns=abc&'
-         'workers_to_run=translationWorker&multiple_templates=False'))
+         'workers_to_run=translationWorker&'
+         'multiple_templates=False&client_id=G-0ABCXYZ'))
 
     self.assertEqual(expected_status_code, actual_response.status_code)
     self.assertEqual(expected_data, actual_response.text)

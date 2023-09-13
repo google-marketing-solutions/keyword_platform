@@ -52,6 +52,7 @@ def main() -> flask.Response:
   multiple_templates = flask.request.args.get(
       'multiple_templates', default=False, type=lambda v: v.lower() == 'true'
   )
+  client_id = flask.request.args.get('client_id')
 
   settings = settings_lib.Settings(
       source_language_code=source_language_code,
@@ -60,6 +61,7 @@ def main() -> flask.Response:
       campaigns=campaigns,
       workers_to_run=workers_to_run,
       multiple_templates=multiple_templates,
+      client_id=client_id,
   )
 
   logging.info('Built run settings: %s', settings)
