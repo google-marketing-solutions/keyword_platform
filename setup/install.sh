@@ -85,7 +85,7 @@ echo "Enter a Google Ads Developer Token:"
 read developer_token
 DEVELOPER_TOKEN=$developer_token
 
-echo "Enter your Google Ads Login Customer ID (wihtout hyphens):"
+echo "Enter your Google Ads Login Customer ID (without hyphens):"
 read login_customer_id
 LOGIN_CUSTOMER_ID=$login_customer_id
 
@@ -114,7 +114,7 @@ for API in "${REQUIRED_APIS[@]}"; do
 done
 
 # Create a GCS bucket to store terraform state files.
-echo "Creating terraform state cloud storage bucket..." 
+echo "Creating terraform state cloud storage bucket..."
 gcloud storage buckets create gs://${terraform_state_bucket_name} \
   --project=${GOOGLE_CLOUD_PROJECT}
 # Enable versioning.
