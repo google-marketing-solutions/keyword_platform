@@ -16,20 +16,23 @@
  */
 
 import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
 import {Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
 import {Output} from '../models/interfaces';
+import {LOCATION_TOKEN} from '../shared/tokens';
 
 /** Run service. */
 @Injectable({providedIn: 'root'})
 export class RunService {
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+      private readonly http: HttpClient,
+      @Inject(LOCATION_TOKEN) private readonly location: Location) {}
 
   run(accountIds: string[], campaignIds: string[], sourceLanguageCode: string,
-      targetLanguageCode: string, multipleTemplates: boolean,
-      workers: string[]): Observable<HttpResponse<Output>> {
+      targetLanguageCode: string, multipleTemplates: boolean, workers: string[],
+      client_id: string): Observable<HttpResponse<Output>> {
     const params = new HttpParams({
       fromObject: {
         'customer_ids': accountIds.join(','),
@@ -38,13 +41,14 @@ export class RunService {
         'target_language_codes': targetLanguageCode,
         'workers_to_run': workers.join(','),
         'multiple_templates': multipleTemplates.toString(),
+        'client_id': client_id,
         'endpoint': 'run'
       }
     });
     return this.http
         .get<Output>(
-            (window.location.hostname === 'localhost' ? './test-api/run.json' :
-                                                        './proxy'),
+            (this.location.hostname === 'localhost' ? './test-api/run.json' :
+                                                      './proxy'),
             {
               headers: new HttpHeaders({'Content-Type': 'application/json'}),
               observe: 'response',

@@ -35,6 +35,18 @@ enum LanguageControl {
 }
 
 /**
+ * Interface for the dataLayer window property that is set by the Google Tag
+ * Manager (GTM) script. The data type for the dataLayer property is an array
+ * that contains arrays and objects set by the arguments object within the
+ * GTM script.
+ * See
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments
+ */
+declare interface WindowProperty {
+  dataLayer: Array<Array<{}>>;
+}
+
+/**
  * The parent component of the form.
  *
  * TODO(): Move translation/language logic to its own "Translate"
@@ -134,10 +146,22 @@ export class FormComponent implements OnInit, AfterViewInit {
     // Disable form upon request.
     this.disableControls(true);
     this.requestStatus = RequestStatus.REQUESTED;
+
+    // The dataLayer property is defined as a window object by the Google Tag
+    // Manager script so attemping to access it directly will fail because it's
+    // not recognized as part of the native window object. E.g. window.dataLayer
+    // returns undefined. So the native window object is set as a
+    // window object (WindowProperty) that contains the dataLayer property in
+    // order to get dataLayer values.
+    const windowProperty = window as unknown as WindowProperty;
+    // The Google Tag Manager script appends the client ID as the second element
+    // within the second array appended to the dataLayer property (array) via
+    // the arguments object hence the index ([1][1]) reference.
+    const clientId = windowProperty.dataLayer[1][1] as string;
     this.runService
         .run(
             this.accountIds, this.campaignIds, this.sourceLanguageCode!,
-            this.targetLanguageCode!, this.multipleTemplates, workers)
+            this.targetLanguageCode!, this.multipleTemplates, workers, clientId)
         .subscribe(
             (response => {
               this.requestStatus = RequestStatus.RESPONDED;
