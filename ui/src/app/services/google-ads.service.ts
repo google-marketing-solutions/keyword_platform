@@ -15,17 +15,20 @@
  * limitations under the License.
  */
 
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse} from '@angular/common/http';
+import {Inject, Injectable} from '@angular/core';
+import {Observable, throwError} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 
-import { GoogleAds } from '../models/interfaces';
+import {GoogleAds} from '../models/interfaces';
+import {LOCATION_TOKEN} from '../shared/tokens';
 
 /** Google Ads service. */
 @Injectable({providedIn: 'root'})
 export class GoogleAdsService {
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+      private readonly http: HttpClient,
+      @Inject(LOCATION_TOKEN) private readonly location: Location) {}
 
   getAccounts(): Observable<HttpResponse<GoogleAds[]>> {
     const params =
@@ -60,9 +63,8 @@ export class GoogleAdsService {
 
   private getHost(api: string) {
     return (
-        window.location.hostname === 'localhost' ?
-            './test-api/' + api + '.json' :
-            './proxy');
+        this.location.hostname === 'localhost' ? './test-api/' + api + '.json' :
+                                                 './proxy');
   }
 
   private getHeader() {
