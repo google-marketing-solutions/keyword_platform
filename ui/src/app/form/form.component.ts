@@ -35,15 +35,15 @@ enum LanguageControl {
 }
 
 /**
- * Interface for the dataLayer window property that is set by the Google Tag
- * Manager (GTM) script. The data type for the dataLayer property is an array
- * that contains arrays and objects set by the arguments object within the
- * GTM script.
+ * Interface for the clientId window property that is set by the Google Tag
+ * Manager (GTM) script. The data type for the clientId property is a string
+ * as its value is defined by the Google Analytics client_id field.
+ *
  * See
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments
+ * https://developers.google.com/analytics/devguides/collection/ga4/reference/config#client_id
  */
-declare interface WindowProperty {
-  dataLayer: Array<Array<{}>>;
+declare interface ClientIdProperty {
+  clientId: string;
 }
 
 /**
@@ -147,17 +147,14 @@ export class FormComponent implements OnInit, AfterViewInit {
     this.disableControls(true);
     this.requestStatus = RequestStatus.REQUESTED;
 
-    // The dataLayer property is defined as a window object by the Google Tag
+    // The clientId property is defined as a window object by the Google Tag
     // Manager script so attemping to access it directly will fail because it's
-    // not recognized as part of the native window object. E.g. window.dataLayer
-    // returns undefined. So the native window object is set as a
-    // window object (WindowProperty) that contains the dataLayer property in
-    // order to get dataLayer values.
-    const windowProperty = window as unknown as WindowProperty;
-    // The Google Tag Manager script appends the client ID as the second element
-    // within the second array appended to the dataLayer property (array) via
-    // the arguments object hence the index ([1][1]) reference.
-    const clientId = windowProperty.dataLayer[1][1] as string;
+    // not recognized as part of the native window object. E.g. window.clientId
+    // returns undefined. So the native window object is set as a window object
+    // that contains the clientId property in order to gets its value.
+    const windowObject = window as unknown as ClientIdProperty;
+    const clientId = windowObject.clientId;
+
     this.runService
         .run(
             this.accountIds, this.campaignIds, this.sourceLanguageCode!,

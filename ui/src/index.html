@@ -21,10 +21,19 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-C0ZGCTLG7Z"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+    window.clientId = window.clientId || '';
 
-    gtag('config', 'G-C0ZGCTLG7Z');
+    const measurementId = 'G-C0ZGCTLG7Z';
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', measurementId);
+    gtag('get', measurementId, 'client_id', (clientId) => {
+      window.clientId = clientId;
+    });
   </script>
   <meta charset="utf-8">
   <title>Keyword Platform</title>
