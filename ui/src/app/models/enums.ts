@@ -31,3 +31,17 @@ export enum RequestStatus {
   RESPONDED = 'Responded',
   ERROR = 'Error'
 }
+
+/** Status of server responses. */
+export enum ResponseStatus {
+  SUCCESS = 200,
+  SERVER_ERROR = 500
+}
+
+/** Messages for server responses. */
+export enum ResponseMessage {
+  SUCCESS = 'Success.',
+  SERVER_ERROR =
+      'Failed to process request. A developer can check the logs for details.',
+  UNKNOWN_ERROR = 'Unknown error. A developer can check the logs for details.'
+}
