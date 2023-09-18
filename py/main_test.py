@@ -16,7 +16,6 @@
 
 from unittest import mock
 
-
 from absl.testing import absltest
 import execution_runner
 import main
@@ -118,16 +117,16 @@ class MainTest(absltest.TestCase):
 
   @mock.patch.object(main, '_setup_logging', autospec=True)
   @mock.patch.object(execution_runner, 'ExecutionRunner', autospec=True)
-  def test_run(
-      self, mock_execution_runner, mock_setup_logging):
+  def test_run(self, mock_execution_runner, mock_setup_logging):
     del mock_setup_logging  # Unused.
 
     mock_execution_runner.return_value.run_workers.return_value = {
         'worker_results': {
             'translationWorker': worker_result.WorkerResult(
                 status=worker_result.Status.SUCCESS,
-                keywords_modified=100),
-            },
+                keywords_modified=100,
+            ),
+        },
         'asset_urls': ['file1', 'file2', 'file3'],
     }
 
@@ -140,8 +139,13 @@ class MainTest(absltest.TestCase):
                 'error_msg': '',
                 'keywords_added': 0,
                 'keywords_modified': 100,
+                'ads_added': 0,
+                'ads_modified': 0,
+                'translation_chars_sent': 0,
+                'genai_chars_sent': 0,
                 'status': 'SUCCESS',
                 'warning_msg': '',
+                'duration_ms': 0,
             }
         },
     }

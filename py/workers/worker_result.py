@@ -30,5 +30,10 @@ class WorkerResult:
   status: Status
   keywords_modified: int = 0
   keywords_added: int = 0
+  ads_modified: int = 0
+  ads_added: int = 0
   warning_msg: str|None = ''
   error_msg: str|None = ''
+  translation_chars_sent: int = 0
+  genai_chars_sent: int = 0
+  duration_ms: int = 0

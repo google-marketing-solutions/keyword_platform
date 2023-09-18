@@ -51,7 +51,8 @@ class TranslationWorker(base_worker.BaseWorker):
       logging.warning('Skipping translation: Google Ads or Keywords empty.')
       return worker_result.WorkerResult(
           status=worker_result.Status.FAILURE,
-          warning_msg='Skipping translation: Google Ads or Keywords empty.')
+          warning_msg='Skipping translation: Google Ads or Keywords empty.',
+      )
 
     self._translate_keywords(
         keywords=google_ads_objects.keywords,
