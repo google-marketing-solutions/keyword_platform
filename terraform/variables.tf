@@ -77,6 +77,11 @@ variable "bucket_name" {
   description = "The bucket name to store Keywordplatform output files."
 }
 
+variable "opt_put" {
+  description = "Whether or not to opt out of GA tracking."
+  type = bool
+}
+
 
 ##
 # Test utilities

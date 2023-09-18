@@ -98,6 +98,7 @@ class CloudTranslationClient:
     # ensure token is fresh and won't be retrieved repeatedly.
     self.access_token = None
     self._vertex_client = vertex_client
+    self._translated_characters = 0
     api_utils.validate_credentials(self.credentials, _CREDENTIAL_REQUIRED_KEYS)
     logging.info('Successfully initialized CloudTranslationClient.')
 
@@ -140,6 +141,7 @@ class CloudTranslationClient:
       try:
         response = api_utils.send_api_request(
             url, params, self._get_http_header())
+        self._translated_characters += sum([len(item) for item in batch])
       except requests.exceptions.HTTPError as http_error:
         # If the translation API requests still fail after retries, it's likely
         # we may have hit project quota. In this case, exit early so we can
@@ -166,7 +168,12 @@ class CloudTranslationClient:
         'Completed translation for %d terms.', translation_frame.size())
 
     self._shorten_overflowing_translations(
-        translation_frame, target_language_code)
+        translation_frame, target_language_code
+    )
+
+  def get_translated_characters(self) -> int:
+    """Gets the number of characters sent to the translation API."""
+    return self._translated_characters
 
   def _get_http_header(self) -> dict[str, str]:
     """Get the Authorization HTTP header.

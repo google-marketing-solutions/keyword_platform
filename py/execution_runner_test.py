@@ -24,6 +24,7 @@ from absl.testing import absltest
 from absl.testing import parameterized
 import execution_runner as execution_runner_lib
 from common import cloud_translation_client
+from common import execution_analytics_client
 from common import google_ads_client
 from common import storage_client
 from common import vertex_client as vertex_client_lib
@@ -149,6 +150,9 @@ class ExecutionRunnerTest(parameterized.TestCase):
     self.enter_context(
         mock.patch.dict(os.environ, {'BUCKET_NAME': 'fake_bucket_name'})
     )
+    self.mock_ga_opt_out = self.enter_context(
+        mock.patch.dict(os.environ, {'GA_OPT_OUT': 'false'})
+    )
     self.mock_storage_client = self.enter_context(
         mock.patch.object(storage_client, 'StorageClient', autospec=True)
     )
@@ -159,6 +163,13 @@ class ExecutionRunnerTest(parameterized.TestCase):
     )
     self.mock_google_ads_client = self.enter_context(
         mock.patch.object(google_ads_client, 'GoogleAdsClient', autospec=True)
+    )
+    self.mock_execution_analytics_client = self.enter_context(
+        mock.patch.object(
+            execution_analytics_client,
+            'ExecutionAnalyticsClient',
+            autospec=True,
+        )
     )
     self.mock_secret_manager = self.enter_context(
         mock.patch.object(
@@ -374,6 +385,57 @@ class ExecutionRunnerTest(parameterized.TestCase):
     actual_cost_estimate_msg = execution_runner.get_cost_estimate()
 
     self.assertEqual(expected_cost_estimate_msg, actual_cost_estimate_msg)
+
+  def test_execution_analytics_init(self):
+    settings = settings_lib.Settings(
+        source_language_code='en',
+        target_language_codes=['es'],
+        customer_ids=[123, 456],
+        campaigns=[789, 101],
+        workers_to_run=['translationWorker'],
+    )
+
+    # Due to the way workers are dynamically loaded, they need to be mocked
+    # using mock.path.dict.
+    mock_translation_worker = mock.create_autospec(
+        translation_worker.TranslationWorker
+    )
+
+    with mock.patch.dict(
+        execution_runner_lib._WORKERS,
+        {'translationWorker': mock_translation_worker},
+    ):
+      execution_runner_lib.ExecutionRunner(settings)
+
+    self.mock_execution_analytics_client.assert_called_once_with(
+        settings=settings
+    )
+
+  def test_execution_analytics_not_initialized(self):
+    self.mock_ga_opt_out = self.enter_context(
+        mock.patch.dict(os.environ, {'GA_OPT_OUT': 'true'})
+    )
+    settings = settings_lib.Settings(
+        source_language_code='en',
+        target_language_codes=['es'],
+        customer_ids=[123, 456],
+        campaigns=[789, 101],
+        workers_to_run=['translationWorker'],
+    )
+
+    # Due to the way workers are dynamically loaded, they need to be mocked
+    # using mock.path.dict.
+    mock_translation_worker = mock.create_autospec(
+        translation_worker.TranslationWorker
+    )
+
+    with mock.patch.dict(
+        execution_runner_lib._WORKERS,
+        {'translationWorker': mock_translation_worker},
+    ):
+      execution_runner_lib.ExecutionRunner(settings)
+
+    self.mock_execution_analytics_client.assert_not_called()
 
 
 if __name__ == '__main__':

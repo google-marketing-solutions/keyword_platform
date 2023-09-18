@@ -69,6 +69,7 @@ class VertexClient:
     # Making a call in __init__ to ensure initialization of VertexClient fails
     # if the GCP_PROJECT was not allowlisted to use Vertex LLMs.
     self._client.predict('Are you there?')
+    self._genai_characters_sent = 0
 
   def shorten_text_to_char_limit(
       self, text_list: list[str], language_code: str, char_limit: int
@@ -103,6 +104,10 @@ class VertexClient:
       if isinstance(shortened_batch, list):
         result.extend(shortened_batch)
     return result
+
+  def get_genai_characters_sent(self) -> int:
+    """Gets the number of characters sent to Vertex API in this instance."""
+    return self._genai_characters_sent
 
   @ratelimiter.RateLimiter(max_calls=_MAX_REQUESTS_PER_MINUTE, period=60)
   def _shorten_text_to_char_limit(
@@ -144,5 +149,6 @@ class VertexClient:
 
         Shortened sentences list:
       """
+      self._genai_characters_sent += len(shorten_prompt)
       response = self._client.predict(shorten_prompt, **parameters)
       return ast.literal_eval(response.text) if response.text else text_list

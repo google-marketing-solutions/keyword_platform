@@ -78,6 +78,7 @@ class VertexClientTest(absltest.TestCase):
         mock.call(expected_prompt, temperature=0, top_p=0.8, top_k=1),
     ])
     self.assertEqual(actual_result, expected_result)
+    self.assertEqual(vertex_client.get_genai_characters_sent(), 312)
 
   def test_shorten_text_to_char_limit_logs_warning_unsupported_language(
       self,
@@ -95,6 +96,7 @@ class VertexClientTest(absltest.TestCase):
             "INFO:absl:shortened_batch: ['some_text']"
         ],
     )
+    self.assertEqual(vertex_client.get_genai_characters_sent(), 0)
 
   def test_shorten_text_to_char_limit_in_batches(self):
     fake_text_list = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']

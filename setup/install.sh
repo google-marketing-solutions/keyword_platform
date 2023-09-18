@@ -97,6 +97,25 @@ echo "Enter a comma-separated list of users to grant access to the solution:"
 read iap_allowed_users
 IAP_ALLOWED_USERS=$iap_allowed_users
 
+opt_out="N"
+
+read -p "Do you want to opt out of sending usage information to Google? (N/n) " yn
+
+if [[ -z "$yn" ]]; then
+  yn="$opt_out"
+fi
+
+yn=$(tr '[:upper:]' '[:lower:]' <<< "$yn")
+
+# If the user's response is "y" or "yes", then they want to opt out.
+if [[ "$yn" == "y" || "$yn" == "yes" ]]; then
+  echo "You have opted out."
+  OPT_OUT=true
+else
+  echo "You have not opted out."
+  OPT_OUT=false
+fi
+
 terraform_state_bucket_name="${GOOGLE_CLOUD_PROJECT}-bucket-tfstate"
 backend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform-backend"
 frontend_image="gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform-frontend"
@@ -161,6 +180,7 @@ terraform -chdir=./terraform plan \
   -var "frontend_image=$frontend_image" \
   -var "backend_image=$backend_image" \
   -var "client_id=$CLIENT_ID" \
+  -var "opt_out=$OPT_OUT" \
   -var "client_secret=$CLIENT_SECRET" \
   -var "developer_token=$DEVELOPER_TOKEN" \
   -var "login_customer_id=$LOGIN_CUSTOMER_ID" \

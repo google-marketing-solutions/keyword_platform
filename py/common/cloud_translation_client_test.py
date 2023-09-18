@@ -205,6 +205,8 @@ class CloudTranslationClientTest(absltest.TestCase):
     # Asserts expected translations added to translation frame
     pd.testing.assert_frame_equal(
         expected_translated_df, actual_translated_df, check_index_type=False)
+    # Asserts the number of characters sent to the Cloud Translation API.
+    self.assertEqual(cloud_translation_client.get_translated_characters(), 9)
 
   @mock.patch.object(api_utils, 'refresh_access_token', autospec=True)
   @mock.patch.object(api_utils, 'send_api_request', autospec=True)
@@ -288,10 +290,11 @@ class CloudTranslationClientTest(absltest.TestCase):
 
     actual_translated_df = translation_frame.df()
 
-    # Asserts expected translations added to translation frame
+    # Asserts expected translations added to translation frame.
     pd.testing.assert_frame_equal(
         expected_translated_df, actual_translated_df, check_index_type=False)
-
+    # Asserts the number of characters sent to the Cloud Translation API.
+    self.assertEqual(cloud_translation_client.get_translated_characters(), 86)
 
 if __name__ == '__main__':
   absltest.main()

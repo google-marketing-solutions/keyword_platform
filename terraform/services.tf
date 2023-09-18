@@ -63,6 +63,18 @@ resource "google_cloud_run_service" "backend_run" {
           name  = "BUCKET_NAME"
           value = google_storage_bucket.output_bucket.name
         }
+        env {
+          name = "GA_MEASUREMENT_ID"
+          value = "G-C0ZGCTLG7Z"
+        }
+        env {
+          name = "GA_API_SECRET"
+          value = "20nczPaFRCm7lmlsofClSg"
+        }
+        env {
+          name = "GA_OPT_OUT"
+          value = var.opt_out
+        }
       }
     }
   }

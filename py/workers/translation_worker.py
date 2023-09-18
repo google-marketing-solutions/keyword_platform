@@ -77,6 +77,15 @@ class TranslationWorker(base_worker.BaseWorker):
         warning_msg=self._warning_msg,
         error_msg=self._error_msg,
         keywords_modified=google_ads_objects.keywords.size(),
+        ads_modified=google_ads_objects.ads.size(),
+        translation_chars_sent=(
+            self._cloud_translation_client.get_translated_characters()
+        ),
+        genai_chars_sent=(
+            self._vertex_client.get_genai_characters_sent()
+            if self._vertex_client
+            else 0
+        ),
     )
 
   def _translate_keywords(
@@ -94,7 +103,6 @@ class TranslationWorker(base_worker.BaseWorker):
     logging.info('Starting keyword translation...')
 
     keywords_translation_frame = keywords.get_translation_frame()
-
     try:
       self._cloud_translation_client.translate(
           translation_frame=keywords_translation_frame,

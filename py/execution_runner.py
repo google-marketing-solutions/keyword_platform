@@ -15,7 +15,9 @@
 """Executes workers to produce expanded / optimized Google Ads objects."""
 
 from concurrent import futures
+import math
 import os
+import time
 from typing import Any
 
 from absl import logging
@@ -23,6 +25,7 @@ import google.auth
 from google.cloud import secretmanager
 
 from common import cloud_translation_client as cloud_translation_client_lib
+from common import execution_analytics_client as execution_analytics_client_lib
 from common import google_ads_client as google_ads_client_lib
 from common import storage_client as storage_client_lib
 from common import vertex_client as vertex_client_lib
@@ -71,6 +74,7 @@ class ExecutionRunner:
     self._gcp_project_id = os.environ['GCP_PROJECT']
     self._settings.credentials = self._get_credentials()
     self._bucket_name = os.environ['BUCKET_NAME']
+    self._ga_opt_out = os.environ['GA_OPT_OUT'].lower() == 'true'
 
     logging.info('ExecutionRunner: initialized credentials.')
 
@@ -98,6 +102,16 @@ class ExecutionRunner:
     )
 
     logging.info('ExecutionRunner: initialized Cloud Translation client.')
+
+    if not self._ga_opt_out:
+      self._execution_analytics_client = (
+          execution_analytics_client_lib.ExecutionAnalyticsClient(
+              settings=self._settings
+          )
+      )
+      logging.info('ExecutionRunner: initialized Execution Analytics client.')
+    else:
+      self._execution_analytics_client = None
     logging.info('ExecutionRunner: initialization complete.')
 
   def _get_credentials(self) -> dict[str, str]:
@@ -316,15 +330,25 @@ class ExecutionRunner:
         that worker run.
     """
     results = {}
-
+    # TODO: b/300917779 - Extract to a util function somewhere and add tests.
+    start_ms = math.floor(time.time() * 1000)
     for worker_id in self._settings.workers_to_run:
       worker = _WORKERS[worker_id](
-          self._cloud_translation_client, self._vertex_client)
+          cloud_translation_client=self._cloud_translation_client,
+          vertex_client=self._vertex_client,
+      )
 
       logging.info('Running %s...', worker.name)
       result = worker.execute(self._settings, google_ads_objects)
+      end_ms = math.floor(time.time() * 1000)
+      duration_ms = end_ms - start_ms
+      result.duration_ms = duration_ms
       results[worker.name] = result
       logging.info('Finished running %s.', worker.name)
+
+      if self._execution_analytics_client:
+        self._execution_analytics_client.send_worker_result(worker_id, result)
+        logging.info('Finished sending results to GA4.')
 
     return results
 
