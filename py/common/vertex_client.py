@@ -24,8 +24,10 @@ from absl import logging
 import vertexai
 from vertexai.language_models import TextGenerationModel
 import numpy as np
+import ratelimiter
 
 _MODEL = 'text-bison@001'
+_MAX_REQUESTS_PER_MINUTE = 60
 
 AVAILABLE_LANGUAGES = frozenset(['en', 'es', 'ko', 'hi', 'zh'])
 
@@ -102,6 +104,7 @@ class VertexClient:
         result.extend(shortened_batch)
     return result
 
+  @ratelimiter.RateLimiter(max_calls=_MAX_REQUESTS_PER_MINUTE, period=60)
   def _shorten_text_to_char_limit(
       self, text_list: list[str], language_code: str, char_limit: int
   ) -> list[str]:
