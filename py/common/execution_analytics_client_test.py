@@ -65,7 +65,7 @@ class ExecutionAnalyticsClientTest(absltest.TestCase):
   def test_send_execution_results(self):
     expected = {
         'client_id': 'fake_client_id',
-        'timestamp_micros': 1000,
+        'timestamp_micros': 1000000,
         'non_personalized_ads': 'false',
         'events': [{
             'name': 'execution',
@@ -79,8 +79,8 @@ class ExecutionAnalyticsClientTest(absltest.TestCase):
                 'cloud_project_id': 'fake_cloud_project_id',
                 'translation_characters': 10,
                 'genai_characters': 10,
-                'engagement_time_msec': 1000,
-                'session_id': 1000,
+                'engagement_time_msec': 4300,
+                'session_id': 'fake_client_id',
                 'duration_msec': 4300,
                 'source_language': 'en',
                 'target_language': 'de',

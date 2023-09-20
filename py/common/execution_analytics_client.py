@@ -74,7 +74,7 @@ class ExecutionAnalyticsClient:
       The response from Measurement Protocol endpoint. Returns a 200 HTTP status
       code, if the hit was accepted and logs validation errors otherwise.
     """
-    now_ms = math.floor(time.time() * 1000)
+    now_ms = math.floor(time.time() * 1000000)
     qs = {
         'client_id': self._settings.client_id,
         'timestamp_micros': now_ms,
@@ -91,8 +91,8 @@ class ExecutionAnalyticsClient:
                 'cloud_project_id': self._project_id,
                 'translation_characters': worker_result.translation_chars_sent,
                 'genai_characters': worker_result.genai_chars_sent,
-                'engagement_time_msec': now_ms,
-                'session_id': now_ms,
+                'engagement_time_msec': worker_result.duration_ms,
+                'session_id': self._settings.client_id,
                 'duration_msec': worker_result.duration_ms,
                 'source_language': self._settings.source_language_code,
                 'target_language': self._settings.target_language_codes[0],
