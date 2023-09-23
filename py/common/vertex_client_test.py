@@ -43,9 +43,7 @@ class VertexClientTest(absltest.TestCase):
         )
     )
     mock_response = mock.MagicMock()
-    mock_response.text = (
-        "['This texts needs to be shortened because it is too long.']"
-    )
+    mock_response.text = 'This text needs to be shorter.'
     self.mock_model.return_value.predict.return_value = mock_response
 
   def test_shorten_text_to_char_limit(self):
@@ -54,19 +52,13 @@ class VertexClientTest(absltest.TestCase):
     ]
     test_char_limit = 50
     expected_prompt = f"""
-        Make each of the following sentences shorter
+          Shorten the following text to be under {test_char_limit} characters,
+          keep the original language and ensure that the shortened text is
+          gramatically correct:
 
-        Sentences:
-          {fake_text_list}
-
-        Do so until this Python function returns true:
-          all(len(sentence) < {test_char_limit} for shortened_sentence in Sentences)
-
-        Shortened sentences list:
-      """
-    expected_result = [
-        'This texts needs to be shortened because it is too long.'
-    ]
+          {fake_text_list[0]}
+        """
+    expected_result = ['This text needs to be shorter.']
     vertex_client = vertex_client_lib.VertexClient()
 
     actual_result = vertex_client.shorten_text_to_char_limit(
@@ -75,10 +67,16 @@ class VertexClientTest(absltest.TestCase):
 
     self.mock_model.return_value.predict.assert_has_calls([
         mock.call('Are you there?'),
-        mock.call(expected_prompt, temperature=0, top_p=0.8, top_k=1),
+        mock.call(
+            expected_prompt,
+            temperature=0.2,
+            top_p=0.95,
+            top_k=40,
+            max_output_tokens=13,
+        ),
     ])
     self.assertEqual(actual_result, expected_result)
-    self.assertEqual(vertex_client.get_genai_characters_sent(), 312)
+    self.assertEqual(vertex_client.get_genai_characters_sent(), 248)
 
   def test_shorten_text_to_char_limit_logs_warning_unsupported_language(
       self,
@@ -91,35 +89,13 @@ class VertexClientTest(absltest.TestCase):
     self.assertEqual(
         logs.output,
         [
-            ('WARNING:absl:Language unsupported not supported.'
-             ' Returning original text list.'),
-            "INFO:absl:shortened_batch: ['some_text']"
+            (
+                'WARNING:absl:Language unsupported not supported.'
+                ' Returning original text list.'
+            )
         ],
     )
     self.assertEqual(vertex_client.get_genai_characters_sent(), 0)
-
-  def test_shorten_text_to_char_limit_in_batches(self):
-    fake_text_list = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']
-    test_char_limit = 50
-    test_language_code = 'en'
-
-    vertex_client = vertex_client_lib.VertexClient()
-    with mock.patch.object(
-        vertex_client,
-        '_shorten_text_to_char_limit',
-        autospec=True,
-    ) as mock_shorten_text_to_char_limit:
-      vertex_client.shorten_text_to_char_limit(
-          fake_text_list, test_language_code, test_char_limit
-      )
-      mock_shorten_text_to_char_limit.assert_has_calls([
-          mock.call(
-              fake_text_list[0:6],
-              test_language_code,
-              test_char_limit,
-          ),
-          mock.call(fake_text_list[6:11], test_language_code, test_char_limit),
-      ])
 
 
 if __name__ == '__main__':

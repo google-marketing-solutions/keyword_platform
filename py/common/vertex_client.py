@@ -22,32 +22,13 @@ import math
 import os
 from absl import logging
 import vertexai
-from vertexai.language_models import TextGenerationModel
-import numpy as np
+from vertexai.language_models import TextGenerationModel, TextGenerationResponse
 import ratelimiter
 
 _MODEL = 'text-bison@001'
 _MAX_REQUESTS_PER_MINUTE = 60
 
 AVAILABLE_LANGUAGES = frozenset(['en', 'es', 'ko', 'hi', 'zh'])
-
-
-def split_list(input_list: list[str], max_len: int = 10) -> list[list[str]]:
-  """Splits a list into a list of shorter lists.
-
-  Args:
-    input_list: The list to split up.
-    max_len: The max length of the splits.
-
-  Returns:
-    A list of lists.
-  """
-  num_batches = math.ceil(len(input_list) / max_len)
-  result = []
-  batches = np.array_split(input_list, num_batches)
-  for batch in batches:
-    result.append(batch.tolist())
-  return result
 
 
 class VertexClient:
@@ -88,43 +69,43 @@ class VertexClient:
       The a list of strings that are under the passed character limit. If the
       passed language code isn't supported the original text list is returned.
     """
-    batches = split_list(text_list)
     result = []
-    with futures.ThreadPoolExecutor() as executor:
-      shortened_batches = executor.map(
-          lambda text_list: self._shorten_text_to_char_limit(
-              text_list, language_code, char_limit
+    with futures.ThreadPoolExecutor(max_workers=8) as executor:
+      generator = executor.map(
+          lambda text: self._shorten_text_to_char_limit(
+              text, language_code, char_limit
           ),
-          batches,
+          text_list,
       )
 
-    for shortened_batch in shortened_batches:
-      logging.info('shortened_batch: %s', shortened_batch)
-
-      if isinstance(shortened_batch, list):
-        result.extend(shortened_batch)
+    for item in generator:
+      if isinstance(item, str):
+        result.append(item)
     return result
 
   def get_genai_characters_sent(self) -> int:
     """Gets the number of characters sent to Vertex API in this instance."""
     return self._genai_characters_sent
 
-  @ratelimiter.RateLimiter(max_calls=_MAX_REQUESTS_PER_MINUTE, period=60)
   def _shorten_text_to_char_limit(
-      self, text_list: list[str], language_code: str, char_limit: int
-  ) -> list[str]:
-    """Shortens a list of strings under the provided character limit.
+      self, text: str, language_code: str, char_limit: int
+  ) -> str:
+    """Shortens a text under the provided character limit.
 
     If a text list element is equal or under the character limit already, the
-    original list element will be returned.
+    original list element will be returned. The function prompts an LLM and
+    descreases the maximum number of output tokens gradually until the output
+    is under the desired character limit. More details on the model can be found
+    here:
+    https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/text
 
     Args:
-      text_list: A list of strings to shorten.
+      text: The text to shorten.
       language_code: The language of the text.
       char_limit: The character limit to shorten the text to.
 
     Returns:
-      The a list of strings that are under the passed character limit. If the
+      The a string that is under the passed character limit. If the
       passed language code isn't supported the original text list is returned.
     """
     if language_code not in AVAILABLE_LANGUAGES:
@@ -132,23 +113,42 @@ class VertexClient:
           'Language %s not supported. Returning original text list.',
           language_code,
       )
-      return text_list
+      return text
     else:
-      # Sets temperature to be deterministic and select the most probable
-      # output via top_p and top_k. More details here:
-      # https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/text
-      parameters = {'temperature': 0, 'top_p': 0.8, 'top_k': 1}
-      shorten_prompt = f"""
-        Make each of the following sentences shorter
+      shortened_text = text
+      # One token has approximately 4 characters. This can be used to determine
+      # an output token number to start with.
+      start_output_tokens = math.ceil(char_limit / 4)
+      output_tokens = start_output_tokens
+      while len(shortened_text) > char_limit:
+        parameters = {
+            'temperature': 0.2,
+            'top_p': 0.95,
+            'top_k': 40,
+            'max_output_tokens': output_tokens,
+        }
+        shorten_prompt = f"""
+          Shorten the following text to be under {char_limit} characters,
+          keep the original language and ensure that the shortened text is
+          gramatically correct:
 
-        Sentences:
-          {text_list}
+          {text}
+        """
+        response = self._send_rate_limited_prompt(shorten_prompt, **parameters)
+        self._genai_characters_sent += len(shorten_prompt)
+        shortened_text = response.text
+        # Decrease the max number of output tokens by 1 for the next iteration.
+        output_tokens += -1
+      logging.info(
+          'Shortened text: "%s" to "%s" after %d iterations',
+          text,
+          shortened_text,
+          start_output_tokens - output_tokens,
+      )
+      return shortened_text
 
-        Do so until this Python function returns true:
-          all(len(sentence) < {char_limit} for shortened_sentence in Sentences)
-
-        Shortened sentences list:
-      """
-      self._genai_characters_sent += len(shorten_prompt)
-      response = self._client.predict(shorten_prompt, **parameters)
-      return ast.literal_eval(response.text) if response.text else text_list
+  @ratelimiter.RateLimiter(max_calls=_MAX_REQUESTS_PER_MINUTE, period=60)
+  def _send_rate_limited_prompt(
+      self, prompt: str, **parameters
+  ) -> TextGenerationResponse:
+    return self._client.predict(prompt, **parameters)
