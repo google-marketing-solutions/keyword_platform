@@ -52,9 +52,7 @@ class VertexClientTest(absltest.TestCase):
     ]
     test_char_limit = 50
     expected_prompt = f"""
-          Shorten the following text to be under {test_char_limit} characters,
-          keep the original language and ensure that the shortened text is
-          gramatically correct:
+          Make the following sentence shorter:
 
           {fake_text_list[0]}
         """
@@ -62,7 +60,7 @@ class VertexClientTest(absltest.TestCase):
     vertex_client = vertex_client_lib.VertexClient()
 
     actual_result = vertex_client.shorten_text_to_char_limit(
-        fake_text_list, 'en', 50
+        fake_text_list, 'en', test_char_limit
     )
 
     self.mock_model.return_value.predict.assert_has_calls([
@@ -76,7 +74,7 @@ class VertexClientTest(absltest.TestCase):
         ),
     ])
     self.assertEqual(actual_result, expected_result)
-    self.assertEqual(vertex_client.get_genai_characters_sent(), 248)
+    self.assertEqual(vertex_client.get_genai_characters_sent(), 124)
 
   def test_shorten_text_to_char_limit_logs_warning_unsupported_language(
       self,

@@ -30,6 +30,15 @@ _MAX_REQUESTS_PER_MINUTE = 60
 
 AVAILABLE_LANGUAGES = frozenset(['en', 'es', 'ko', 'hi', 'zh'])
 
+_PROMPT_MAP = {
+    'en': 'Make the following sentence shorter:',
+    'de': 'Mache den folgenden Satz kürzer:',
+    'es': 'Acorta la siguiente frase:',
+    'ko': '다음 문장을 더 짧게 만드세요:',
+    'hi': 'निम्नलिखित वाक्य को छोटा करें:',
+    'zh': '将下面的句子缩短:',
+}
+
 
 class VertexClient:
   """A client to make requests to the Vertex API.
@@ -128,9 +137,7 @@ class VertexClient:
             'max_output_tokens': output_tokens,
         }
         shorten_prompt = f"""
-          Shorten the following text to be under {char_limit} characters,
-          keep the original language and ensure that the shortened text is
-          gramatically correct:
+          {_PROMPT_MAP[language_code]}
 
           {text}
         """
