@@ -24,22 +24,16 @@ import google.cloud.logging
 import execution_runner as execution_runner_lib
 from data_models import settings as settings_lib
 
-client = None
+client = google.cloud.logging.Client()
+client.setup_logging()
+
 app = flask.Flask(__name__)
 flask_cors.CORS(app)
-
-
-def _setup_logging() -> None:
-  """Sets up Cloud Logging."""
-  main.client = google.cloud.logging.Client()
-  main.client.setup_logging()
 
 
 @app.route('/run', methods=['POST', 'GET'])
 def main() -> flask.Response:
   """Entry point for Cloud Run."""
-  _setup_logging()
-
   logging.info('Received request: run/')
 
   source_language_code = flask.request.args.get('source_language_code').lower()
@@ -90,8 +84,6 @@ def get_accessible_accounts() -> flask.Response:
   Returns:
     A list of dicts with account id and name.
   """
-  _setup_logging()
-
   logging.info('Received request: /accessible_accounts')
 
   settings = settings_lib.Settings()
@@ -123,8 +115,6 @@ def get_campaigns() -> flask.Response:
   Returns:
     A list of dicts with campaign id and name.
   """
-  _setup_logging()
-
   logging.info('Received request: /campaigns')
 
   selected_accounts = flask.request.args.get('selected_accounts').split(',')
@@ -161,8 +151,6 @@ def get_cost() -> flask.Response:
   Returns:
     A response containing a string with the cost estimate and explanation.
   """
-  _setup_logging()
-
   logging.info('Received request: /cost')
 
   customer_ids = flask.request.form.get('customer_ids', '').split(',')
@@ -194,5 +182,4 @@ def get_cost() -> flask.Response:
 
 
 if __name__ == '__main__':
-  _setup_logging()
   app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
