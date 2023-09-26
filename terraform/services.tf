@@ -51,6 +51,13 @@ resource "google_cloud_run_service" "backend_run" {
       containers {
         image = data.google_container_registry_image.backend_latest.image_url
 
+        resources {
+          limits = {
+            cpu = "4000m"
+            memory = "8Gi"
+          }
+        }
+
         env {
           name  = "GCP_PROJECT"
           value = var.project_id
