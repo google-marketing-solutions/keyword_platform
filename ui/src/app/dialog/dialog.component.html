@@ -14,7 +14,7 @@
  limitations under the License.
 -->
 
-<div *ngIf="status === 200">
+<div *ngIf="statusText === 'OK'">
   <div>
     <div class="juxtapose">
       <h1 mat-dialog-title class="title">Download</h1>
@@ -54,7 +54,7 @@
     </div>
   </div>
 </div>
-<div *ngIf="status !== 200">
+<div *ngIf="statusText !== 'OK'">
   <div>
     <div class="juxtapose">
       <h1 mat-dialog-title class="title">Error</h1>
@@ -68,7 +68,7 @@
   <div mat-dialog-content class="content">
     <div class="error">
       <mat-icon aria-hidden="false" aria-label="Error" fontIcon="error" class="icon"></mat-icon>
-      <span>{{message}}</span>
+      <span>{{statusText}}</span>
     </div>
   </div>
 </div>

@@ -18,13 +18,10 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA} from '@angular/material/dialog';
 
-import {ResponseMessage, ResponseStatus} from '../models/enums';
 import {Output} from '../models/interfaces';
 
-const CHAR_LIMIT = 75;
-
 interface DialogData {
-  [key: string]: Output|number|null;
+  [key: string]: Output|string|null;
 }
 
 /** The dialog component to display output. */
@@ -36,23 +33,15 @@ interface DialogData {
 export class DialogComponent implements OnInit {
   assetUrls?: {[key: string]: string[]};
   message?: string;
-  status?: number;
+  statusText?: string;
 
   constructor(@Inject(MAT_DIALOG_DATA) readonly data: DialogData) {}
 
   ngOnInit() {
-    switch (this.data['status']) {
-      case ResponseStatus.SUCCESS:
-        this.status = ResponseStatus.SUCCESS;
-        const value = this.data['value'] as Output;
-        this.assetUrls = value['asset_urls'] as {[key: string]: string[]};
-        break;
-      case ResponseStatus.SERVER_ERROR:
-        this.status = ResponseStatus.SERVER_ERROR;
-        this.message = ResponseMessage.SERVER_ERROR;
-        break;
-      default:
-        this.message = ResponseMessage.UNKNOWN_ERROR;
+    this.statusText = this.data['statusText'] as string;
+    if (this.statusText === 'OK') {
+      const value = this.data['value'] as Output;
+      this.assetUrls = value['asset_urls'] as {[key: string]: string[]};
     }
   }
 
@@ -72,7 +61,8 @@ export class DialogComponent implements OnInit {
   getFileTypeDescription(key: string): string {
     let message = 'Unknown file type:';
     if (key === 'xlsx') {
-      message = 'Excel files (export as CSV for import into Google Ads Editor):';
+      message =
+          'Excel files (export as CSV for import into Google Ads Editor):';
     } else if (key === 'csv') {
       message = 'CSV files (for direct import into Google Ads Editor):';
     }
