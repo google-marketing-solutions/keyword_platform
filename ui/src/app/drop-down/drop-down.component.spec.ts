@@ -41,7 +41,7 @@ describe('DropDownComponent', () => {
   });
 
   // TODO(): Add effective unit tests.
-  it('should create', () => {
+  it('should be created', () => {
     expect(component).toBeTruthy();
   });
 });
