@@ -60,6 +60,6 @@ export class RunService {
   }
 
   private handleError(error: HttpErrorResponse) {
-    return throwError(error.message);
+    return throwError(error.statusText);
   }
 }
