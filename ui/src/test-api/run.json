@@ -19,8 +19,13 @@
       "error_msg": "",
       "keywords_added": 0,
       "keywords_modified": 10,
+      "ads_added": 0,
+      "ads_modified": 0,
+      "translation_chars_sent": 0,
+      "genai_chars_sent": 0,
       "status": "SUCCESS",
-      "warning_msg": ""
+      "warning_msg": "",
+      "duration_ms": 0
     }
   }
 }
