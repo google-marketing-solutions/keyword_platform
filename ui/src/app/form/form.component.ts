@@ -162,11 +162,11 @@ export class FormComponent implements OnInit, AfterViewInit {
         .subscribe(
             (response => {
               this.requestStatus = RequestStatus.RESPONDED;
-              this.openDialog(response.status!, response.body!);
+              this.openDialog(response.statusText!, response.body!);
             }),
             (error => {
               this.requestStatus = RequestStatus.ERROR;
-              this.openDialog(0, null);
+              this.openDialog(error.statusText!, null);
               console.error(error);
             }));
   }
@@ -252,8 +252,8 @@ export class FormComponent implements OnInit, AfterViewInit {
     return this.form.controls;
   }
 
-  private openDialog(status: number, value: Output|null) {
-    this.dialog.open(DialogComponent, {data: {status, value}});
+  private openDialog(statusText: string, value: Output|null) {
+    this.dialog.open(DialogComponent, {data: {statusText, value}});
     this.dialog.afterAllClosed.subscribe(() => {
       // Enable form after the results rendered in the dialog container gets
       // closed so that the form can be interacted with again.
