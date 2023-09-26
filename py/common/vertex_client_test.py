@@ -52,7 +52,7 @@ class VertexClientTest(absltest.TestCase):
     ]
     test_char_limit = 50
     expected_prompt = f"""
-          Make the following sentence shorter:
+          Make the following sentence simple and short:
 
           {fake_text_list[0]}
         """
@@ -74,7 +74,7 @@ class VertexClientTest(absltest.TestCase):
         ),
     ])
     self.assertEqual(actual_result, expected_result)
-    self.assertEqual(vertex_client.get_genai_characters_sent(), 124)
+    self.assertEqual(vertex_client.get_genai_characters_sent(), 133)
 
   def test_shorten_text_to_char_limit_logs_warning_unsupported_language(
       self,

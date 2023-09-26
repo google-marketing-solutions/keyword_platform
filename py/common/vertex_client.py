@@ -16,7 +16,6 @@
 
 See class doctring for more details.
 """
-import ast
 from concurrent import futures
 import math
 import os
@@ -31,12 +30,12 @@ _MAX_REQUESTS_PER_MINUTE = 60
 AVAILABLE_LANGUAGES = frozenset(['en', 'es', 'ko', 'hi', 'zh'])
 
 _PROMPT_MAP = {
-    'en': 'Make the following sentence shorter:',
-    'de': 'Mache den folgenden Satz kürzer:',
-    'es': 'Acorta la siguiente frase:',
-    'ko': '다음 문장을 더 짧게 만드세요:',
-    'hi': 'निम्नलिखित वाक्य को छोटा करें:',
-    'zh': '将下面的句子缩短:',
+    'en': 'Make the following sentence simple and short:',
+    'de': 'Mache den folgenden Satz einfach und kurz:',
+    'es': 'Haz la siguiente oración simple y corta.:',
+    'ko': '다음 문장을 간단하고 짧게 만드세요.',
+    'hi': 'निम्नलिखित वाक्य को सरल एवं संक्षिप्त बनायें:',
+    'zh': '让下面的句子变得简单、简短：',
 }
 
 
@@ -48,7 +47,7 @@ class VertexClient:
   Example usage:
     vertex_client = VertexClient()
     shortened_text = vertex_client.shorten_text_to_char_limit(
-      'Some long headline...', 'en', 50)
+      ['Some long headline...'], 'en', 50)
   """
 
   def __init__(self) -> None:
