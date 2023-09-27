@@ -27,7 +27,7 @@ import ratelimiter
 _MODEL = 'text-bison@001'
 _MAX_REQUESTS_PER_MINUTE = 60
 
-AVAILABLE_LANGUAGES = frozenset(['en', 'es', 'ko', 'hi', 'zh'])
+AVAILABLE_LANGUAGES = frozenset(['en'])
 
 _PROMPT_MAP = {
     'en': 'Make the following sentence simple and short:',
