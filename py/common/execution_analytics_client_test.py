@@ -70,8 +70,6 @@ class ExecutionAnalyticsClientTest(absltest.TestCase):
         'events': [{
             'name': 'execution',
             'params': {
-                'campaign_ids': 'fake_campaign_id',
-                'customer_ids': 'fake_customer_id',
                 'keywords_modified': 1,
                 'ads_modified': 1,
                 'worker': 'fake_worker_id',
@@ -85,6 +83,10 @@ class ExecutionAnalyticsClientTest(absltest.TestCase):
                 'source_language': 'en',
                 'target_language': 'de',
                 'backend_errors': 0,
+                'items': [
+                    {'campaign_id': 'fake_campaign_id'},
+                    {'customer_id': 'fake_customer_id'},
+                ],
             },
         }],
     }

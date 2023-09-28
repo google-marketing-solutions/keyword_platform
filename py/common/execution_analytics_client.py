@@ -82,8 +82,6 @@ class ExecutionAnalyticsClient:
         'events': [{
             'name': 'execution',
             'params': {
-                'campaign_ids': ','.join(self._settings.campaigns),
-                'customer_ids': ','.join(self._settings.customer_ids),
                 'keywords_modified': worker_result.keywords_modified,
                 'ads_modified': worker_result.ads_modified,
                 'worker': worker_id,
@@ -97,6 +95,7 @@ class ExecutionAnalyticsClient:
                 'source_language': self._settings.source_language_code,
                 'target_language': self._settings.target_language_codes[0],
                 'backend_errors': 1 if worker_result.error_msg else 0,
+                'items': self._generate_items(),
             },
         }],
     }
@@ -116,3 +115,20 @@ class ExecutionAnalyticsClient:
       logging.debug('GA4 hit not valid: %s', validation_messages)
       is_valid_hit = False
     return is_valid_hit
+
+  def _generate_items(self) -> list[dict[str, Any]]:
+    """Generates the items event array for a MP hit from settings."""
+    items = []
+    items.extend(
+        [
+            {'campaign_id': campaign_id}
+            for campaign_id in self._settings.campaigns
+        ]
+    )
+    items.extend(
+        [
+            {'customer_id': customer_id}
+            for customer_id in self._settings.customer_ids
+        ]
+    )
+    return items
