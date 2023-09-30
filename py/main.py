@@ -31,22 +31,22 @@ app = flask.Flask(__name__)
 flask_cors.CORS(app)
 
 
-@app.route('/run', methods=['POST', 'GET'])
+@app.route('/run', methods=['POST'])
 def main() -> flask.Response:
   """Entry point for Cloud Run."""
   logging.info('Received request: run/')
 
-  source_language_code = flask.request.args.get('source_language_code').lower()
+  source_language_code = flask.request.form.get('source_language_code').lower()
   target_language_codes = (
-      flask.request.args.get('target_language_codes').lower().split(',')
+      flask.request.form.get('target_language_codes').lower().split(',')
   )
-  customer_ids = flask.request.args.get('customer_ids').split(',')
-  campaigns = flask.request.args.get('campaigns').split(',')
-  workers_to_run = flask.request.args.get('workers_to_run').split(',')
-  multiple_templates = flask.request.args.get(
+  customer_ids = flask.request.form.get('customer_ids').split(',')
+  campaigns = flask.request.form.get('campaigns').split(',')
+  workers_to_run = flask.request.form.get('workers_to_run').split(',')
+  multiple_templates = flask.request.form.get(
       'multiple_templates', default=False, type=lambda v: v.lower() == 'true'
   )
-  client_id = flask.request.args.get('client_id')
+  client_id = flask.request.form.get('client_id')
 
   settings = settings_lib.Settings(
       source_language_code=source_language_code,
