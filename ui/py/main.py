@@ -74,13 +74,34 @@ def proxy() -> flask.Response:
     logging.warning('Failed to get id_token for %s', url)
 
   # Makes the request to the backend container endpoint.
-  endpoint = flask.request.args.get('endpoint')
-  params = urllib.parse.urlencode(flask.request.args)
-  request = urllib.request.Request(f'{url}/{endpoint}?{params}')
-  logging.info('Making request: %s', request)
-  request.add_header('Authorization', f'Bearer {id_token}')
 
-  return urllib.request.urlopen(request)
+  if flask.request.method == 'GET':
+    # Builds and sends GET request
+    endpoint = flask.request.args.get('endpoint')
+    params = urllib.parse.urlencode(flask.request.args)
+    request = urllib.request.Request(f'{url}/{endpoint}?{params}')
+    logging.info('Making GET request: %s', request)
+    request.add_header('Authorization', f'Bearer {id_token}')
+
+    return urllib.request.urlopen(request)
+  else:
+    # Builds and sends POST request
+    data = ''
+    endpoint = ''
+
+    if flask.request.form:
+      endpoint = flask.request.form.get('endpoint')
+      data = urllib.parse.urlencode(flask.request.form)
+    elif flask.request.json:
+      endpoint = flask.request.json.get('endpoint')
+      data = urllib.parse.urlencode(flask.request.json)
+
+    data.encode('ascii')
+    request = urllib.request.Request(f'{url}/{endpoint}', data)
+    logging.info('Making POST request: %s', request)
+    request.add_header('Authorization', f'Bearer {id_token}')
+
+    return urllib.request.urlopen(request)
 
 
 if __name__ == '__main__':

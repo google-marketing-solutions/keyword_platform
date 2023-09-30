@@ -53,7 +53,7 @@ class MainTest(absltest.TestCase):
   @mock.patch.dict(os.environ, {'BACKEND_URL': 'https://fake-url.a.run.app'})
   @mock.patch.object(google.oauth2.id_token, 'fetch_id_token', autospec=True)
   @mock.patch.object(urllib.request, 'urlopen', autospec=True)
-  def test_proxy(self, mock_urlopen, mock_fetch_id_token):
+  def test_proxy_get_request(self, mock_urlopen, mock_fetch_id_token):
     fake_id_token = '12345'
     mock_fetch_id_token.return_value = fake_id_token
     mock_urlopen.return_value = 'fake_response'
@@ -74,6 +74,64 @@ class MainTest(absltest.TestCase):
     self.assertEqual(expected_auth_header, actual_auth_header)
     self.assertEqual(expected_response, actual_response.data.decode('utf-8'))
 
+  @mock.patch.dict(os.environ, {'BACKEND_URL': 'https://fake-url.a.run.app'})
+  @mock.patch.object(google.oauth2.id_token, 'fetch_id_token', autospec=True)
+  @mock.patch.object(urllib.request, 'urlopen', autospec=True)
+  def test_proxy_post_request_form(self, mock_urlopen, mock_fetch_id_token):
+    fake_id_token = '12345'
+    mock_fetch_id_token.return_value = fake_id_token
+    mock_urlopen.return_value = 'fake_response'
 
-if __name__ == "__main__":
+    expected_response = 'fake_response'
+    expected_full_url = (
+        'https://fake-url.a.run.app/run')
+    expected_auth_header = 'Bearer 12345'
+    expected_data = 'endpoint=run&campaign_ids=123'
+
+    actual_response = main.app.test_client().post(
+        '/proxy', data={
+            'endpoint': 'run',
+            'campaign_ids': '123'})
+
+    request_arg = mock_urlopen.call_args_list[0][0][0]
+    actual_full_url = request_arg.full_url
+    actual_data = request_arg.data
+    actual_auth_header = request_arg.headers['Authorization']
+
+    self.assertEqual(expected_full_url, actual_full_url)
+    self.assertEqual(expected_auth_header, actual_auth_header)
+    self.assertEqual(expected_response, actual_response.data.decode('utf-8'))
+    self.assertEqual(expected_data, actual_data)
+
+  @mock.patch.dict(os.environ, {'BACKEND_URL': 'https://fake-url.a.run.app'})
+  @mock.patch.object(google.oauth2.id_token, 'fetch_id_token', autospec=True)
+  @mock.patch.object(urllib.request, 'urlopen', autospec=True)
+  def test_proxy_post_request_json(self, mock_urlopen, mock_fetch_id_token):
+    fake_id_token = '12345'
+    mock_fetch_id_token.return_value = fake_id_token
+    mock_urlopen.return_value = 'fake_response'
+
+    expected_response = 'fake_response'
+    expected_full_url = (
+        'https://fake-url.a.run.app/run')
+    expected_auth_header = 'Bearer 12345'
+    expected_data = 'campaign_ids=123&endpoint=run'
+
+    actual_response = main.app.test_client().post(
+        '/proxy', json={
+            'endpoint': 'run',
+            'campaign_ids': '123'})
+
+    request_arg = mock_urlopen.call_args_list[0][0][0]
+    actual_full_url = request_arg.full_url
+    actual_data = request_arg.data
+    actual_auth_header = request_arg.headers['Authorization']
+
+    self.assertEqual(expected_full_url, actual_full_url)
+    self.assertEqual(expected_auth_header, actual_auth_header)
+    self.assertEqual(expected_response, actual_response.data.decode('utf-8'))
+    self.assertEqual(expected_data, actual_data)
+
+
+if __name__ == '__main__':
   absltest.main()
