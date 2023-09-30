@@ -18,7 +18,7 @@
 import {AfterViewInit, ChangeDetectorRef, Component, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
-import {MatSlideToggleChange} from '@angular/material/slide-toggle';
+import {MatSlideToggle, MatSlideToggleChange} from '@angular/material/slide-toggle';
 
 import {DialogComponent} from '../dialog/dialog.component';
 import {DropDownComponent} from '../drop-down/drop-down.component';
@@ -77,6 +77,9 @@ export class FormComponent implements OnInit, AfterViewInit {
 
   @ViewChildren('component')
   private readonly components!: QueryList<DropDownComponent>;
+
+  @ViewChildren('slideToggle')
+  private readonly slideToggles!: QueryList<MatSlideToggle>;
 
   constructor(
       private readonly changeRefDetector: ChangeDetectorRef,
@@ -145,6 +148,7 @@ export class FormComponent implements OnInit, AfterViewInit {
     }
     // Disable form upon request.
     this.disableControls(true);
+    this.disableSlideToggles(true);
     this.requestStatus = RequestStatus.REQUESTED;
 
     // The clientId property is defined as a window object by the Google Tag
@@ -155,6 +159,8 @@ export class FormComponent implements OnInit, AfterViewInit {
     const windowObject = window as unknown as ClientIdProperty;
     const clientId = windowObject.clientId;
 
+    console.log('Run service requested.');
+
     this.runService
         .run(
             this.accountIds, this.campaignIds, this.sourceLanguageCode!,
@@ -163,10 +169,11 @@ export class FormComponent implements OnInit, AfterViewInit {
             (response => {
               this.requestStatus = RequestStatus.RESPONDED;
               this.openDialog(response.statusText!, response.body!);
+              console.log('Run service request successful.');
             }),
             (error => {
               this.requestStatus = RequestStatus.ERROR;
-              this.openDialog(error.statusText!, null);
+              this.openDialog(error, null);
               console.error(error);
             }));
   }
@@ -226,10 +233,18 @@ export class FormComponent implements OnInit, AfterViewInit {
     }
   }
 
+  private disableSlideToggles(disable: boolean) {
+    for (const slideToggle of this.slideToggles) {
+      slideToggle.setDisabledState(disable);
+    }
+  }
+
   private getAccounts() {
+    console.log('Accounts requested.');
     this.googleAdsService.getAccounts().subscribe(
         (response => {
           this.accounts = response.body!;
+          console.log('Accounts request successful.');
         }),
         (error => {
           console.error(error);
@@ -237,11 +252,13 @@ export class FormComponent implements OnInit, AfterViewInit {
   }
 
   private getCampaigns() {
+    console.log('Campaigns requested.');
     this.campaigns = [];
     this.googleAdsService.getCampaigns(this.accountIds)
         .subscribe(
             (response => {
               this.campaigns = response.body!;
+              console.log('Campaigns request successful.');
             }),
             (error => {
               console.error(error);
@@ -258,6 +275,7 @@ export class FormComponent implements OnInit, AfterViewInit {
       // Enable form after the results rendered in the dialog container gets
       // closed so that the form can be interacted with again.
       this.disableControls(false);
+      this.disableSlideToggles(false);
     });
   }
 }

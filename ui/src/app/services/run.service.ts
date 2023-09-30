@@ -21,45 +21,36 @@ import {Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
 import {Output} from '../models/interfaces';
-import {LOCATION_TOKEN} from '../shared/tokens';
 
 /** Run service. */
 @Injectable({providedIn: 'root'})
 export class RunService {
-  constructor(
-      private readonly http: HttpClient,
-      @Inject(LOCATION_TOKEN) private readonly location: Location) {}
+  constructor(private readonly http: HttpClient) {}
 
   run(accountIds: string[], campaignIds: string[], sourceLanguageCode: string,
       targetLanguageCode: string, multipleTemplates: boolean, workers: string[],
       client_id: string): Observable<HttpResponse<Output>> {
-    const params = new HttpParams({
-      fromObject: {
-        'customer_ids': accountIds.join(','),
-        'campaigns': campaignIds.join(','),
-        'source_language_code': sourceLanguageCode,
-        'target_language_codes': targetLanguageCode,
-        'workers_to_run': workers.join(','),
-        'multiple_templates': multipleTemplates.toString(),
-        'client_id': client_id,
-        'endpoint': 'run'
-      }
-    });
     return this.http
-        .get<Output>(
-            (this.location.hostname === 'localhost' ? './test-api/run.json' :
-                                                      './proxy'),
+        .post<Output>(
+            './proxy', {
+              'customer_ids': accountIds.join(','),
+              'campaigns': campaignIds.join(','),
+              'source_language_code': sourceLanguageCode,
+              'target_language_codes': targetLanguageCode,
+              'workers_to_run': workers.join(','),
+              'multiple_templates': multipleTemplates.toString(),
+              'client_id': client_id,
+              'endpoint': 'run'
+            },
             {
               headers: new HttpHeaders({'Content-Type': 'application/json'}),
               observe: 'response',
-              params,
-              responseType: 'json',
-            },
-            )
+              responseType: 'json'
+            })
         .pipe(catchError(this.handleError), map(response => response));
   }
 
   private handleError(error: HttpErrorResponse) {
-    return throwError(error.statusText);
+    return throwError(error.message);
   }
 }

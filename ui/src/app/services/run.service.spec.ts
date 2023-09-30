@@ -20,29 +20,18 @@ import {HttpClientTestingModule, HttpTestingController} from '@angular/common/ht
 import {TestBed} from '@angular/core/testing';
 import {of, throwError} from 'rxjs';
 
-import {LOCATION_TOKEN} from '../shared/tokens';
-
 import {RunService} from './run.service';
 
 describe('RunService', () => {
-  const ENDPOINT =
-      './proxy?customer_ids=1&campaigns=1&source_language_code=en' +
-      '&target_language_codes=de&workers_to_run=translationWorker' +
-      '&multiple_templates=false&client_id=aaa.bbb&endpoint=run';
+  const ENDPOINT = './proxy';
 
   let service: RunService;
   let httpMock: HttpTestingController;
   let spy: jasmine.Spy;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientModule, HttpClientTestingModule],
-      providers: [{
-        provide: LOCATION_TOKEN,
-        useValue: {hostname: 'hostname.0.0.0.0.nip.io'}
-      }],
-
-    });
+    TestBed.configureTestingModule(
+        {imports: [HttpClientModule, HttpClientTestingModule]});
 
     service = TestBed.inject(RunService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -57,7 +46,7 @@ describe('RunService', () => {
         .run(['1'], ['1'], 'en', 'de', false, ['translationWorker'], 'aaa.bbb')
         .subscribe();
     const request = httpMock.expectOne(ENDPOINT);
-    expect(request.request.method).toBe('GET');
+    expect(request.request.method).toBe('POST');
     httpMock.verify();
   });
 
