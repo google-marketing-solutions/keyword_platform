@@ -84,8 +84,8 @@ class ExecutionAnalyticsClientTest(absltest.TestCase):
                 'target_language': 'de',
                 'backend_errors': 0,
                 'items': [
-                    {'campaign_id': 'fake_campaign_id'},
-                    {'customer_id': 'fake_customer_id'},
+                    {'item_id': 'fake_campaign_id', 'affiliation': 'campaign'},
+                    {'item_id': 'fake_customer_id', 'affiliation': 'customer'},
                 ],
             },
         }],

@@ -121,13 +121,13 @@ class ExecutionAnalyticsClient:
     items = []
     items.extend(
         [
-            {'campaign_id': campaign_id}
+            {'item_id': campaign_id, 'affiliation': 'campaign'}
             for campaign_id in self._settings.campaigns
         ]
     )
     items.extend(
         [
-            {'customer_id': customer_id}
+            {'item_id': customer_id, 'affiliation': 'customer'}
             for customer_id in self._settings.customer_ids
         ]
     )
