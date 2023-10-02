@@ -96,7 +96,7 @@ def proxy() -> flask.Response:
       endpoint = flask.request.json.get('endpoint')
       data = urllib.parse.urlencode(flask.request.json)
 
-    data.encode('utf-8')
+    data = data.encode('utf-8')
     request = urllib.request.Request(f'{url}/{endpoint}', data)
     logging.info('Making POST request: %s', request)
     request.add_header('Authorization', f'Bearer {id_token}')

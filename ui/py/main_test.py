@@ -86,7 +86,7 @@ class MainTest(absltest.TestCase):
     expected_full_url = (
         'https://fake-url.a.run.app/run')
     expected_auth_header = 'Bearer 12345'
-    expected_data = 'endpoint=run&campaign_ids=123'
+    expected_data = b'endpoint=run&campaign_ids=123'
 
     actual_response = main.app.test_client().post(
         '/proxy', data={
@@ -115,7 +115,7 @@ class MainTest(absltest.TestCase):
     expected_full_url = (
         'https://fake-url.a.run.app/run')
     expected_auth_header = 'Bearer 12345'
-    expected_data = 'campaign_ids=123&endpoint=run'
+    expected_data = b'campaign_ids=123&endpoint=run'
 
     actual_response = main.app.test_client().post(
         '/proxy', json={
