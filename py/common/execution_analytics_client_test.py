@@ -68,7 +68,7 @@ class ExecutionAnalyticsClientTest(absltest.TestCase):
         'timestamp_micros': 1000000,
         'non_personalized_ads': 'false',
         'events': [{
-            'name': 'execution',
+            'name': 'select_item',
             'params': {
                 'keywords_modified': 1,
                 'ads_modified': 1,

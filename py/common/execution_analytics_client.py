@@ -80,7 +80,7 @@ class ExecutionAnalyticsClient:
         'timestamp_micros': now_ms,
         'non_personalized_ads': 'false',
         'events': [{
-            'name': 'execution',
+            'name': 'select_item',
             'params': {
                 'keywords_modified': worker_result.keywords_modified,
                 'ads_modified': worker_result.ads_modified,
