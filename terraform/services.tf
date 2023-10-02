@@ -83,7 +83,7 @@ resource "google_cloud_run_service" "backend_run" {
           value = var.opt_out
         }
       }
-      timeout_seconds = 900
+      timeout_seconds = 3200
     }
   }
 
