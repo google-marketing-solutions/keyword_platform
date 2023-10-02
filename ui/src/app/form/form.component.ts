@@ -29,6 +29,9 @@ import {GoogleAdsService} from '../services/google-ads.service';
 import {RunService} from '../services/run.service';
 import {TranslationService} from '../services/translation.service';
 
+
+const CAMPAIGN_CONTROL = 'campaigns';
+
 enum LanguageControl {
   SOURCE_LANGUAGE = 'source-language',
   TARGET_LANGUAGE = 'target-language'
@@ -69,6 +72,7 @@ export class FormComponent implements OnInit, AfterViewInit {
   sourceLanguageCode?: string;
   targetLanguageCode?: string;
   multipleTemplates = false;
+  showSpinner = false;
 
   private accountIds: string[] = [];
   private campaignIds: string[] = [];
@@ -104,7 +108,15 @@ export class FormComponent implements OnInit, AfterViewInit {
   accountSelection(value: SelectionDataGroup) {
     const account = value as GoogleAds[];
     const length = account.length;
-    this.campaigns = [];
+
+    // Reset campaign selections anytime accounts get selected in order to
+    // force validation handling otherwise campaign values from the previous UI
+    // interaction gets used even though they aren't visible in the campaign's
+    // selection field.
+    const controls = this.getFormControls();
+    const campaignControl = controls[CAMPAIGN_CONTROL];
+    campaignControl.reset();
+
     this.accountIds = [];
     if (length === 0) {
       return;
@@ -146,9 +158,8 @@ export class FormComponent implements OnInit, AfterViewInit {
     if (this.sourceLanguageCode && this.targetLanguageCode) {
       workers.push(Worker.TRANSLATION_WORKER);
     }
-    // Disable form upon request.
-    this.disableControls(true);
-    this.disableSlideToggles(true);
+
+    this.disableForm(true);
     this.requestStatus = RequestStatus.REQUESTED;
 
     // The clientId property is defined as a window object by the Google Tag
@@ -160,7 +171,6 @@ export class FormComponent implements OnInit, AfterViewInit {
     const clientId = windowObject.clientId;
 
     console.log('Run service requested.');
-
     this.runService
         .run(
             this.accountIds, this.campaignIds, this.sourceLanguageCode!,
@@ -168,11 +178,13 @@ export class FormComponent implements OnInit, AfterViewInit {
         .subscribe(
             (response => {
               this.requestStatus = RequestStatus.RESPONDED;
+              this.disableForm(false);
               this.openDialog(response.statusText!, response.body!);
               console.log('Run service request successful.');
             }),
             (error => {
               this.requestStatus = RequestStatus.ERROR;
+              this.disableForm(false);
               this.openDialog(error, null);
               console.error(error);
             }));
@@ -227,40 +239,48 @@ export class FormComponent implements OnInit, AfterViewInit {
     };
   }
 
-  private disableControls(disable: boolean) {
+  private disableForm(disable: boolean) {
     for (const control of Object.values(this.getFormControls())) {
       (disable) ? control.disable() : control.enable();
     }
-  }
 
-  private disableSlideToggles(disable: boolean) {
     for (const slideToggle of this.slideToggles) {
       slideToggle.setDisabledState(disable);
     }
   }
 
   private getAccounts() {
+    this.showSpinner = true;
     console.log('Accounts requested.');
     this.googleAdsService.getAccounts().subscribe(
         (response => {
+          this.showSpinner = false;
           this.accounts = response.body!;
+          this.disableForm(false);
           console.log('Accounts request successful.');
         }),
         (error => {
+          this.showSpinner = false;
+          this.disableForm(false);
           console.error(error);
         }));
   }
 
   private getCampaigns() {
+    this.disableForm(true);
+    this.showSpinner = true;
     console.log('Campaigns requested.');
-    this.campaigns = [];
     this.googleAdsService.getCampaigns(this.accountIds)
         .subscribe(
             (response => {
+              this.showSpinner = false;
               this.campaigns = response.body!;
+              this.disableForm(false);
               console.log('Campaigns request successful.');
             }),
             (error => {
+              this.showSpinner = false;
+              this.disableForm(false);
               console.error(error);
             }));
   }
@@ -271,11 +291,5 @@ export class FormComponent implements OnInit, AfterViewInit {
 
   private openDialog(statusText: string, value: Output|null) {
     this.dialog.open(DialogComponent, {data: {statusText, value}});
-    this.dialog.afterAllClosed.subscribe(() => {
-      // Enable form after the results rendered in the dialog container gets
-      // closed so that the form can be interacted with again.
-      this.disableControls(false);
-      this.disableSlideToggles(false);
-    });
   }
 }

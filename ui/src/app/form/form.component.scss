@@ -57,6 +57,12 @@
 }
 
 .spinner {
+  position: absolute;
+  left: 45%;
+  top: 350px;
+}
+
+.run-spinner {
   display:inline-block;
   margin-right: 10px;
   position: relative;

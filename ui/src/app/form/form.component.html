@@ -15,6 +15,9 @@
 -->
 
 <div class="content">
+  <div *ngIf="showSpinner" class="spinner">
+    <mat-spinner></mat-spinner>
+  </div>
   <mat-tab-group
       fitInkBarToContent
       mat-stretch-tabs="false"
@@ -57,6 +60,7 @@
               [className]="'responsive'"
               [values]="accounts"
               [label]="'Select accounts'"
+              [isDisabled]=true
               [isMultiple]=true
               [isRequired]=true
               (selectionEvent)="accountSelection($event)">
@@ -72,6 +76,7 @@
               [className]="'responsive'"
               [values]="campaigns"
               [label]="'Select campaigns'"
+              [isDisabled]=true
               [isMultiple]=true
               [isRequired]=true
               (selectionEvent)="campaignSelection($event)">
@@ -87,6 +92,7 @@
                 [className]="'static'"
                 [values]="languages"
                 [label]="'Select source language'"
+                [isDisabled]=true
                 [isMultiple]=false
                 [isRequired]=true
                 (selectionEvent)="sourceLanguageSelection($event)">
@@ -99,6 +105,7 @@
                 [className]="'static'"
                 [values]="languages"
                 [label]="'Select target language'"
+                [isDisabled]=true
                 [isMultiple]=false
                 [isRequired]=true
                 (selectionEvent)="targetLanguageSelection($event)">
@@ -111,6 +118,7 @@
           <mat-slide-toggle
               #slideToggle
               color="primary"
+              disabled="true"
               (change)="templatesTogglechange($event)">
             Multiple Google Ads Editor Templates</mat-slide-toggle>
         </div>
@@ -119,8 +127,8 @@
               mat-raised-button
               color="primary"
               type="submit"
-              [disabled]="hasFormError() || isRunRequestedStatus()">
-            <span *ngIf="isRunRequestedStatus()" class="spinner">
+              [disabled]="hasFormError() || showSpinner || isRunRequestedStatus()">
+            <span *ngIf="isRunRequestedStatus()" class="run-spinner">
               <mat-spinner [diameter]="25"></mat-spinner>
             </span>
             <span>Run</span>
