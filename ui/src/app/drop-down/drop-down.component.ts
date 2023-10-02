@@ -33,6 +33,7 @@ export class DropDownComponent implements OnInit {
   @Input() controllerName?: string;
   @Input() label?: string;
   @Input() className?: string;
+  @Input() isDisabled?: boolean;
   @Input() isMultiple?: boolean;
   @Input() isRequired?: boolean;
   @Input({required: true}) values!: SelectionData[];
@@ -48,6 +49,10 @@ export class DropDownComponent implements OnInit {
   ngOnInit() {
     if (this.isRequired) {
       this.control.addValidators(Validators.required);
+    }
+
+    if (this.isDisabled) {
+      this.control.disable();
     }
   }
 
@@ -91,12 +96,7 @@ export class DropDownComponent implements OnInit {
         this.selectionEvent.emit(selection);
       }
     } else {
-      // Toggling all selected options is always detected by this onChange event
-      // so do not emit this event when selection of all options is used or if
-      // used then do not emit when all selection options get deselected.
-      if (!this.isAllSelected) {
-        this.selectionEvent.emit(selection);
-      }
+      this.selectionEvent.emit(selection);
     }
   }
 }
