@@ -41,7 +41,7 @@ describe('RunService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should use http GET method', () => {
+  it('should use http POST method', () => {
     service
         .run(['1'], ['1'], 'en', 'de', false, ['translationWorker'], 'aaa.bbb')
         .subscribe();
