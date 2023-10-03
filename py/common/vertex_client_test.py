@@ -13,13 +13,19 @@
 # limitations under the License.
 
 import os
+import time
 from unittest import mock
 
+import google.api_core
 import vertexai
 from vertexai.language_models import TextGenerationModel
 
 from absl.testing import absltest
 from common import vertex_client as vertex_client_lib
+
+_FAKE_TEXT = 'This texts needs to be shortened because it is too long.'
+
+_TEST_CHAR_LIMIT = 30
 
 
 class VertexClientTest(absltest.TestCase):
@@ -42,58 +48,35 @@ class VertexClientTest(absltest.TestCase):
             autospec=True,
         )
     )
-    mock_response = mock.MagicMock()
-    mock_response.text = 'This text needs to be shorter.'
-    self.mock_model.return_value.predict.return_value = mock_response
+    self.mock_response = mock.MagicMock()
+    self.mock_response.text = 'This text needs to be shorter.'
 
   def test_shorten_text_to_char_limit(self):
-    fake_text_list = [
-        'This texts needs to be shortened because it is too long.',
-    ]
-    test_char_limit = 50
+    self.mock_model.return_value.predict.return_value = self.mock_response
     expected_prompt = f"""
           Make the following sentence simple and short:
 
-          {fake_text_list[0]}
+          {_FAKE_TEXT}
         """
     expected_result = ['This text needs to be shorter.']
     vertex_client = vertex_client_lib.VertexClient()
 
     actual_result = vertex_client.shorten_text_to_char_limit(
-        fake_text_list, 'en', test_char_limit
+        [_FAKE_TEXT], 'en', _TEST_CHAR_LIMIT
     )
 
     self.mock_model.return_value.predict.assert_has_calls([
         mock.call('Are you there?'),
         mock.call(
             expected_prompt,
-            temperature=0.2,
-            top_p=0.95,
+            temperature=0.4,
+            top_p=0.9,
             top_k=40,
-            max_output_tokens=13,
+            max_output_tokens=8,
         ),
     ])
     self.assertEqual(actual_result, expected_result)
     self.assertEqual(vertex_client.get_genai_characters_sent(), 133)
-
-  def test_shorten_text_to_char_limit_logs_warning_unsupported_language(
-      self,
-  ):
-    vertex_client = vertex_client_lib.VertexClient()
-
-    with self.assertLogs() as logs:
-      vertex_client.shorten_text_to_char_limit(['some_text'], 'unsupported', 50)
-
-    self.assertEqual(
-        logs.output,
-        [
-            (
-                'WARNING:absl:Language unsupported not supported.'
-                ' Returning original text list.'
-            )
-        ],
-    )
-    self.assertEqual(vertex_client.get_genai_characters_sent(), 0)
 
 
 if __name__ == '__main__':

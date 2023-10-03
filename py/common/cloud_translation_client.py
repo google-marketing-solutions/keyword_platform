@@ -167,9 +167,15 @@ class CloudTranslationClient:
     logging.info(
         'Completed translation for %d terms.', translation_frame.size())
 
-    self._shorten_overflowing_translations(
-        translation_frame, target_language_code
-    )
+    if target_language_code in vertex_client_lib.AVAILABLE_LANGUAGES:
+      self._shorten_overflowing_translations(
+          translation_frame, target_language_code
+      )
+    else:
+      logging.warning(
+          'Language %s not supported for shortening.',
+          target_language_code,
+      )
 
   def get_translated_characters(self) -> int:
     """Gets the number of characters sent to the translation API."""

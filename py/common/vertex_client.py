@@ -19,13 +19,16 @@ See class doctring for more details.
 from concurrent import futures
 import math
 import os
+
 from absl import logging
+import google.api_core
 import vertexai
 from vertexai.language_models import TextGenerationModel, TextGenerationResponse
-import ratelimiter
+
+from common import utils
+
 
 _MODEL = 'text-bison@001'
-_MAX_REQUESTS_PER_MINUTE = 60
 
 AVAILABLE_LANGUAGES = frozenset(['en'])
 
@@ -85,7 +88,6 @@ class VertexClient:
           ),
           text_list,
       )
-
     for item in generator:
       if isinstance(item, str):
         result.append(item)
@@ -113,25 +115,18 @@ class VertexClient:
       char_limit: The character limit to shorten the text to.
 
     Returns:
-      The a string that is under the passed character limit. If the
-      passed language code isn't supported the original text list is returned.
+      The a string that is under the passed character limit.
     """
-    if language_code not in AVAILABLE_LANGUAGES:
-      logging.warning(
-          'Language %s not supported. Returning original text list.',
-          language_code,
-      )
-      return text
-    else:
-      shortened_text = text
-      # One token has approximately 4 characters. This can be used to determine
-      # an output token number to start with.
-      start_output_tokens = math.ceil(char_limit / 4)
-      output_tokens = start_output_tokens
+    shortened_text = text
+    # One token has approximately 4 characters. This can be used to determine
+    # an output token number to start with.
+    start_output_tokens = math.ceil(char_limit / 4)
+    output_tokens = start_output_tokens
+    try:
       while len(shortened_text) > char_limit:
         parameters = {
-            'temperature': 0.2,
-            'top_p': 0.95,
+            'temperature': 0.4,
+            'top_p': 0.9,
             'top_k': 40,
             'max_output_tokens': output_tokens,
         }
@@ -140,7 +135,7 @@ class VertexClient:
 
           {text}
         """
-        response = self._send_rate_limited_prompt(shorten_prompt, **parameters)
+        response = self._send_prompt_with_backoff(shorten_prompt, **parameters)
         self._genai_characters_sent += len(shorten_prompt)
         shortened_text = response.text
         # Decrease the max number of output tokens by 1 for the next iteration.
@@ -151,10 +146,19 @@ class VertexClient:
           shortened_text,
           start_output_tokens - output_tokens,
       )
-      return shortened_text
+    # Catching broadly here to ensure the generator is never stopped
+    # prematurely.
+    except utils.MaxRetriesExceededError as err:
+      logging.error('Failed to shorten text: %s, returning original text.', err)
+    return shortened_text
 
-  @ratelimiter.RateLimiter(max_calls=_MAX_REQUESTS_PER_MINUTE, period=60)
-  def _send_rate_limited_prompt(
+  @utils.exponential_backoff_retry(
+      base_delay=2,
+      back_off_factor=2,
+      exceptions=[google.api_core.exceptions.ResourceExhausted],
+  )
+  def _send_prompt_with_backoff(
       self, prompt: str, **parameters
   ) -> TextGenerationResponse:
+    """Sends a prompt to the LLM."""
     return self._client.predict(prompt, **parameters)

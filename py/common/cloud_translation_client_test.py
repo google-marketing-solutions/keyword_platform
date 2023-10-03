@@ -43,7 +43,11 @@ class CloudTranslationClientTest(absltest.TestCase):
 
   @mock.patch.object(api_utils, 'refresh_access_token', autospec=True)
   @mock.patch.object(api_utils, 'send_api_request', autospec=True)
-  def test_translate(self, mock_send_api_request, mock_refresh_access_token):
+  def test_translate(
+      self,
+      mock_send_api_request,
+      mock_refresh_access_token,
+  ):
     credentials = {
         'client_id': 'fake_client_id',
         'client_secret': 'fake_client_secret',
@@ -51,7 +55,7 @@ class CloudTranslationClientTest(absltest.TestCase):
     }
     gcp_project_name = 'fake_gcp_project'
     source_language = 'en'
-    target_language = 'es'
+    target_language = 'available_language'
     api_version = 3
     batch_char_limit = 10  # Set to smaller size for testing
 
@@ -74,15 +78,18 @@ class CloudTranslationClientTest(absltest.TestCase):
 
     expected_translated_df = pd.DataFrame({
         'source_term': ['email', 'fast', 'efficient'],
-        'target_terms': [{'es': 'correo electrónico'},
-                         {'es': 'rápido'},
-                         {'es': 'eficiente'}],
+        'target_terms': [
+            {'available_language': 'correo electrónico'},
+            {'available_language': 'rápido'},
+            {'available_language': 'eficiente'},
+        ],
         'dataframe_locations': [
             [(0, 'Keyword'), (2, 'Keyword')],
             [(1, 'Keyword')],
-            [(2, 'Keyword')]],
+            [(2, 'Keyword')],
+        ],
         'char_limit': [90, 90, 90],
-        })
+    })
 
     mock_send_api_request.side_effect = [
         {'translations': [
@@ -95,39 +102,51 @@ class CloudTranslationClientTest(absltest.TestCase):
 
     expected_api_calls = [
         mock.call(
-            ('https://translate.googleapis.com/v3/projects/fake_gcp_project'
-             ':translateText'),
+            (
+                'https://translate.googleapis.com/v3/projects/fake_gcp_project'
+                ':translateText'
+            ),
             {
                 'contents': ['email', 'fast'],
                 'mimeType': 'text/plain',
                 'parent': 'projects/fake_gcp_project',
                 'source_language_code': 'en',
-                'target_language_code': 'es',
+                'target_language_code': 'available_language',
             },
             {
                 'Authorization': 'Bearer fake_access_token',
                 'Content-Type': 'application/json',
-            }),
+            },
+        ),
         mock.call(
-            ('https://translate.googleapis.com/v3/projects/fake_gcp_project'
-             ':translateText'),
+            (
+                'https://translate.googleapis.com/v3/projects/fake_gcp_project'
+                ':translateText'
+            ),
             {
                 'contents': ['efficient'],
                 'mimeType': 'text/plain',
                 'parent': 'projects/fake_gcp_project',
                 'source_language_code': 'en',
-                'target_language_code': 'es',
+                'target_language_code': 'available_language',
             },
             {
                 'Authorization': 'Bearer fake_access_token',
                 'Content-Type': 'application/json',
-            })
+            },
+        ),
     ]
 
-    cloud_translation_client.translate(
-        translation_frame=translation_frame,
-        source_language_code=source_language,
-        target_language_code=target_language)
+    with mock.patch.object(
+        vertex_client,
+        'AVAILABLE_LANGUAGES',
+        new=frozenset(['available_language']),
+    ):
+      cloud_translation_client.translate(
+          translation_frame=translation_frame,
+          source_language_code=source_language,
+          target_language_code=target_language,
+      )
 
     actual_translated_df = translation_frame.df()
 
@@ -141,7 +160,10 @@ class CloudTranslationClientTest(absltest.TestCase):
   @mock.patch.object(api_utils, 'refresh_access_token', autospec=True)
   @mock.patch.object(api_utils, 'send_api_request', autospec=True)
   def test_translate_exits_early_on_api_error(
-      self, mock_send_api_request, mock_refresh_access_token):
+      self,
+      mock_send_api_request,
+      mock_refresh_access_token,
+  ):
     credentials = {
         'client_id': 'fake_client_id',
         'client_secret': 'fake_client_secret',
@@ -149,7 +171,7 @@ class CloudTranslationClientTest(absltest.TestCase):
     }
     gcp_project_name = 'fake_gcp_project'
     source_language = 'en'
-    target_language = 'es'
+    target_language = 'available_language'
     api_version = 3
     batch_char_limit = 10  # Set to smaller size for testing
 
@@ -172,15 +194,18 @@ class CloudTranslationClientTest(absltest.TestCase):
 
     expected_translated_df = pd.DataFrame({
         'source_term': ['email', 'fast', 'efficient'],
-        'target_terms': [{'es': 'correo electrónico'},
-                         {'es': 'rápido'},
-                         {}],
+        'target_terms': [
+            {'available_language': 'correo electrónico'},
+            {'available_language': 'rápido'},
+            {},
+        ],
         'dataframe_locations': [
             [(0, 'Keyword'), (2, 'Keyword')],
             [(1, 'Keyword')],
-            [(2, 'Keyword')]],
+            [(2, 'Keyword')],
+        ],
         'char_limit': [90, 90, 90],
-        })
+    })
 
     mock_send_api_request.side_effect = [
         {'translations': [
@@ -190,15 +215,21 @@ class CloudTranslationClientTest(absltest.TestCase):
 
     mock_refresh_access_token.return_value = 'fake_access_token'
 
-    try:
-      cloud_translation_client.translate(
-          translation_frame=translation_frame,
-          source_language_code=source_language,
-          target_language_code=target_language)
-    except requests.exceptions.HTTPError:
-      # Simulating a caller catching the error and patching in the partially
-      # complete data.
-      print('Skipping exception')
+    with mock.patch.object(
+        vertex_client,
+        'AVAILABLE_LANGUAGES',
+        new=frozenset(['available_language']),
+    ):
+      try:
+        cloud_translation_client.translate(
+            translation_frame=translation_frame,
+            source_language_code=source_language,
+            target_language_code=target_language,
+        )
+      except requests.exceptions.HTTPError:
+        # Simulating a caller catching the error and patching in the partially
+        # complete data.
+        print('Skipping exception')
 
     actual_translated_df = translation_frame.df()
 
@@ -211,7 +242,10 @@ class CloudTranslationClientTest(absltest.TestCase):
   @mock.patch.object(api_utils, 'refresh_access_token', autospec=True)
   @mock.patch.object(api_utils, 'send_api_request', autospec=True)
   def test_translate_shortens_translations(
-      self, mock_send_api_request, mock_refresh_access_token):
+      self,
+      mock_send_api_request,
+      mock_refresh_access_token,
+  ):
     credentials = {
         'client_id': 'fake_client_id',
         'client_secret': 'fake_client_secret',
@@ -219,7 +253,7 @@ class CloudTranslationClientTest(absltest.TestCase):
     }
     gcp_project_name = 'fake_gcp_project'
     source_language = 'en'
-    target_language = 'es'
+    target_language = 'available_language'
     api_version = 3
     batch_char_limit = 2500
 
@@ -254,24 +288,29 @@ class CloudTranslationClientTest(absltest.TestCase):
     })
 
     expected_translated_df = pd.DataFrame({
-        'source_term': ['term_to_overflow_1',
-                        'term_that_fits_1',
-                        'term_to_overflow_2',
-                        'term_that_fits_2',
-                        'term_to_overflow_3'],
-        'target_terms': [{'es': 'shortened1'},
-                         {'es': 'untruncated_translation_1'},
-                         {'es': 'shortened2'},
-                         {'es': 'untruncated_translation_2'},
-                         {'es': 'shortened3'}],
+        'source_term': [
+            'term_to_overflow_1',
+            'term_that_fits_1',
+            'term_to_overflow_2',
+            'term_that_fits_2',
+            'term_to_overflow_3',
+        ],
+        'target_terms': [
+            {'available_language': 'shortened1'},
+            {'available_language': 'untruncated_translation_1'},
+            {'available_language': 'shortened2'},
+            {'available_language': 'untruncated_translation_2'},
+            {'available_language': 'shortened3'},
+        ],
         'dataframe_locations': [
             [(0, 'Keyword'), (2, 'Keyword')],
             [(1, 'Keyword')],
             [(3, 'Keyword')],
             [(4, 'Keyword')],
-            [(5, 'Keyword')]],
+            [(5, 'Keyword')],
+        ],
         'char_limit': [10, 90, 15, 90, 15],
-        })
+    })
 
     mock_send_api_request.side_effect = [
         {'translations': [
@@ -283,10 +322,16 @@ class CloudTranslationClientTest(absltest.TestCase):
 
     mock_refresh_access_token.return_value = 'fake_access_token'
 
-    cloud_translation_client.translate(
-        translation_frame=translation_frame,
-        source_language_code=source_language,
-        target_language_code=target_language)
+    with mock.patch.object(
+        vertex_client,
+        'AVAILABLE_LANGUAGES',
+        new=frozenset(['available_language']),
+    ):
+      cloud_translation_client.translate(
+          translation_frame=translation_frame,
+          source_language_code=source_language,
+          target_language_code=target_language,
+      )
 
     actual_translated_df = translation_frame.df()
 
@@ -295,6 +340,55 @@ class CloudTranslationClientTest(absltest.TestCase):
         expected_translated_df, actual_translated_df, check_index_type=False)
     # Asserts the number of characters sent to the Cloud Translation API.
     self.assertEqual(cloud_translation_client.get_translated_characters(), 86)
+
+  @mock.patch.object(api_utils, 'refresh_access_token', autospec=True)
+  @mock.patch.object(api_utils, 'send_api_request', autospec=True)
+  def test_shorten_text_to_char_limit_not_called_unsupported_language(
+      self, mock_send_api_request, mock_refresh_access_token
+  ):
+    del mock_send_api_request, mock_refresh_access_token
+    credentials = {
+        'client_id': 'fake_client_id',
+        'client_secret': 'fake_client_secret',
+        'refresh_token': 'fake_refresh_token',
+    }
+    gcp_project_name = 'fake_gcp_project'
+    source_language = 'en'
+    target_language = 'unsupported_language'
+    api_version = 3
+    batch_char_limit = 10  # Set to smaller size for testing
+
+    cloud_translation_client = (
+        cloud_translation_client_lib.CloudTranslationClient(
+            credentials=credentials,
+            gcp_project_name=gcp_project_name,
+            api_version=api_version,
+            batch_char_limit=batch_char_limit,
+        )
+    )
+
+    translation_frame = translation_frame_lib.TranslationFrame({
+        'email': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(0, 'Keyword'), (2, 'Keyword')],
+            char_limit=90,
+        ),
+        'fast': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=90
+        ),
+        'efficient': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(2, 'Keyword')], char_limit=90
+        ),
+    })
+
+    cloud_translation_client.translate(
+        translation_frame=translation_frame,
+        source_language_code=source_language,
+        target_language_code=target_language,
+    )
+
+    mock_vertex_client = mock.create_autospec(vertex_client.VertexClient)
+    mock_vertex_client.shorten_text_to_char_limit.assert_not_called()
+
 
 if __name__ == '__main__':
   absltest.main()

@@ -10,6 +10,7 @@ httplib2
 pandas
 requests
 google-generativeai
+google-api-core
 google-cloud-aiplatform
 gcsfs
 XlsxWriter
