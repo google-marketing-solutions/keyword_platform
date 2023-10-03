@@ -83,7 +83,7 @@ resource "google_cloud_run_service" "backend_run" {
           value = var.opt_out
         }
       }
-      timeout_seconds = 3200
+      timeout_seconds = 3600
     }
   }
 
@@ -118,7 +118,7 @@ resource "google_cloud_run_service" "frontend_run" {
     metadata {
       annotations = {
         "autoscaling.knative.dev/minScale" = "1"
-        "autoscaling.knative.dev/maxScale" = "1"
+        "autoscaling.knative.dev/maxScale" = "5"
       }
     }
 
@@ -128,14 +128,21 @@ resource "google_cloud_run_service" "frontend_run" {
       containers {
         image = data.google_container_registry_image.frontend_latest.image_url
 
+        resources {
+          limits = {
+            cpu = "2000m"
+            memory = "2Gi"
+          }
+        }
+
         env {
           name  = "BACKEND_URL"
           value = local.backend_url
         }
       }
+      timeout_seconds = 3600
     }
   }
-
   autogenerate_revision_name = true
 
   traffic {
