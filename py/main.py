@@ -46,6 +46,9 @@ def main() -> flask.Response:
   multiple_templates = flask.request.form.get(
       'multiple_templates', default=False, type=lambda v: v.lower() == 'true'
   )
+  translate_ads = flask.request.form.get(
+      'translate_ads', default=True, type=lambda v: v.lower() == 'true'
+  )
   client_id = flask.request.form.get('client_id')
 
   settings = settings_lib.Settings(
@@ -56,6 +59,7 @@ def main() -> flask.Response:
       workers_to_run=workers_to_run,
       multiple_templates=multiple_templates,
       client_id=client_id,
+      translate_ads=translate_ads,
   )
 
   logging.info('Built run settings: %s', settings)
