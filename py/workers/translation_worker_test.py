@@ -504,6 +504,76 @@ _EXPECTED_ADS_DF = pd.DataFrame(
     },
 )
 
+_EXPECTED_ADS_DF_WHEN_TRANSLATION_SKIPPED = pd.DataFrame(
+    {
+        'Action': ['Add', 'Add'],
+        'Customer ID': ['Enter customer ID', 'Enter customer ID'],
+        'Ad status': ['Paused', 'Paused'],
+        'Campaign': [
+            'Gmail Test Campaign',
+            'Analytics Test Campaign',
+        ],
+        'Ad group': ['Ad group 1', 'Ad group 1'],
+        'Ad type': ['Responsive search ad', 'Responsive search ad'],
+        'Headline 1': ['Email Login', 'Official Website'],
+        'Original Headline 1': ['Email Login', 'Official Website'],
+        'Headline 2': ['Online Email', 'Official Site'],
+        'Original Headline 2': ['Online Email', 'Official Site'],
+        'Headline 3': ['Sign in', 'High Quality Products'],
+        'Original Headline 3': ['Sign in', 'High Quality Products'],
+        'Headline 4': ['', ''],
+        'Original Headline 4': ['', ''],
+        'Headline 5': ['', ''],
+        'Original Headline 5': ['', ''],
+        'Headline 6': ['', ''],
+        'Original Headline 6': ['', ''],
+        'Headline 7': ['', ''],
+        'Original Headline 7': ['', ''],
+        'Headline 8': ['', ''],
+        'Original Headline 8': ['', ''],
+        'Headline 9': ['', ''],
+        'Original Headline 9': ['', ''],
+        'Headline 10': ['', ''],
+        'Original Headline 10': ['', ''],
+        'Headline 11': ['', ''],
+        'Original Headline 11': ['', ''],
+        'Headline 12': ['', ''],
+        'Original Headline 12': ['', ''],
+        'Headline 13': ['', ''],
+        'Original Headline 13': ['', ''],
+        'Headline 14': ['', ''],
+        'Original Headline 14': ['', ''],
+        'Headline 15': ['', ''],
+        'Original Headline 15': ['', ''],
+        'Description 1': [
+            'Email thats intuitive, efficient, and useful',
+            'Google Analytics',
+        ],
+        'Original Description 1': [
+            'Email thats intuitive, efficient, and useful',
+            'Google Analytics',
+        ],
+        'Description 2': [
+            '15 GB of storage, less spam, and mobile access',
+            'Try Analytics today!',
+        ],
+        'Original Description 2': [
+            '15 GB of storage, less spam, and mobile access',
+            'Try Analytics today!',
+        ],
+        'Description 3': ['', ''],
+        'Original Description 3': ['', ''],
+        'Description 4': ['', ''],
+        'Original Description 4': ['', ''],
+        'Final URL': [
+            'https://mail.google.com/',
+            'http://analytics.google.com',
+        ],
+        'Labels': ['Keyword Translator', 'Keyword Translator'],
+        'Updates applied': [[], []],
+    },
+)
+
 _EXPECTED_CAMPAIGNS_DF = pd.DataFrame(
     {
         'Action': ['Add', 'Add', 'Add'],
@@ -602,6 +672,7 @@ class TranslationWorkerTest(absltest.TestCase):
     settings = settings_lib.Settings(
         source_language_code='en',
         target_language_codes=['es'],
+        translate_ads=True
     )
 
     # Arranges google ads objects
@@ -687,7 +758,8 @@ class TranslationWorkerTest(absltest.TestCase):
   @mock.patch.object(api_utils, 'refresh_access_token', autospec=True)
   @mock.patch.object(api_utils, 'send_api_request', autospec=True)
   def test_execute_sets_warning_msg_when_exception_cause(
-          self, mock_send_api_request, mock_refresh_access_token):
+      self, mock_send_api_request, mock_refresh_access_token
+  ):
     # Arranges mock translation API
     credentials = {
         'client_id': 'fake_client_id',
@@ -741,6 +813,62 @@ class TranslationWorkerTest(absltest.TestCase):
 
     # Asserts result
     self.assertEqual(expected_warning_msg, result.warning_msg)
+
+  @mock.patch.object(api_utils, 'refresh_access_token', autospec=True)
+  @mock.patch.object(api_utils, 'send_api_request', autospec=True)
+  def test_execute_does_not_translate_ads_when_translate_ads_is_false(
+          self, mock_send_api_request, mock_refresh_access_token):
+    # Arranges mock translation API
+    credentials = {
+        'client_id': 'fake_client_id',
+        'client_secret': 'fake_client_secret',
+        'refresh_token': 'fake_refresh_token',
+    }
+    gcp_project_name = 'fake_gcp_project'
+    api_version = 3
+
+    cloud_translation_client = (
+        cloud_translation_client_lib.CloudTranslationClient(
+            credentials=credentials,
+            gcp_project_name=gcp_project_name,
+            api_version=api_version))
+
+    mock_send_api_request.side_effect = [
+        {'translations': [
+            {'translatedText': 'correo electrónico'},
+            {'translatedText': 'rápido'}]}]
+
+    mock_refresh_access_token.return_value = 'fake_access_token'
+
+    # Arranges settings
+    settings = settings_lib.Settings(
+        source_language_code='en',
+        target_language_codes=['es'],
+        translate_ads=False
+    )
+
+    # Arranges google ads objects
+    google_ads_objects = google_ads_objects_lib.GoogleAdsObjects(
+        ads=ads_lib.Ads(_ADS_DATA_GOOGLE_ADS_API_RESPONSE),
+        keywords=keywords_lib.Keywords(_KEYWORDS_GOOGLE_ADS_API_RESPONSE),
+        campaigns=campaigns_lib.Campaigns(_CAMPAIGNS_GOOGLE_ADS_API_RESPONSE),
+        ad_groups=ad_groups_lib.AdGroups(_AD_GROUPS_GOOGLE_ADS_RESPONSE))
+
+    # Arranges translation worker
+    translation_worker = translation_worker_lib.TranslationWorker(
+        cloud_translation_client=cloud_translation_client, vertex_client=None
+    )
+
+    # Act
+    translation_worker.execute(
+            settings=settings, google_ads_objects=google_ads_objects)
+
+    # Asserts ads not translated
+    actual_ads_df = google_ads_objects.ads.df()
+
+    pd.testing.assert_frame_equal(
+        actual_ads_df, _EXPECTED_ADS_DF_WHEN_TRANSLATION_SKIPPED,
+        check_index_type=False)
 
 
 if __name__ == '__main__':
