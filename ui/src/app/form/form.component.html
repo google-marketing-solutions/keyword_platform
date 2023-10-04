@@ -123,6 +123,16 @@
             Multiple Google Ads Editor Templates</mat-slide-toggle>
         </div>
         <div class="component">
+          <p class="sub-title">If enabled, will translate ad headline and descriptions. If not
+            enabled, only keywords will be translated.</p>
+          <mat-slide-toggle
+              #slideToggle
+              color="primary"
+              disabled="true"
+              (change)="translateAdsTogglechange($event)">
+            Translate Ad Headlines/Descriptions</mat-slide-toggle>
+        </div>
+        <div class="component">
           <button
               mat-raised-button
               color="primary"
