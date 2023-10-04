@@ -22,7 +22,11 @@ backend container.
 
 import logging
 import os
+import signal as signal_lib
+import sys
+import types
 import urllib
+
 
 import flask
 import flask_cors
@@ -104,5 +108,20 @@ def proxy() -> flask.Response:
     return urllib.request.urlopen(request)
 
 
+# [START cloudrun_sigterm_handler]
+def shutdown_handler(signal: int, frame: types.FrameType) -> None:
+  """Gracefully shutdown app."""
+  print(f'FrameType: {frame}')
+  print(f'Signal received, shutting down: {signal}.')
+  print('Exiting process.', flush=True)
+  sys.exit(0)
+
+
 if __name__ == '__main__':
+  # handles Ctrl-C locally
+  signal_lib.signal(signal_lib.SIGINT, shutdown_handler)
+
   app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+else:
+  # handles Cloud Run container termination
+  signal_lib.signal(signal_lib.SIGTERM, shutdown_handler)
