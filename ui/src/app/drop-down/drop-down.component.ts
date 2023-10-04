@@ -96,7 +96,12 @@ export class DropDownComponent implements OnInit {
         this.selectionEvent.emit(selection);
       }
     } else {
-      this.selectionEvent.emit(selection);
+      // Toggling all selected options is always detected by this onChange event
+      // so do not emit this event when selection of all options is used or if
+      // used then do not emit when all selection options get deselected.
+      if (!this.isAllSelected) {
+        this.selectionEvent.emit(selection);
+      }
     }
   }
 }
