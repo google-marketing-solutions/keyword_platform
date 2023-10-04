@@ -14,6 +14,7 @@
 
 """Common utilities for REST HTTP clients."""
 
+from absl import logging
 from typing import Any
 
 import requests
@@ -102,6 +103,10 @@ def send_api_request(
       url=url, method=method, json=params, headers=headers
   )
 
-  response.raise_for_status()
+  if response.status_code == 403:
+    logging.warning('403 Caught: %s', response)
+    return '403: Not allowed (Check permissions)'
+  else:
+    response.raise_for_status()
 
   return response.json()
