@@ -47,7 +47,7 @@ class TranslationWorker(base_worker.BaseWorker):
     """
     logging.info('Starting execution: %s', self.name)
 
-    if not google_ads_objects.keywords or not google_ads_objects.ads:
+    if not google_ads_objects.keywords and not google_ads_objects.ads:
       logging.warning('Skipping translation: Google Ads or Keywords empty.')
       return worker_result.WorkerResult(
           status=worker_result.Status.FAILURE,
@@ -59,10 +59,13 @@ class TranslationWorker(base_worker.BaseWorker):
         source_language_code=settings.source_language_code,
         target_language_code=settings.target_language_codes[0])
 
-    self._translate_ads(
-        ads=google_ads_objects.ads,
-        source_language_code=settings.source_language_code,
-        target_language_code=settings.target_language_codes[0])
+    if settings.translate_ads:
+      logging.info('Starting ad translation...')
+      self._translate_ads(
+          ads=google_ads_objects.ads,
+          source_language_code=settings.source_language_code,
+          target_language_code=settings.target_language_codes[0])
+      logging.info('Ad translation complete.')
 
     self._apply_translation_suffix_to_campaigns_and_ad_groups(
         campaigns=google_ads_objects.campaigns,
@@ -70,14 +73,21 @@ class TranslationWorker(base_worker.BaseWorker):
         target_language_code=settings.target_language_codes[0],
     )
 
+    ads_modified = (
+        google_ads_objects.ads.size() if google_ads_objects.ads else 0)
+
+    keywords_modified = (
+        google_ads_objects.keywords.size() if google_ads_objects.keywords else 0
+        )
+
     logging.info('Finished execution: %s', self.name)
 
     return worker_result.WorkerResult(
         status=worker_result.Status.SUCCESS,
         warning_msg=self._warning_msg,
         error_msg=self._error_msg,
-        keywords_modified=google_ads_objects.keywords.size(),
-        ads_modified=google_ads_objects.ads.size(),
+        keywords_modified=keywords_modified,
+        ads_modified=ads_modified,
         translation_chars_sent=(
             self._cloud_translation_client.get_translated_characters()
         ),

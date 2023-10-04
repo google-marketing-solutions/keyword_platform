@@ -275,7 +275,7 @@ class ExecutionRunner:
     return campaigns_lib.Campaigns(campaign_responses)
 
   def _build_ads_and_ad_groups(
-      self) -> tuple[ads_lib.Ads, ad_groups_lib.AdGroups]:
+      self) -> tuple[ads_lib.Ads | None, ad_groups_lib.AdGroups]:
     """Builds Ads and Ad Groups objects."""
     ads_data_responses = []
     campaigns = self._settings.campaigns
@@ -291,7 +291,12 @@ class ExecutionRunner:
       if isinstance(response, list):
         ads_data_responses.append(response)
 
-    ads = ads_lib.Ads(ads_data_responses)
+    if self._settings.translate_ads:
+      ads = ads_lib.Ads(ads_data_responses)
+    else:
+      logging.info('Skipping ads translation.')
+      ads = None
+
     ad_groups = ad_groups_lib.AdGroups(ads_data_responses)
 
     return ads, ad_groups
