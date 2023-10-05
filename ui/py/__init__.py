@@ -12,9 +12,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Init Google Cloud Logging."""
-
-import google.cloud.logging
-
-client = google.cloud.logging.Client()
-client.setup_logging()
