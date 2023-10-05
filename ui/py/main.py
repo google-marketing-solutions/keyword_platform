@@ -31,6 +31,7 @@ import urllib
 import flask
 import flask_cors
 import google.auth.transport.requests
+import google.cloud.logging
 import google.oauth2.id_token
 
 
@@ -38,6 +39,8 @@ import google.oauth2.id_token
 # Cloud Run Python container.
 _BACKEND_URL_ENV_VAR = 'BACKEND_URL'
 
+client = google.cloud.logging.Client()
+client.setup_logging()
 
 app = flask.Flask(
     __name__,
@@ -111,9 +114,8 @@ def proxy() -> flask.Response:
 # [START cloudrun_sigterm_handler]
 def shutdown_handler(signal: int, frame: types.FrameType) -> None:
   """Gracefully shutdown app."""
-  print(f'FrameType: {frame}')
-  print(f'Signal received, shutting down: {signal}.')
-  print('Exiting process.', flush=True)
+  del frame  # Unused.
+  logging.info('Signal received: %s. Shutting down.', signal)
   sys.exit(0)
 
 
