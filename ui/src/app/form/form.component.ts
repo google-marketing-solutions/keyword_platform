@@ -71,6 +71,7 @@ export class FormComponent implements OnInit, AfterViewInit {
   languages!: Language[];
   sourceLanguageCode?: string;
   targetLanguageCode?: string;
+  shortenTranslationsToCharLimit = false;
   multipleTemplates = false;
   translateAds = false;
   showSpinner = false;
@@ -158,6 +159,10 @@ export class FormComponent implements OnInit, AfterViewInit {
     this.translateAds = event.checked;
   }
 
+  shortenTogglechange(event: MatSlideToggleChange) {
+    this.shortenTranslationsToCharLimit = event.checked;
+  }
+
   onSubmit() {
     const workers = [];
     if (this.sourceLanguageCode && this.targetLanguageCode) {
@@ -179,8 +184,8 @@ export class FormComponent implements OnInit, AfterViewInit {
     this.runService
         .run(
             this.accountIds, this.campaignIds, this.sourceLanguageCode!,
-            this.targetLanguageCode!, this.multipleTemplates, workers, clientId,
-            this.translateAds)
+            this.targetLanguageCode!, this.shortenTranslationsToCharLimit,
+            this.multipleTemplates, workers, clientId, this.translateAds)
         .subscribe(
             (response => {
               this.requestStatus = RequestStatus.RESPONDED;
