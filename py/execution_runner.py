@@ -72,6 +72,7 @@ class ExecutionRunner:
     """
     self._settings = settings
     self._gcp_project_id = os.environ['GCP_PROJECT']
+    self._gcp_region = os.environ['GCP_REGION']
     self._settings.credentials = self._get_credentials()
     self._bucket_name = os.environ['BUCKET_NAME']
     self._ga_opt_out = os.environ['GA_OPT_OUT'].lower() == 'true'
@@ -98,7 +99,9 @@ class ExecutionRunner:
         cloud_translation_client_lib.CloudTranslationClient(
             credentials=self._settings.credentials,
             gcp_project_name=self._gcp_project_id,
-            vertex_client=self._vertex_client)
+            gcp_region=self._gcp_region,
+            vertex_client=self._vertex_client,
+        )
     )
 
     logging.info('ExecutionRunner: initialized Cloud Translation client.')
@@ -375,3 +378,7 @@ class ExecutionRunner:
     )
 
     return storage_client.export_google_ads_objects_to_gcs()
+
+  def list_glossaries(self) -> list[str]:
+    """Gets a list of available glossaries."""
+    return self._cloud_translation_client.list_glossaries()

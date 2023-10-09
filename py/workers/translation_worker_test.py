@@ -641,13 +641,17 @@ class TranslationWorkerTest(absltest.TestCase):
         'refresh_token': 'fake_refresh_token',
     }
     gcp_project_name = 'fake_gcp_project'
+    gcp_region = 'fake_gcp_region'
     api_version = 3
 
     cloud_translation_client = (
         cloud_translation_client_lib.CloudTranslationClient(
             credentials=credentials,
             gcp_project_name=gcp_project_name,
-            api_version=api_version))
+            gcp_region=gcp_region,
+            api_version=api_version,
+        )
+    )
 
     mock_send_api_request.side_effect = [
         {'translations': [
@@ -726,13 +730,17 @@ class TranslationWorkerTest(absltest.TestCase):
         'refresh_token': 'fake_refresh_token',
     }
     gcp_project_name = 'fake_gcp_project'
+    gcp_region = 'fake_gcp_region'
     api_version = 3
 
     cloud_translation_client = (
         cloud_translation_client_lib.CloudTranslationClient(
             credentials=credentials,
             gcp_project_name=gcp_project_name,
-            api_version=api_version))
+            gcp_region=gcp_region,
+            api_version=api_version,
+        )
+    )
 
     # Arranges settings
     settings = settings_lib.Settings(
@@ -767,13 +775,17 @@ class TranslationWorkerTest(absltest.TestCase):
         'refresh_token': 'fake_refresh_token',
     }
     gcp_project_name = 'fake_gcp_project'
+    gcp_region = 'fake_gcp_region'
     api_version = 3
 
     cloud_translation_client = (
         cloud_translation_client_lib.CloudTranslationClient(
             credentials=credentials,
             gcp_project_name=gcp_project_name,
-            api_version=api_version))
+            gcp_region=gcp_region,
+            api_version=api_version,
+        )
+    )
 
     mock_send_api_request.side_effect = [
         {'translations': [
@@ -825,13 +837,17 @@ class TranslationWorkerTest(absltest.TestCase):
         'refresh_token': 'fake_refresh_token',
     }
     gcp_project_name = 'fake_gcp_project'
+    gcp_region = 'fake_gcp_region'
     api_version = 3
 
     cloud_translation_client = (
         cloud_translation_client_lib.CloudTranslationClient(
             credentials=credentials,
             gcp_project_name=gcp_project_name,
-            api_version=api_version))
+            gcp_region=gcp_region,
+            api_version=api_version,
+        )
+    )
 
     mock_send_api_request.side_effect = [
         {'translations': [
@@ -861,7 +877,8 @@ class TranslationWorkerTest(absltest.TestCase):
 
     # Act
     translation_worker.execute(
-            settings=settings, google_ads_objects=google_ads_objects)
+        settings=settings, google_ads_objects=google_ads_objects
+    )
 
     # Asserts ads not translated
     actual_ads_df = google_ads_objects.ads.df()

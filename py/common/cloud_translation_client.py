@@ -28,7 +28,12 @@ TRANSLATE_API_BASE_URL = 'https://translate.googleapis.com'
 
 TRANSLATE_TEXT_ENDPOINT = (
     TRANSLATE_API_BASE_URL
-    + '/v{api_version}/projects/{gcp_project_name}:translateText'
+    + '/v{api_version}/projects/{gcp_project_name}/locations/{gcp_region}:translateText'
+)
+
+LIST_GLOSSARIES_ENDPOINT = (
+    TRANSLATE_API_BASE_URL
+    + '/v{api_version}/projects/{gcp_project_name}/locations/{gcp_region}/glossaries'
 )
 
 _API_VERSION = '3'
@@ -72,8 +77,9 @@ class CloudTranslationClient:
 
   def __init__(
       self,
-      credentials: dict[str, str],
       gcp_project_name: str,
+      gcp_region: str,
+      credentials: dict[str, str] | None = None,
       api_version: str = _API_VERSION,
       batch_char_limit: int = _DEFAULT_BATCH_CHAR_LIMIT,
       vertex_client: vertex_client_lib.VertexClient | None = None,
@@ -81,32 +87,36 @@ class CloudTranslationClient:
     """Instantiates the Clound Translation client.
 
     Args:
-      credentials: The Cloud API credentials as dict. Should contain client_id,
-        client_secret, and refresh_token keys.
       gcp_project_name: The name or ID of the Google Cloud Project associated
         with the credentials.
+      gcp_region: The Google Cloud Project region.
+      credentials: The Cloud API credentials as dict. Should contain client_id,
+        client_secret, and refresh_token keys.
       api_version: The Cloud Translate API API Version.
       batch_char_limit: The size of content batches to send to the translation
         API, in chars.
       vertex_client: An instance of the Vertex client for accessing LLM APIs.
     """
-    self.api_version = api_version
-    self.batch_char_limit = batch_char_limit
-    self.credentials = credentials
-    self.gcp_project_name = gcp_project_name
+    self._api_version = api_version
+    self._batch_char_limit = batch_char_limit
+    self._gcp_project_name = gcp_project_name
+    self._gcp_region = gcp_region
+    self._credentials = credentials
     # The access_token be lazily loaded and cached when the API is called to
     # ensure token is fresh and won't be retrieved repeatedly.
-    self.access_token = None
+    self._access_token = None
     self._vertex_client = vertex_client
     self._translated_characters = 0
-    api_utils.validate_credentials(self.credentials, _CREDENTIAL_REQUIRED_KEYS)
+    api_utils.validate_credentials(self._credentials, _CREDENTIAL_REQUIRED_KEYS)
     logging.info('Successfully initialized CloudTranslationClient.')
 
   def translate(
       self,
       translation_frame: translation_frame_lib.TranslationFrame,
       source_language_code: str,
-      target_language_code: str) -> None:
+      target_language_code: str,
+      glossary_id: str = '',
+  ) -> None:
     """Translates the terms in a translation frame in place.
 
     The translations will be added to the 'target_terms' column of the
@@ -116,16 +126,18 @@ class CloudTranslationClient:
       translation_frame: The terms to translate.
       source_language_code: The language to translate from.
       target_language_code: The language to translate to.
+      glossary_id: The glossary to use during tranlsation.
     """
     logging.info('Starting translation for %d terms.', translation_frame.size())
 
     batch_start = 0
-    parent = f'projects/{self.gcp_project_name}'
+    parent = f'projects/{self._gcp_project_name}'
 
     while batch_start < translation_frame.size():
 
       batch, next_batch_index = translation_frame.get_term_batch(
-          batch_start, self.batch_char_limit)
+          batch_start, self._batch_char_limit
+      )
 
       params = {
           'contents': batch,
@@ -134,9 +146,24 @@ class CloudTranslationClient:
           'source_language_code': source_language_code,
           'target_language_code': target_language_code,
       }
+      response_key = 'translations'
+      if glossary_id:
+        logging.info('Translating with glossary: %s', glossary_id)
+        glossary = (
+            f'{parent}/locations/{self._gcp_region}/glossaries/{glossary_id}'
+        )
+        params['glossaryConfig'] = {
+            'glossary': glossary,
+            'ignore_case': False,
+        }
+
+        response_key = 'glossaryTranslations'
 
       url = TRANSLATE_TEXT_ENDPOINT.format(
-          api_version=self.api_version, gcp_project_name=self.gcp_project_name)
+          api_version=self._api_version,
+          gcp_project_name=self._gcp_project_name,
+          gcp_region=self._gcp_region,
+      )
 
       try:
         response = api_utils.send_api_request(
@@ -154,7 +181,7 @@ class CloudTranslationClient:
                    batch_start,
                    batch_start + len(batch) - 1, translation_frame.size())
 
-      translations = [t['translatedText'] for t in response['translations']]
+      translations = [t['translatedText'] for t in response[response_key]]
 
       translation_frame.add_translations(
           start_index=batch_start,
@@ -187,10 +214,10 @@ class CloudTranslationClient:
     Returns:
       The authorization HTTP header.
     """
-    if not self.access_token:
-      self.access_token = api_utils.refresh_access_token(self.credentials)
+    if not self._access_token:
+      self._access_token = api_utils.refresh_access_token(self._credentials)
     return {
-        'Authorization': f'Bearer {self.access_token}',
+        'Authorization': f'Bearer {self._access_token}',
         'Content-Type': 'application/json',
     }
 
@@ -300,3 +327,26 @@ class CloudTranslationClient:
         translation_lengths
         > translation_frame.df()[translation_frame_lib.CHAR_LIMIT]
     ]
+
+  def list_glossaries(self) -> list[str]:
+    """Gets a list of available glossaries.
+
+    Returns:
+      A list of glossary IDs.
+    """
+    url = LIST_GLOSSARIES_ENDPOINT.format(
+        api_version=self._api_version,
+        gcp_project_name=self._gcp_project_name,
+        gcp_region=self._gcp_region,
+    )
+    try:
+      response = api_utils.send_api_request(url, {}, self._get_http_header())
+    except requests.exceptions.HTTPError as http_error:
+      logging.exception(
+          'Encountered error during calls to Translation API: %s', http_error
+      )
+      raise
+    glossary_ids = [
+        glossary['name'].split('/')[-1] for glossary in response['glossaries']
+    ]
+    return glossary_ids

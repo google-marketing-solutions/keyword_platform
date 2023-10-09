@@ -32,3 +32,4 @@ class Settings:
   multiple_templates: bool = False
   client_id: str = ''
   translate_ads: bool = True
+  glossary_id: str = ''
