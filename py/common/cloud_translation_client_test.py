@@ -351,6 +351,7 @@ class CloudTranslationClientTest(parameterized.TestCase):
             api_version=api_version,
             batch_char_limit=batch_char_limit,
             vertex_client=mock_vertex_client,
+            shorten_translations_to_char_limit=True,
         )
     )
 
@@ -422,10 +423,26 @@ class CloudTranslationClientTest(parameterized.TestCase):
     # Asserts the number of characters sent to the Cloud Translation API.
     self.assertEqual(cloud_translation_client.get_translated_characters(), 86)
 
+  @parameterized.named_parameters(
+      {
+          'testcase_name': 'unsupported_language',
+          'mock_target_language': 'unsupported_language',
+          'mock_shorten_translations_to_char_limit': True,
+      },
+      {
+          'testcase_name': 'opted_out_of_shorten_overflowing_translations',
+          'mock_target_language': 'available_language',
+          'mock_shorten_translations_to_char_limit': False,
+      },
+  )
   @mock.patch.object(api_utils, 'refresh_access_token', autospec=True)
   @mock.patch.object(api_utils, 'send_api_request', autospec=True)
   def test_shorten_text_to_char_limit_not_called_unsupported_language(
-      self, mock_send_api_request, mock_refresh_access_token
+      self,
+      mock_send_api_request,
+      mock_refresh_access_token,
+      mock_target_language,
+      mock_shorten_translations_to_char_limit,
   ):
     del mock_send_api_request, mock_refresh_access_token
     credentials = {
@@ -436,19 +453,24 @@ class CloudTranslationClientTest(parameterized.TestCase):
     gcp_project_name = 'fake_gcp_project'
     gcp_region = 'fake_gcp_region'
     source_language = 'en'
-    target_language = 'unsupported_language'
+    target_language = mock_target_language
+    shorten_translations_to_char_limit = mock_shorten_translations_to_char_limit
     api_version = 3
     batch_char_limit = 10  # Set to smaller size for testing
 
-    cloud_translation_client = (
-        cloud_translation_client_lib.CloudTranslationClient(
-            credentials=credentials,
-            gcp_project_name=gcp_project_name,
-            gcp_region=gcp_region,
-            api_version=api_version,
-            batch_char_limit=batch_char_limit,
-        )
-    )
+    with mock.patch.object(
+        vertex_client,
+        'AVAILABLE_LANGUAGES',
+        new=frozenset(['available_language']),
+    ):
+      cloud_translation_client = cloud_translation_client_lib.CloudTranslationClient(
+          credentials=credentials,
+          gcp_project_name=gcp_project_name,
+          gcp_region=gcp_region,
+          api_version=api_version,
+          batch_char_limit=batch_char_limit,
+          shorten_translations_to_char_limit=shorten_translations_to_char_limit,
+      )
 
     translation_frame = translation_frame_lib.TranslationFrame({
         'email': translation_metadata.TranslationMetadata(

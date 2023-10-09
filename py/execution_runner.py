@@ -85,8 +85,8 @@ class ExecutionRunner:
     except google.api_core.exceptions.PermissionDenied as err:
       self._vertex_client = None
       logging.info(
-          'ExecutionRunner: Vertex API client could not be initialized. Vertex'
-          ' AI will not be used: %s',
+          'ExecutionRunner: Vertex API client could not be initialized.'
+          ' Vertex AI will not be used: %s',
           err,
       )
 
@@ -101,6 +101,9 @@ class ExecutionRunner:
             gcp_project_name=self._gcp_project_id,
             gcp_region=self._gcp_region,
             vertex_client=self._vertex_client,
+            shorten_translations_to_char_limit=(
+                self._settings.shorten_translations_to_char_limit
+            ),
         )
     )
 
