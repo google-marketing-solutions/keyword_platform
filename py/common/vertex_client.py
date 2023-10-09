@@ -30,7 +30,7 @@ from common import utils
 
 _MODEL = 'text-bison@001'
 
-AVAILABLE_LANGUAGES = frozenset(['en'])
+AVAILABLE_LANGUAGES = frozenset(['en', 'es', 'de', 'ko', 'hi', 'zh'])
 
 _PROMPT_MAP = {
     'en': 'Make the following sentence simple and short:',
