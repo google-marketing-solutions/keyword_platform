@@ -43,6 +43,11 @@ def main() -> flask.Response:
   customer_ids = flask.request.form.get('customer_ids').split(',')
   campaigns = flask.request.form.get('campaigns').split(',')
   workers_to_run = flask.request.form.get('workers_to_run').split(',')
+  shorten_translations_to_char_limit = flask.request.form.get(
+      'shorten_translations_to_char_limit',
+      default=False,
+      type=lambda v: v.lower() == 'true',
+  )
   multiple_templates = flask.request.form.get(
       'multiple_templates', default=False, type=lambda v: v.lower() == 'true'
   )
@@ -58,6 +63,7 @@ def main() -> flask.Response:
       customer_ids=customer_ids,
       campaigns=campaigns,
       workers_to_run=workers_to_run,
+      shorten_translations_to_char_limit=shorten_translations_to_char_limit,
       multiple_templates=multiple_templates,
       client_id=client_id,
       translate_ads=translate_ads,

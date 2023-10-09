@@ -83,6 +83,7 @@ class CloudTranslationClient:
       api_version: str = _API_VERSION,
       batch_char_limit: int = _DEFAULT_BATCH_CHAR_LIMIT,
       vertex_client: vertex_client_lib.VertexClient | None = None,
+      shorten_translations_to_char_limit: bool = False,
   ) -> None:
     """Instantiates the Clound Translation client.
 
@@ -96,6 +97,8 @@ class CloudTranslationClient:
       batch_char_limit: The size of content batches to send to the translation
         API, in chars.
       vertex_client: An instance of the Vertex client for accessing LLM APIs.
+      shorten_translations_to_char_limit: Whether or not to shorten overflowing
+        translations.
     """
     self._api_version = api_version
     self._batch_char_limit = batch_char_limit
@@ -106,6 +109,9 @@ class CloudTranslationClient:
     # ensure token is fresh and won't be retrieved repeatedly.
     self._access_token = None
     self._vertex_client = vertex_client
+    self._shorten_translations_to_char_limit = (
+        shorten_translations_to_char_limit
+    )
     self._translated_characters = 0
     api_utils.validate_credentials(self._credentials, _CREDENTIAL_REQUIRED_KEYS)
     logging.info('Successfully initialized CloudTranslationClient.')
@@ -194,13 +200,16 @@ class CloudTranslationClient:
     logging.info(
         'Completed translation for %d terms.', translation_frame.size())
 
-    if target_language_code in vertex_client_lib.AVAILABLE_LANGUAGES:
+    if (
+        target_language_code in vertex_client_lib.AVAILABLE_LANGUAGES
+        and self._shorten_translations_to_char_limit
+    ):
       self._shorten_overflowing_translations(
           translation_frame, target_language_code
       )
     else:
       logging.warning(
-          'Language %s not supported for shortening.',
+          'Language %s not supported for shortening or user opted out.',
           target_language_code,
       )
 
