@@ -57,14 +57,18 @@ class TranslationWorker(base_worker.BaseWorker):
     self._translate_keywords(
         keywords=google_ads_objects.keywords,
         source_language_code=settings.source_language_code,
-        target_language_code=settings.target_language_codes[0])
+        target_language_code=settings.target_language_codes[0],
+        glossary_id=settings.glossary_id,
+    )
 
     if settings.translate_ads:
       logging.info('Starting ad translation...')
       self._translate_ads(
           ads=google_ads_objects.ads,
           source_language_code=settings.source_language_code,
-          target_language_code=settings.target_language_codes[0])
+          target_language_code=settings.target_language_codes[0],
+          glossary_id=settings.glossary_id,
+      )
       logging.info('Ad translation complete.')
 
     self._apply_translation_suffix_to_campaigns_and_ad_groups(
@@ -102,13 +106,16 @@ class TranslationWorker(base_worker.BaseWorker):
       self,
       keywords: keywords_lib.Keywords,
       source_language_code: str,
-      target_language_code: str) -> None:
+      target_language_code: str,
+      glossary_id: str | None = None,
+  ) -> None:
     """Translates the keywords data model.
 
     Args:
       keywords: The keywords data object to translate.
       source_language_code: The language code to translate from.
       target_language_code: The language code to translate to.
+      glossary_id: The glossary to use during translation.
     """
     logging.info('Starting keyword translation...')
 
@@ -118,6 +125,7 @@ class TranslationWorker(base_worker.BaseWorker):
           translation_frame=keywords_translation_frame,
           source_language_code=source_language_code,
           target_language_code=target_language_code,
+          glossary_id=glossary_id,
       )
     except requests.exceptions.HTTPError as http_error:
       # Catch the exception so we can write the data we did manage to
@@ -141,13 +149,16 @@ class TranslationWorker(base_worker.BaseWorker):
       self,
       ads: ads_lib.Ads,
       source_language_code: str,
-      target_language_code: str) -> None:
+      target_language_code: str,
+      glossary_id: str | None = None,
+  ) -> None:
     """Translates the ads data model.
 
     Args:
       ads: The ads data object to translate.
       source_language_code: The language code to translate from.
       target_language_code: The language code to translate to.
+      glossary_id: The glossary to use during translation.
     """
     logging.info('Starting ad translation...')
 
@@ -158,6 +169,7 @@ class TranslationWorker(base_worker.BaseWorker):
           translation_frame=ads_translation_frame,
           source_language_code=source_language_code,
           target_language_code=target_language_code,
+          glossary_id=glossary_id,
       )
     except requests.exceptions.HTTPError as http_error:
       # Catch the exception so we can write the data we did manage to

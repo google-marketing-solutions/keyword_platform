@@ -13,13 +13,14 @@
 # limitations under the License.
 
 """Tests for the CloudTranslationClient class."""
-
+import os
 from unittest import mock
 
 import pandas as pd
 import requests
 
 from absl.testing import absltest
+from absl.testing import parameterized
 from common import api_utils
 from common import cloud_translation_client as cloud_translation_client_lib
 from common import vertex_client
@@ -27,7 +28,7 @@ from data_models import translation_frame as translation_frame_lib
 from data_models import translation_metadata
 
 
-class CloudTranslationClientTest(absltest.TestCase):
+class CloudTranslationClientTest(parameterized.TestCase):
 
   def test_init_raises_exception_when_credentials_invalid(self):
     invalid_credentials = {
@@ -36,17 +37,113 @@ class CloudTranslationClientTest(absltest.TestCase):
         'refresh_token': 'fake_refresh_token',
     }
     gcp_project_name = 'fake_gcp_project'
+    gcp_region = 'fake_gcp_region'
 
     with self.assertRaises(AttributeError):
       cloud_translation_client_lib.CloudTranslationClient(
-          credentials=invalid_credentials, gcp_project_name=gcp_project_name)
+          credentials=invalid_credentials,
+          gcp_project_name=gcp_project_name,
+          gcp_region=gcp_region,
+      )
 
+  @parameterized.named_parameters(
+      {
+          'testcase_name': 'without_glossary',
+          'mock_glossary_id': '',
+          'expected_api_calls': [
+              mock.call(
+                  (
+                      'https://translate.googleapis.com/v3/projects/fake_gcp_project/'
+                      'locations/fake_gcp_region:translateText'
+                  ),
+                  {
+                      'contents': ['email', 'fast'],
+                      'mimeType': 'text/plain',
+                      'parent': 'projects/fake_gcp_project',
+                      'source_language_code': 'en',
+                      'target_language_code': 'available_language',
+                  },
+                  {
+                      'Authorization': 'Bearer fake_access_token',
+                      'Content-Type': 'application/json',
+                  },
+              ),
+              mock.call(
+                  (
+                      'https://translate.googleapis.com/v3/projects/fake_gcp_project/'
+                      'locations/fake_gcp_region:translateText'
+                  ),
+                  {
+                      'contents': ['efficient'],
+                      'mimeType': 'text/plain',
+                      'parent': 'projects/fake_gcp_project',
+                      'source_language_code': 'en',
+                      'target_language_code': 'available_language',
+                  },
+                  {
+                      'Authorization': 'Bearer fake_access_token',
+                      'Content-Type': 'application/json',
+                  },
+              ),
+          ],
+      },
+      {
+          'testcase_name': 'with_glossary',
+          'mock_glossary_id': 'en-to-available_language-glossary',
+          'expected_api_calls': [
+              mock.call(
+                  (
+                      'https://translate.googleapis.com/v3/projects/fake_gcp_project/'
+                      'locations/fake_gcp_region:translateText'
+                  ),
+                  {
+                      'contents': ['email', 'fast'],
+                      'mimeType': 'text/plain',
+                      'parent': 'projects/fake_gcp_project',
+                      'source_language_code': 'en',
+                      'target_language_code': 'available_language',
+                      'glossaryConfig': {
+                          'glossary': 'projects/fake_gcp_project/locations/fake_gcp_region/glossaries/en-to-available_language-glossary',
+                          'ignore_case': False,
+                      },
+                  },
+                  {
+                      'Authorization': 'Bearer fake_access_token',
+                      'Content-Type': 'application/json',
+                  },
+              ),
+              mock.call(
+                  (
+                      'https://translate.googleapis.com/v3/projects/fake_gcp_project/'
+                      'locations/fake_gcp_region:translateText'
+                  ),
+                  {
+                      'contents': ['efficient'],
+                      'mimeType': 'text/plain',
+                      'parent': 'projects/fake_gcp_project',
+                      'source_language_code': 'en',
+                      'target_language_code': 'available_language',
+                      'glossaryConfig': {
+                          'glossary': 'projects/fake_gcp_project/locations/fake_gcp_region/glossaries/en-to-available_language-glossary',
+                          'ignore_case': False,
+                      },
+                  },
+                  {
+                      'Authorization': 'Bearer fake_access_token',
+                      'Content-Type': 'application/json',
+                  },
+              ),
+          ],
+      },
+  )
   @mock.patch.object(api_utils, 'refresh_access_token', autospec=True)
   @mock.patch.object(api_utils, 'send_api_request', autospec=True)
   def test_translate(
       self,
       mock_send_api_request,
       mock_refresh_access_token,
+      mock_glossary_id,
+      expected_api_calls,
   ):
     credentials = {
         'client_id': 'fake_client_id',
@@ -54,6 +151,7 @@ class CloudTranslationClientTest(absltest.TestCase):
         'refresh_token': 'fake_refresh_token',
     }
     gcp_project_name = 'fake_gcp_project'
+    gcp_region = 'fake_gcp_region'
     source_language = 'en'
     target_language = 'available_language'
     api_version = 3
@@ -63,8 +161,11 @@ class CloudTranslationClientTest(absltest.TestCase):
         cloud_translation_client_lib.CloudTranslationClient(
             credentials=credentials,
             gcp_project_name=gcp_project_name,
+            gcp_region=gcp_region,
             api_version=api_version,
-            batch_char_limit=batch_char_limit))
+            batch_char_limit=batch_char_limit,
+        )
+    )
 
     translation_frame = translation_frame_lib.TranslationFrame({
         'email': translation_metadata.TranslationMetadata(
@@ -92,50 +193,23 @@ class CloudTranslationClientTest(absltest.TestCase):
     })
 
     mock_send_api_request.side_effect = [
-        {'translations': [
-            {'translatedText': 'correo electrónico'},
-            {'translatedText': 'rápido'}]},
-        {'translations': [
-            {'translatedText': 'eficiente'}]}]
+        {
+            'translations': [
+                {'translatedText': 'correo electrónico'},
+                {'translatedText': 'rápido'},
+            ],
+            'glossaryTranslations': [
+                {'translatedText': 'correo electrónico'},
+                {'translatedText': 'rápido'},
+            ],
+        },
+        {
+            'translations': [{'translatedText': 'eficiente'}],
+            'glossaryTranslations': [{'translatedText': 'eficiente'}],
+        },
+    ]
 
     mock_refresh_access_token.return_value = 'fake_access_token'
-
-    expected_api_calls = [
-        mock.call(
-            (
-                'https://translate.googleapis.com/v3/projects/fake_gcp_project'
-                ':translateText'
-            ),
-            {
-                'contents': ['email', 'fast'],
-                'mimeType': 'text/plain',
-                'parent': 'projects/fake_gcp_project',
-                'source_language_code': 'en',
-                'target_language_code': 'available_language',
-            },
-            {
-                'Authorization': 'Bearer fake_access_token',
-                'Content-Type': 'application/json',
-            },
-        ),
-        mock.call(
-            (
-                'https://translate.googleapis.com/v3/projects/fake_gcp_project'
-                ':translateText'
-            ),
-            {
-                'contents': ['efficient'],
-                'mimeType': 'text/plain',
-                'parent': 'projects/fake_gcp_project',
-                'source_language_code': 'en',
-                'target_language_code': 'available_language',
-            },
-            {
-                'Authorization': 'Bearer fake_access_token',
-                'Content-Type': 'application/json',
-            },
-        ),
-    ]
 
     with mock.patch.object(
         vertex_client,
@@ -146,6 +220,7 @@ class CloudTranslationClientTest(absltest.TestCase):
           translation_frame=translation_frame,
           source_language_code=source_language,
           target_language_code=target_language,
+          glossary_id=mock_glossary_id,
       )
 
     actual_translated_df = translation_frame.df()
@@ -170,6 +245,7 @@ class CloudTranslationClientTest(absltest.TestCase):
         'refresh_token': 'fake_refresh_token',
     }
     gcp_project_name = 'fake_gcp_project'
+    gcp_region = 'fake_gcp_region'
     source_language = 'en'
     target_language = 'available_language'
     api_version = 3
@@ -179,8 +255,11 @@ class CloudTranslationClientTest(absltest.TestCase):
         cloud_translation_client_lib.CloudTranslationClient(
             credentials=credentials,
             gcp_project_name=gcp_project_name,
+            gcp_region=gcp_region,
             api_version=api_version,
-            batch_char_limit=batch_char_limit))
+            batch_char_limit=batch_char_limit,
+        )
+    )
 
     translation_frame = translation_frame_lib.TranslationFrame({
         'email': translation_metadata.TranslationMetadata(
@@ -252,6 +331,7 @@ class CloudTranslationClientTest(absltest.TestCase):
         'refresh_token': 'fake_refresh_token',
     }
     gcp_project_name = 'fake_gcp_project'
+    gcp_region = 'fake_gcp_region'
     source_language = 'en'
     target_language = 'available_language'
     api_version = 3
@@ -267,6 +347,7 @@ class CloudTranslationClientTest(absltest.TestCase):
         cloud_translation_client_lib.CloudTranslationClient(
             credentials=credentials,
             gcp_project_name=gcp_project_name,
+            gcp_region=gcp_region,
             api_version=api_version,
             batch_char_limit=batch_char_limit,
             vertex_client=mock_vertex_client,
@@ -353,6 +434,7 @@ class CloudTranslationClientTest(absltest.TestCase):
         'refresh_token': 'fake_refresh_token',
     }
     gcp_project_name = 'fake_gcp_project'
+    gcp_region = 'fake_gcp_region'
     source_language = 'en'
     target_language = 'unsupported_language'
     api_version = 3
@@ -362,6 +444,7 @@ class CloudTranslationClientTest(absltest.TestCase):
         cloud_translation_client_lib.CloudTranslationClient(
             credentials=credentials,
             gcp_project_name=gcp_project_name,
+            gcp_region=gcp_region,
             api_version=api_version,
             batch_char_limit=batch_char_limit,
         )
@@ -388,6 +471,82 @@ class CloudTranslationClientTest(absltest.TestCase):
 
     mock_vertex_client = mock.create_autospec(vertex_client.VertexClient)
     mock_vertex_client.shorten_text_to_char_limit.assert_not_called()
+
+  @parameterized.named_parameters(
+      {
+          'testcase_name': 'glossaries_exist',
+          'expected_response': {
+              'glossaries': [
+                  {
+                      'name': 'projects/fake-project-id/locations/fake-region/glossaries/fake-glosssary-1',
+                      'languagePair': {
+                          'sourceLanguageCode': 'en',
+                          'targetLanguageCode': 'ru',
+                      },
+                      'inputConfig': {
+                          'gcsSource': {
+                              'inputUri': (
+                                  'gs://bucket-name/glossary-file-name-1'
+                              )
+                          }
+                      },
+                      'entryCount': 9603,
+                  },
+                  {
+                      'name': 'projects/fake-project-id/locations/fake-region/glossaries/fake-glosssary-2',
+                      'languagePair': {
+                          'sourceLanguageCode': 'en',
+                          'targetLanguageCode': 'es',
+                      },
+                      'inputConfig': {
+                          'gcsSource': {
+                              'inputUri': (
+                                  'gs://bucket-name/glossary-file-name-2'
+                              )
+                          }
+                      },
+                      'entryCount': 9604,
+                  },
+              ]
+          },
+          'expected_result': ['fake-glosssary-1', 'fake-glosssary-2'],
+      },
+      {
+          'testcase_name': 'glossaries_does_not_exist',
+          'expected_response': {'glossaries': []},
+          'expected_result': [],
+      },
+  )
+  @mock.patch.object(api_utils, 'refresh_access_token', autospec=True)
+  @mock.patch.object(api_utils, 'send_api_request', autospec=True)
+  def test_list_glossaies(
+      self,
+      mock_send_api_request,
+      mock_refresh_access_token,
+      expected_response,
+      expected_result,
+  ):
+    credentials = {
+        'client_id': 'fake_client_id',
+        'client_secret': 'fake_client_secret',
+        'refresh_token': 'fake_refresh_token',
+    }
+    gcp_project_name = 'fake_gcp_project'
+    gcp_region = 'fake_gcp_region'
+    api_version = 3
+    mock_refresh_access_token.return_value = 'fake_access_token'
+    mock_send_api_request.return_value = expected_response
+    cloud_translation_client = (
+        cloud_translation_client_lib.CloudTranslationClient(
+            credentials=credentials,
+            gcp_project_name=gcp_project_name,
+            gcp_region=gcp_region,
+            api_version=api_version,
+        )
+    )
+    actual_result = cloud_translation_client.list_glossaries()
+
+    self.assertEqual(actual_result, expected_result)
 
 
 if __name__ == '__main__':

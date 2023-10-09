@@ -240,6 +240,9 @@ class ExecutionRunnerTest(parameterized.TestCase):
         mock.patch.dict(os.environ, {'GCP_PROJECT': 'fake_gcp_project'})
     )
     self.enter_context(
+        mock.patch.dict(os.environ, {'GCP_REGION': 'fake_gcp_region'})
+    )
+    self.enter_context(
         mock.patch.dict(os.environ, {'BUCKET_NAME': 'fake_bucket_name'})
     )
     self.mock_ga_opt_out = self.enter_context(

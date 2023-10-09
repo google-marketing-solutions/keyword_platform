@@ -14,9 +14,9 @@
 
 """Entry point for Cloud Run."""
 import http
-import logging
 import os
 
+from absl import logging
 import flask
 import flask_cors
 import google.cloud.logging
@@ -50,6 +50,7 @@ def main() -> flask.Response:
       'translate_ads', default=True, type=lambda v: v.lower() == 'true'
   )
   client_id = flask.request.form.get('client_id')
+  glossary_id = flask.request.form.get('glossary_id')
 
   settings = settings_lib.Settings(
       source_language_code=source_language_code,
@@ -60,6 +61,7 @@ def main() -> flask.Response:
       multiple_templates=multiple_templates,
       client_id=client_id,
       translate_ads=translate_ads,
+      glossary_id=glossary_id,
   )
 
   logging.info('Built run settings: %s', settings)
@@ -172,7 +174,7 @@ def get_cost() -> flask.Response:
   try:
     cost_estimate = execution_runner.get_cost_estimate()
   except Exception as exception:
-                                  # (Isolation block for server)
+    # (Isolation block for server)
     logging.error('Execution Runner raised an exception trying to get '
                   'cost estimate: %s', exception)
     return flask.Response(
@@ -183,6 +185,34 @@ def get_cost() -> flask.Response:
   logging.info('Request complete: /cost')
 
   return flask.make_response(cost_estimate, http.HTTPStatus.OK)
+
+
+@app.route('/list_glossaries', methods=['GET'])
+def get_glossaries() -> flask.Response:
+  """End point to get list of glossaries.
+
+  Returns:
+    A response containing a list of available glossaries.
+  """
+  logging.info('Received request: /list_glossaries')
+  settings = settings_lib.Settings()
+  execution_runner = execution_runner_lib.ExecutionRunner(settings)
+  try:
+    glossaries = execution_runner.list_glossaries()
+  except Exception as exception:
+    # (Isolation block for server)
+    logging.error(
+        'Cloud Translation Client raised an exception trying to get '
+        'glossaries: %s',
+        exception,
+    )
+    return flask.Response(
+        ('The server encountered and error and could not complete your request.'
+         ' Developers can check the logs for details.'),
+        http.HTTPStatus.INTERNAL_SERVER_ERROR)
+  logging.info('Request complete: /list_glossaries')
+
+  return flask.make_response(glossaries, http.HTTPStatus.OK)
 
 
 if __name__ == '__main__':
