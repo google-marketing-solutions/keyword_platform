@@ -15,13 +15,36 @@
  * limitations under the License.
  */
 
-import {Injectable} from '@angular/core';
-
+import {Inject, Injectable} from '@angular/core';
 import {Language} from '../models/interfaces';
+import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse} from '@angular/common/http';
+import {Observable, throwError} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
+import {LOCATION_TOKEN} from '../shared/tokens';
 
 /** Translation service. */
 @Injectable({providedIn: 'root'})
 export class TranslationService {
+  constructor(
+    private readonly http: HttpClient,
+    @Inject(LOCATION_TOKEN) private readonly location: Location) {}
+
+  getGlossaries(): Observable<HttpResponse<string[]>> {
+    const params =
+        new HttpParams({fromObject: {'endpoint': 'list_glossaries'}});
+    return this.http
+        .get<string[]>(
+            this.getHost('list_glossaries'),
+            {
+              headers: this.getHeader(),
+              observe: 'response',
+              params,
+              responseType: 'json'
+            },
+            )
+        .pipe(catchError(this.handleError), map(response => response));
+  }
+
   // TODO(): Consider obtaining list of languages from the
   // Cloud Translation API, a Keyword Platform endpoint (if in the roadmap)
   // or a JSON file.
@@ -167,5 +190,19 @@ export class TranslationService {
       {code: 'yo', name: 'Yoruba'},
       {code: 'zu', name: 'Zulu'}
     ];
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    return throwError(error.message);
+  }
+
+  private getHeader() {
+    return new HttpHeaders({'Content-Type': 'application/json'});
+  }
+
+  private getHost(api: string) {
+    return (
+        this.location.hostname === 'localhost' ? './test-api/' + api + '.json' :
+                                                 './proxy');
   }
 }

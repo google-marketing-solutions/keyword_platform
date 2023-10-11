@@ -25,7 +25,7 @@ import {GoogleAds, Language} from './interfaces';
 /**
  * SelectionData type.
  */
-export type SelectionData = GoogleAds|Language;
+export type SelectionData = GoogleAds|Language|string;
 
 /**
  * SelectionData type grouping.
