@@ -19,6 +19,7 @@ import {AfterViewInit, ChangeDetectorRef, Component, OnInit, QueryList, ViewChil
 import {AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSlideToggle, MatSlideToggleChange} from '@angular/material/slide-toggle';
+import {MatCheckbox} from '@angular/material/checkbox';
 
 import {DialogComponent} from '../dialog/dialog.component';
 import {DropDownComponent} from '../drop-down/drop-down.component';
@@ -73,7 +74,8 @@ export class FormComponent implements OnInit, AfterViewInit {
   targetLanguageCode?: string;
   shortenTranslationsToCharLimit = false;
   multipleTemplates = false;
-  translateAds = false;
+  translateAds = true;
+  translateKeywords = true;
   showSpinner = false;
 
   private accountIds: string[] = [];
@@ -84,8 +86,8 @@ export class FormComponent implements OnInit, AfterViewInit {
   @ViewChildren('component')
   private readonly components!: QueryList<DropDownComponent>;
 
-  @ViewChildren('slideToggle')
-  private readonly slideToggles!: QueryList<MatSlideToggle>;
+  @ViewChildren('disableOnLoad')
+  private readonly disableOnLoad!: QueryList<MatSlideToggle|MatCheckbox>;
 
   constructor(
       private readonly changeRefDetector: ChangeDetectorRef,
@@ -151,18 +153,6 @@ export class FormComponent implements OnInit, AfterViewInit {
     this.targetLanguageCode = language.code;
   }
 
-  templatesTogglechange(event: MatSlideToggleChange) {
-    this.multipleTemplates = event.checked;
-  }
-
-  translateAdsTogglechange(event: MatSlideToggleChange) {
-    this.translateAds = event.checked;
-  }
-
-  shortenTogglechange(event: MatSlideToggleChange) {
-    this.shortenTranslationsToCharLimit = event.checked;
-  }
-
   onSubmit() {
     const workers = [];
     if (this.sourceLanguageCode && this.targetLanguageCode) {
@@ -185,7 +175,8 @@ export class FormComponent implements OnInit, AfterViewInit {
         .run(
             this.accountIds, this.campaignIds, this.sourceLanguageCode!,
             this.targetLanguageCode!, this.shortenTranslationsToCharLimit,
-            this.multipleTemplates, workers, clientId, this.translateAds)
+            this.multipleTemplates, workers, clientId, this.translateKeywords,
+            this.translateAds)
         .subscribe(
             (response => {
               this.requestStatus = RequestStatus.RESPONDED;
@@ -255,8 +246,8 @@ export class FormComponent implements OnInit, AfterViewInit {
       (disable) ? control.disable() : control.enable();
     }
 
-    for (const slideToggle of this.slideToggles) {
-      slideToggle.setDisabledState(disable);
+    for (const element of this.disableOnLoad) {
+      element.setDisabledState(disable);
     }
   }
 

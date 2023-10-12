@@ -30,7 +30,8 @@ export class RunService {
   run(accountIds: string[], campaignIds: string[], sourceLanguageCode: string,
       targetLanguageCode: string, shortenTranslationsToCharLimit: boolean,
       multipleTemplates: boolean, workers: string[], client_id: string,
-      translateAds: boolean): Observable<HttpResponse<Output>> {
+      translateKeywords: boolean, translateAds: boolean
+     ): Observable<HttpResponse<Output>> {
     return this.http
         .post<Output>(
             './proxy', {
@@ -42,6 +43,7 @@ export class RunService {
               'workers_to_run': workers.join(','),
               'multiple_templates': multipleTemplates.toString(),
               'client_id': client_id,
+              'translate_keywords': translateKeywords.toString(),
               'translate_ads': translateAds.toString(),
               'endpoint': 'run'
             },

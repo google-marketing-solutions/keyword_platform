@@ -22,6 +22,7 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatSelectModule} from '@angular/material/select';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatTabsModule} from '@angular/material/tabs';
@@ -42,7 +43,7 @@ describe('FormComponent', () => {
         BrowserAnimationsModule, FormsModule, HttpClientModule, MatDialogModule,
         MatFormFieldModule, MatIconModule, MatProgressSpinnerModule,
         MatSelectModule, ReactiveFormsModule, MatTabsModule,
-        MatSlideToggleModule
+        MatSlideToggleModule, MatCheckboxModule
       ]
     });
     fixture = TestBed.createComponent(FormComponent);

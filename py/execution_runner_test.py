@@ -536,7 +536,41 @@ class ExecutionRunnerTest(parameterized.TestCase):
 
     self.mock_execution_analytics_client.assert_not_called()
 
-  def test_translate_ads_setting_equals_false_does_not_fetch_ads_data(self):
+  @parameterized.named_parameters(
+      {
+          'testcase_name': 'translate_ads_false',
+          'mock_translate_ads': False,
+          'mock_translate_keywords': True,
+          'expected_cost_estimate_msg': (
+              'Estimated cost: $0.00 USD. '
+              '(0 ad chars + 20 keyword chars) * $0.000020/char.)'
+          ),
+      },
+      {
+          'testcase_name': 'translate_keywords_false',
+          'mock_translate_ads': True,
+          'mock_translate_keywords': False,
+          'expected_cost_estimate_msg': (
+              'Estimated cost: $0.00 USD. '
+              '(46 ad chars + 0 keyword chars) * $0.000020/char.)'
+          ),
+      },
+      {
+          'testcase_name': 'translate_ads_and_keywords_false',
+          'mock_translate_ads': False,
+          'mock_translate_keywords': False,
+          'expected_cost_estimate_msg': (
+              'Estimated cost: $0.00 USD. '
+              '(0 ad chars + 0 keyword chars) * $0.000020/char.)'
+          ),
+      },
+  )
+  def test_translate_ads_setting_equals_false_does_not_fetch_ads_data(
+      self,
+      mock_translate_ads,
+      mock_translate_keywords,
+      expected_cost_estimate_msg,
+  ):
     """Tests GoogleAdsObjects.Ads is not populated when translate_ads is False.
 
     This is tricky to test as still make the API call to populate AdGroups, and
@@ -550,7 +584,8 @@ class ExecutionRunnerTest(parameterized.TestCase):
         customer_ids=[123, 456],
         campaigns=[789, 101],
         workers_to_run=['translationWorker'],
-        translate_ads=False,
+        translate_ads=mock_translate_ads,
+        translate_keywords=mock_translate_keywords,
     )
 
     self.mock_google_ads_client.return_value.get_keywords_data_for_campaigns.return_value = (
@@ -560,10 +595,6 @@ class ExecutionRunnerTest(parameterized.TestCase):
     self.mock_google_ads_client.return_value.get_ads_data_for_campaigns.return_value = (
         _GOOGLE_ADS_RESPONSE
     )
-
-    expected_cost_estimate_msg = (
-        'Estimated cost: $0.00 USD. '
-        '(0 ad chars + 20 keyword chars) * $0.000020/char.)')
 
     execution_runner = execution_runner_lib.ExecutionRunner(settings)
     actual_cost_estimate_msg = execution_runner.get_cost_estimate()

@@ -21,6 +21,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
@@ -46,7 +47,7 @@ import {ServicesModule} from './services/services_module';
     MatButtonModule, MatSlideToggleModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatProgressSpinnerModule, MatSelectModule,
     ReactiveFormsModule, FormsModule, MatTabsModule, RouterModule,
-    ServicesModule
+    ServicesModule, MatCheckboxModule
   ],
   providers: [],
   bootstrap: [AppComponent]

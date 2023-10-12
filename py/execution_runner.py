@@ -307,7 +307,7 @@ class ExecutionRunner:
 
     return ads, ad_groups
 
-  def _build_keywords(self) -> keywords_lib.Keywords:
+  def _build_keywords(self) -> keywords_lib.Keywords | None:
     """Builds a Keywords object."""
 
     keywords_responses = []
@@ -326,7 +326,12 @@ class ExecutionRunner:
       if isinstance(response, list):
         keywords_responses.append(response)
 
-    return keywords_lib.Keywords(keywords_responses)
+    if self._settings.translate_keywords:
+      keywords = keywords_lib.Keywords(keywords_responses)
+    else:
+      logging.info('Skipping keywords translation.')
+      keywords = None
+    return keywords
 
   def _run_workers(
       self, google_ads_objects: google_ads_objects_lib.GoogleAdsObjects
