@@ -829,7 +829,8 @@ class TranslationWorkerTest(absltest.TestCase):
   @mock.patch.object(api_utils, 'refresh_access_token', autospec=True)
   @mock.patch.object(api_utils, 'send_api_request', autospec=True)
   def test_execute_does_not_translate_ads_when_translate_ads_is_false(
-          self, mock_send_api_request, mock_refresh_access_token):
+      self, mock_send_api_request, mock_refresh_access_token
+  ):
     # Arranges mock translation API
     credentials = {
         'client_id': 'fake_client_id',

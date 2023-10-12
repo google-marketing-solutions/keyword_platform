@@ -54,6 +54,9 @@ def main() -> flask.Response:
   translate_ads = flask.request.form.get(
       'translate_ads', default=True, type=lambda v: v.lower() == 'true'
   )
+  translate_keywords = flask.request.form.get(
+      'translate_keywords', default=True, type=lambda v: v.lower() == 'true'
+  )
   client_id = flask.request.form.get('client_id')
   glossary_id = flask.request.form.get('glossary_id')
 
@@ -67,6 +70,7 @@ def main() -> flask.Response:
       multiple_templates=multiple_templates,
       client_id=client_id,
       translate_ads=translate_ads,
+      translate_keywords=translate_keywords,
       glossary_id=glossary_id,
   )
 

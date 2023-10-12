@@ -53,13 +53,15 @@ class TranslationWorker(base_worker.BaseWorker):
           status=worker_result.Status.FAILURE,
           warning_msg='Skipping translation: Google Ads or Keywords empty.',
       )
-
-    self._translate_keywords(
-        keywords=google_ads_objects.keywords,
-        source_language_code=settings.source_language_code,
-        target_language_code=settings.target_language_codes[0],
-        glossary_id=settings.glossary_id,
-    )
+    if settings.translate_keywords:
+      logging.info('Starting keyword translation...')
+      self._translate_keywords(
+          keywords=google_ads_objects.keywords,
+          source_language_code=settings.source_language_code,
+          target_language_code=settings.target_language_codes[0],
+          glossary_id=settings.glossary_id,
+      )
+      logging.info('Keyword translation complete.')
 
     if settings.translate_ads:
       logging.info('Starting ad translation...')
