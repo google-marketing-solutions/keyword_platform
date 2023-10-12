@@ -500,7 +500,7 @@ class CloudTranslationClientTest(parameterized.TestCase):
           'expected_response': {
               'glossaries': [
                   {
-                      'name': 'projects/fake-project-id/locations/fake-region/glossaries/fake-glosssary-1',
+                      'name': 'projects/fake-project-id/locations/fake-region/glossaries/fake-glossary-1',
                       'languagePair': {
                           'sourceLanguageCode': 'en',
                           'targetLanguageCode': 'ru',
@@ -515,7 +515,7 @@ class CloudTranslationClientTest(parameterized.TestCase):
                       'entryCount': 9603,
                   },
                   {
-                      'name': 'projects/fake-project-id/locations/fake-region/glossaries/fake-glosssary-2',
+                      'name': 'projects/fake-project-id/locations/fake-region/glossaries/fake-glossary-2',
                       'languagePair': {
                           'sourceLanguageCode': 'en',
                           'targetLanguageCode': 'es',
@@ -531,7 +531,16 @@ class CloudTranslationClientTest(parameterized.TestCase):
                   },
               ]
           },
-          'expected_result': ['fake-glosssary-1', 'fake-glosssary-2'],
+          'expected_result': [
+              cloud_translation_client_lib.Glossary(
+                  id='fake-glossary-1',
+                  name='projects/fake-project-id/locations/fake-region/glossaries/fake-glossary-1',
+              ),
+              cloud_translation_client_lib.Glossary(
+                  id='fake-glossary-2',
+                  name='projects/fake-project-id/locations/fake-region/glossaries/fake-glossary-2',
+              ),
+          ],
       },
       {
           'testcase_name': 'glossaries_does_not_exist',
