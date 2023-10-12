@@ -16,6 +16,8 @@
 
 See class doctring for more details.
 """
+import dataclasses
+
 from absl import logging
 import pandas as pd
 import requests
@@ -51,6 +53,14 @@ _CREDENTIAL_REQUIRED_KEYS = (
 # average case, and stops us exceeding limits in the worst case of all chars
 # being represented by multiple code points.
 _DEFAULT_BATCH_CHAR_LIMIT = 1500
+
+
+@dataclasses.dataclass
+class Glossary:
+  """A class to represent a Glossary."""
+
+  id: str = dataclasses.field(default_factory=str)
+  name: str = dataclasses.field(default_factory=str)
 
 
 class CloudTranslationClient:
@@ -337,12 +347,13 @@ class CloudTranslationClient:
         > translation_frame.df()[translation_frame_lib.CHAR_LIMIT]
     ]
 
-  def list_glossaries(self) -> list[str]:
+  def list_glossaries(self) -> list[Glossary]:
     """Gets a list of available glossaries.
 
     Returns:
-      A list of glossary IDs.
+      A list of glossary objects.
     """
+    glossaries = []
     url = LIST_GLOSSARIES_ENDPOINT.format(
         api_version=self._api_version,
         gcp_project_name=self._gcp_project_name,
@@ -355,7 +366,8 @@ class CloudTranslationClient:
           'Encountered error during calls to Translation API: %s', http_error
       )
       raise
-    glossary_ids = [
-        glossary['name'].split('/')[-1] for glossary in response['glossaries']
-    ]
-    return glossary_ids
+    for glossary in response['glossaries']:
+      glossaries.append(
+          Glossary(id=glossary['name'].split('/')[-1], name=glossary['name'])
+      )
+    return glossaries

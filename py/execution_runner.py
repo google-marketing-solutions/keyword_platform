@@ -387,6 +387,6 @@ class ExecutionRunner:
 
     return storage_client.export_google_ads_objects_to_gcs()
 
-  def list_glossaries(self) -> list[str]:
+  def list_glossaries(self) -> list[cloud_translation_client_lib.Glossary]:
     """Gets a list of available glossaries."""
     return self._cloud_translation_client.list_glossaries()

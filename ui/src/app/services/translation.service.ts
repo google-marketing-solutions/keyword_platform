@@ -20,6 +20,8 @@ import {Language} from '../models/interfaces';
 import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse} from '@angular/common/http';
 import {Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
+
+import {Glossary} from '../models/interfaces';
 import {LOCATION_TOKEN} from '../shared/tokens';
 
 /** Translation service. */
@@ -29,11 +31,11 @@ export class TranslationService {
     private readonly http: HttpClient,
     @Inject(LOCATION_TOKEN) private readonly location: Location) {}
 
-  getGlossaries(): Observable<HttpResponse<string[]>> {
+  getGlossaries(): Observable<HttpResponse<Glossary[]>> {
     const params =
         new HttpParams({fromObject: {'endpoint': 'list_glossaries'}});
     return this.http
-        .get<string[]>(
+        .get<Glossary[]>(
             this.getHost('list_glossaries'),
             {
               headers: this.getHeader(),

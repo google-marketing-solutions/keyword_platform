@@ -28,6 +28,14 @@ export interface GoogleAds {
 }
 
 /**
+ * Glossary interface for API request/response.
+ */
+export interface Glossary {
+  id: string;
+  name: string;
+}
+
+/**
  * Language interface for input/output.
  */
 export interface Language {
