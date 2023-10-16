@@ -71,8 +71,12 @@ _ACCOUNTS_RESPONSES = [{
     }]
 
 _EXPECTED_ACCOUNTS_LIST = list([
-    accounts_lib.Account(id='5459155099', name='Account 1'),
-    accounts_lib.Account(id='8647404629', name='Account 2'),
+    accounts_lib.Account(
+        id='5459155099', name='Account 1', display_name='[5459155099] Account 1'
+    ),
+    accounts_lib.Account(
+        id='8647404629', name='Account 2', display_name='[8647404629] Account 2'
+    ),
 ])
 
 _CAMPAIGNS_RESPONSES = [
@@ -127,14 +131,17 @@ _EXPECTED_CAMPAIGNS_LIST = list([
     {
         'id': '11123',
         'name': 'Test Campaign 0',
+        'display_name': '[11123] Test Campaign 0',
     },
     {
         'id': '11124',
         'name': 'Test Campaign 1',
+        'display_name': '[11124] Test Campaign 1',
     },
     {
         'id': '11125',
         'name': 'Test Campaign 2',
+        'display_name': '[11125] Test Campaign 2',
     },
 ])
 

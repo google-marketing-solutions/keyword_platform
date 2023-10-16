@@ -196,14 +196,17 @@ _EXPECTED_LIST = list([
     {
         'id': '11123',
         'name': 'Test Campaign 0',
+        'display_name': '[11123] Test Campaign 0',
     },
     {
         'id': '11124',
         'name': 'Test Campaign 1',
+        'display_name': '[11124] Test Campaign 1',
     },
     {
         'id': '11125',
         'name': 'Test Campaign 2',
+        'display_name': '[11125] Test Campaign 2',
     },
 ])
 

@@ -156,9 +156,13 @@ class Campaigns:
     for response_json in response_jsons:
       for batch in response_json:
         for result in batch['results']:
+          campaign_name = result['campaign']['name']
+          campaign_id = result['campaign']['id']
+          campaign_display_name = f'[{campaign_id}] {campaign_name}'
           campaigns.append({
-              'id': result['campaign']['id'],
-              'name': result['campaign']['name'],
+              'id': campaign_id,
+              'name': campaign_name,
+              'display_name': campaign_display_name,
           })
 
     return campaigns
