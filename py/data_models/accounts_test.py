@@ -50,8 +50,14 @@ _EMPTY_GOOGLE_ADS_RESPONSE = [{
 }]
 
 _EXPECTED_LIST = [
-    accounts_lib.Account(id='5459155099', name='Account 1'),
-    accounts_lib.Account(id='8647404629', name='[NO NAME SET]'),
+    accounts_lib.Account(
+        id='5459155099', name='Account 1', display_name='[5459155099] Account 1'
+    ),
+    accounts_lib.Account(
+        id='8647404629',
+        name='[NO NAME SET]',
+        display_name='[8647404629] [NO NAME SET]',
+    ),
 ]
 
 
