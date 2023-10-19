@@ -100,10 +100,7 @@ class ExecutionAnalyticsClient:
         }],
     }
     if self._is_valid_hit(qs):
-      response = requests.post(self._url, json=qs)
-      if response.status_code != 200:
-        logging.error('GA4 hit failed to send: %s', json.loads(response.text))
-      return response
+      return requests.post(self._url, json=qs)
 
   def _is_valid_hit(self, qs: dict[str, Any]) -> bool:
     """Returns True if the hit is valid.
@@ -114,7 +111,7 @@ class ExecutionAnalyticsClient:
     is_valid_hit = True
     debug_response = requests.post(self._debug_url, json=qs)
     validation_messages = json.loads(debug_response.text)['validationMessages']
-    if (validation_messages or debug_response.status_code != 200):
+    if validation_messages:
       logging.debug('GA4 hit not valid: %s', validation_messages)
       is_valid_hit = False
     return is_valid_hit
