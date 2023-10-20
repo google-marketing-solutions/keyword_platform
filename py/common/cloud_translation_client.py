@@ -42,9 +42,8 @@ GLOSSARIES_ENDPOINT = (
     + '/v{api_version}/projects/{gcp_project_name}/locations/{gcp_region}/glossaries'
 )
 
-GLOSSARY_OPERATION_ENDPOINT = (
-    TRANSLATE_API_BASE_URL
-    + '/v{api_version}/{{name={operation_name}}}:{method}'
+OPERATION_ENDPOINT = (
+    TRANSLATE_API_BASE_URL + '/v{api_version}/{operation_name}:{method}'
 )
 
 _GLOSSARY_PATH = 'projects/{gcp_project_name}/locations/{gcp_region}/glossaries/{glossary_id}'
@@ -456,6 +455,7 @@ class CloudTranslationClient:
 
     try:
       self._delete_glossary(glossary_id)
+      logging.info('Deleted glossary with id %s', glossary_id)
     except google.api_core.exceptions.NotFound:
       logging.info('Creating glossary with id %s', glossary_id)
 
@@ -516,7 +516,7 @@ class CloudTranslationClient:
           operation['name'],
           input_uri,
       )
-      url = GLOSSARY_OPERATION_ENDPOINT.format(
+      url = OPERATION_ENDPOINT.format(
           api_version=self._api_version,
           operation_name=operation['name'],
           method='wait',
@@ -553,9 +553,12 @@ class CloudTranslationClient:
     try:
       api_utils.send_api_request(url, {}, self._get_http_header(), 'DELETE')
     except requests.exceptions.HTTPError as http_error:
-      logging.exception(
-          'Encountered error during calls to Translation API: %s', http_error
-      )
-      raise GlossaryError(
-          f'Failed to delete glossary with id {glossary_id}: {http_error}'
-      ) from http_error
+      if http_error.response.status_code == 404:
+        logging.info('Glossary with id %s not found.', glossary_id)
+      else:
+        logging.exception(
+            'Encountered error during calls to Translation API: %s', http_error
+        )
+        raise GlossaryError(
+            f'Failed to delete glossary with id {glossary_id}: {http_error}'
+        ) from http_error

@@ -16,6 +16,7 @@
 import os
 from unittest import mock
 
+import google.api_core
 import pandas as pd
 import requests
 
@@ -580,8 +581,8 @@ class CloudTranslationClientTest(parameterized.TestCase):
     }
 
     expected_operation_url = (
-        'https://translate.googleapis.com/v3/{name=projects/fake-project-id/'
-        'locations/fake-region/operations/fake-operation-id}:wait'
+        'https://translate.googleapis.com/v3/projects/fake-project-id/'
+        'locations/fake-region/operations/fake-operation-id:wait'
     )
     expected_operation_params = {'timeout': '300s'}
     expected_delete_url = os.path.join(expected_create_url, _FAKE_GLOSSARY_ID)
@@ -618,8 +619,10 @@ class CloudTranslationClientTest(parameterized.TestCase):
     ])
 
   def test_create_or_replace_glossary_raises_http_error(self):
-    self.mock_send_api_request.side_effect = requests.exceptions.HTTPError()
-
+    response = requests.Response()
+    response.status_code = 400
+    error = requests.exceptions.HTTPError(response=response)
+    self.mock_send_api_request.side_effect = error
     with self.assertRaises(cloud_translation_client_lib.GlossaryError):
       self.cloud_translation_client.create_or_replace_glossary(
           glossary_id=_FAKE_GLOSSARY_ID,
