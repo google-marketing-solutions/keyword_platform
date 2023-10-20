@@ -21,3 +21,8 @@ output "region" {
   value       = var.region
   description = "Region used to deploy Keyword Platform."
 }
+
+output "glossary_bucket" {
+  value       = "https://console.cloud.google.com/storage/browser/${local.glossary_bucket}"
+  description = "The storage bucket to upload glossary files."
+}

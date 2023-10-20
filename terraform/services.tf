@@ -26,6 +26,18 @@ resource "google_storage_bucket" "output_bucket" {
   force_destroy = true
 }
 
+resource "google_storage_bucket" "glossary_bucket" {
+  name                        = format("%s-glossaries", var.project_id)
+  storage_class               = "REGIONAL"
+  location                    = var.region
+  uniform_bucket_level_access = true
+  force_destroy = true
+}
+
+locals {
+  glossary_bucket = google_storage_bucket.glossary_bucket.name
+}
+
 ##
 # Cloud Run Services
 #
@@ -291,4 +303,35 @@ resource "google_secret_manager_secret_iam_member" "refresh_token-access" {
   secret_id = google_secret_manager_secret.refresh_token.id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.backend_sa.email}"
+}
+
+##
+# PubSub topics and subscriptions.
+#
+resource "google_pubsub_topic" "create_glossary" {
+  name = "create-glossary-topic"
+}
+
+resource "google_pubsub_subscription" "create_glossary_subscription" {
+  name  = "create-glossary-subscription"
+  topic = google_pubsub_topic.create_glossary.name
+  push_config {
+    push_endpoint = format("%s/create_glossary", google_cloud_run_service.backend_run.uri)
+    oidc_token {
+      service_account_email = google_service_account.pubsub_sa.email
+    }
+    attributes = {
+      x-goog-version = "v1"
+    }
+  }
+  depends_on = [google_cloud_run_service.backend_run]
+}
+
+resource "google_storage_notification" "glossary_notification" {
+  provider       = google-beta
+  bucket         = google_storage_bucket.glossary_bucket.name
+  event_types    = ["OBJECT_FINALIZE"]
+  payload_format = "JSON_API_V1"
+  topic          = google_pubsub_topic.create_glossary.id
+  depends_on     = [google_pubsub_topic_iam_binding.binding]
 }
