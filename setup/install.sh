@@ -192,9 +192,14 @@ terraform -chdir=./terraform plan \
   -var "iap_brand_id=$iap_brand_id" \
   -out="/tmp/tfplan"
 
-terraform -chdir=./terraform apply -auto-approve "/tmp/tfplan"
+terraform_apply_exit_code=$(terraform -chdir=./terraform apply -auto-approve "/tmp/tfplan" | tee /dev/tty | ( ! grep "Error applying plan" ); echo $?)
 
-echo "-----------------------------------------------------"
-echo "Congrats! You successfully deployed Keyword Platform."
-echo "-----------------------------------------------------"
-
+if [ $terraform_apply_exit_code -ne 0 ]; then
+  echo "--------------------------------------------------------------------------------------"
+  echo "Oops! Something didn't work, ensure you have Project Owner permissions and try again. "
+  echo "--------------------------------------------------------------------------------------"
+else
+  echo "-----------------------------------------------------"
+  echo "Congrats! You successfully deployed Keyword Platform."
+  echo "-----------------------------------------------------"
+fi
