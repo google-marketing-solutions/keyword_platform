@@ -34,6 +34,11 @@ resource "google_service_account" "iap_sa" {
   project      = var.project_id
 }
 
+resource "google_service_account" "pubsub_sa" {
+  account_id   = "keywordplatform-pubsub-invoker"
+  display_name = "Keyword Platform Pub/Sub Service Account"
+}
+
 resource "google_project_service_identity" "cloudbuild_managed_sa" {
   provider = google-beta
   project  = var.project_id
@@ -44,6 +49,12 @@ resource "google_project_service_identity" "iap_managed_sa" {
   provider = google-beta
   project  = var.project_id
   service  = "iap.googleapis.com"
+}
+
+resource "google_project_service_identity" "pubsub_agent" {
+  provider = google-beta
+  project  = var.project_id
+  service  = "pubsub.googleapis.com"
 }
 
 ##
@@ -124,6 +135,7 @@ data "google_iam_policy" "backend_run_users" {
     role = "roles/run.invoker"
     members = [
         "serviceAccount:${google_service_account.frontend_sa.email}",
+        "serviceAccount:${google_service_account.pubsub_sa.email}",
     ]
   }
 }
@@ -140,4 +152,28 @@ resource "google_cloud_run_service_iam_policy" "backend_run-invoker" {
   project = google_cloud_run_service.backend_run.project
   service = google_cloud_run_service.backend_run.name
   policy_data = data.google_iam_policy.backend_run_users.policy_data
+}
+
+resource "google_project_iam_binding" "project_token_creator" {
+  project = var.project_id
+  role    = "roles/iam.serviceAccountTokenCreator"
+  members = ["serviceAccount:${google_project_service_identity.pubsub_agent.email}"]
+}
+
+
+##
+# PubSub Permissions
+#
+
+// Enable notifications by giving the correct IAM permission to the unique service account.
+data "google_storage_project_service_account" "gcs_account" {
+  provider = google-beta
+}
+
+// Create a Pub/Sub topic.
+resource "google_pubsub_topic_iam_binding" "binding" {
+  provider = google-beta
+  topic    = google_pubsub_topic.create_glossary.id
+  role     = "roles/pubsub.publisher"
+  members  = ["serviceAccount:${data.google_storage_project_service_account.gcs_account.email_address}"]
 }
