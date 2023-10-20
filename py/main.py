@@ -15,6 +15,7 @@
 """Entry point for Cloud Run."""
 import base64
 import http
+import json
 import os
 
 from absl import logging
@@ -246,7 +247,9 @@ def create_glossary() -> flask.Response:
     return flask.make_response(f'Bad Request: {msg}', 400)
 
   pubsub_message = envelope['message']
-  event_data = base64.b64decode(pubsub_message['data']).decode('utf-8').strip()
+  event_data = json.loads(
+      base64.b64decode(pubsub_message['data']).decode('utf-8').strip()
+  )
   settings = settings_lib.Settings()
   execution_runner = execution_runner_lib.ExecutionRunner(settings)
   try:
