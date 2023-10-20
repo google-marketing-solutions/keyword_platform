@@ -316,7 +316,7 @@ resource "google_pubsub_subscription" "create_glossary_subscription" {
   name  = "create-glossary-subscription"
   topic = google_pubsub_topic.create_glossary.name
   push_config {
-    push_endpoint = format("%s/create_glossary", google_cloud_run_service.backend_run.uri)
+    push_endpoint = format("%s/create_glossary", local.backend_url)
     oidc_token {
       service_account_email = google_service_account.pubsub_sa.email
     }
