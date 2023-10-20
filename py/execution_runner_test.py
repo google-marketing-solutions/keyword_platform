@@ -258,7 +258,7 @@ class ExecutionRunnerTest(parameterized.TestCase):
     self.mock_storage_client = self.enter_context(
         mock.patch.object(storage_client, 'StorageClient', autospec=True)
     )
-    self.enter_context(
+    self.cloud_translation_client_mock = self.enter_context(
         mock.patch.object(
             cloud_translation_client, 'CloudTranslationClient', autospec=True
         )
@@ -607,6 +607,24 @@ class ExecutionRunnerTest(parameterized.TestCase):
     actual_cost_estimate_msg = execution_runner.get_cost_estimate()
 
     self.assertEqual(expected_cost_estimate_msg, actual_cost_estimate_msg)
+
+  def test_create_or_replace_glossary(self):
+    settings = settings_lib.Settings()
+    self.cloud_translation_client_mock.return_value.get_glossary_info_from_cloud_event_data.return_value = (
+        'fake_glossary_id',
+        'en',
+        'de',
+        'fake_path',
+    )
+    execution_runner_lib.ExecutionRunner(settings).create_or_replace_glossary(
+        'fake_event_data'
+    )
+    self.cloud_translation_client_mock.return_value.get_glossary_info_from_cloud_event_data.assert_called_once_with(
+        'fake_event_data'
+    )
+    self.cloud_translation_client_mock.return_value.create_or_replace_glossary.assert_called_once_with(
+        'fake_glossary_id', 'en', 'de', 'fake_path'
+    )
 
 
 if __name__ == '__main__':

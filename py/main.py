@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Entry point for Cloud Run."""
+import base64
 import http
 import os
 
@@ -223,6 +224,50 @@ def get_glossaries() -> flask.Response:
   logging.info('Request complete: /list_glossaries')
 
   return flask.make_response(glossaries, http.HTTPStatus.OK)
+
+
+@app.route('/create_glossary', methods=['POST'])
+def create_glossary() -> flask.Response:
+  """End point to create a glossaries.
+
+  Returns:
+    A glossary operation response.
+  """
+  logging.info('Received request: /create_glossary')
+  envelope = flask.request.get_json()
+  if not envelope:
+    msg = 'no Pub/Sub message received'
+    logging.error('Bad Request: %s', msg)
+    return flask.make_response(f'Bad Request: {msg}', 400)
+
+  if not isinstance(envelope, dict) or 'message' not in envelope:
+    msg = 'invalid Pub/Sub message format'
+    logging.error('Bad Request: %s', msg)
+    return flask.make_response(f'Bad Request: {msg}', 400)
+
+  pubsub_message = envelope['message']
+  event_data = base64.b64decode(pubsub_message['data']).decode('utf-8').strip()
+  settings = settings_lib.Settings()
+  execution_runner = execution_runner_lib.ExecutionRunner(settings)
+  try:
+    response = execution_runner.create_or_replace_glossary(event_data)
+  except Exception as exception:
+    # (Isolation block for server)
+    logging.error(
+        'Cloud Translation Client raised an exception trying to create a'
+        ' glossary %s ',
+        exception,
+    )
+    return flask.Response(
+        (
+            'The server encountered and error and could not complete your'
+            ' request. Developers can check the logs for details.'
+        ),
+        http.HTTPStatus.INTERNAL_SERVER_ERROR,
+    )
+  logging.info('Request complete: /create_glossary')
+
+  return flask.make_response(response, http.HTTPStatus.OK)
 
 
 if __name__ == '__main__':

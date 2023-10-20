@@ -17,8 +17,12 @@
 See class doctring for more details.
 """
 import dataclasses
+import os
+import re
+from typing import Any
 
 from absl import logging
+import google.api_core
 import pandas as pd
 import requests
 
@@ -33,10 +37,17 @@ TRANSLATE_TEXT_ENDPOINT = (
     + '/v{api_version}/projects/{gcp_project_name}/locations/{gcp_region}:translateText'
 )
 
-LIST_GLOSSARIES_ENDPOINT = (
+GLOSSARIES_ENDPOINT = (
     TRANSLATE_API_BASE_URL
     + '/v{api_version}/projects/{gcp_project_name}/locations/{gcp_region}/glossaries'
 )
+
+GLOSSARY_OPERATION_ENDPOINT = (
+    TRANSLATE_API_BASE_URL
+    + '/v{api_version}/{{name={operation_name}}}:{method}'
+)
+
+_GLOSSARY_PATH = 'projects/{gcp_project_name}/locations/{gcp_region}/glossaries/{glossary_id}'
 
 _API_VERSION = '3'
 
@@ -45,6 +56,8 @@ _CREDENTIAL_REQUIRED_KEYS = (
     'client_secret',
     'refresh_token',
 )
+
+_GLOSSARY_FILE_VALIDATION_REGEX = r'^[a-z]{2}-to-[a-z]{2}-.+\.csv$'
 
 
 # Max batch size for the Cloud Translation API V3 is 5000 code points.
@@ -61,6 +74,10 @@ class Glossary:
 
   id: str = dataclasses.field(default_factory=str)
   name: str = dataclasses.field(default_factory=str)
+
+
+class GlossaryError(Exception):
+  """An error occurred while creating or deleting Glossaries."""
 
 
 class CloudTranslationClient:
@@ -354,7 +371,7 @@ class CloudTranslationClient:
       A list of glossary objects.
     """
     glossaries = []
-    url = LIST_GLOSSARIES_ENDPOINT.format(
+    url = GLOSSARIES_ENDPOINT.format(
         api_version=self._api_version,
         gcp_project_name=self._gcp_project_name,
         gcp_region=self._gcp_region,
@@ -371,3 +388,174 @@ class CloudTranslationClient:
           Glossary(id=glossary['name'].split('/')[-1], name=glossary['name'])
       )
     return glossaries
+
+  def get_glossary_info_from_cloud_event_data(
+      self,
+      cloud_event_data: dict[str, Any],
+  ) -> tuple[str, str, str, str]:
+    """Gets glossary info from cloud event data.
+
+    The cloud event name has to be of the format:
+      [source_language]-[target_language]-[glossary-id].csv
+
+    Args:
+      cloud_event_data: A cloud event object.
+
+    Returns:
+      A tuple with the glossary id, source, target language and URI.
+
+    Raises:
+      GlossaryError: If the glossary file provided does not have the right name.
+    """
+    file_name = cloud_event_data['name']
+    if not re.fullmatch(_GLOSSARY_FILE_VALIDATION_REGEX, file_name):
+      raise GlossaryError(
+          'Glossary needs to have the format:'
+          ' [source_language]-to-[target_language]-[glossary-id].csv.'
+      )
+    glossary_id, _ = os.path.splitext(cloud_event_data['name'])
+    source_language, _, target_language = glossary_id.split('-')[:3]
+    glossary_uri = (
+        cloud_event_data['selfLink']
+        .replace('https://www.googleapis.com/storage/v1/b/', 'gs://')
+        .replace('/o/', '/')
+    )
+    logging.info(
+        'Glossary file has id: %s, source language: %s, target language: %s.'
+        ' Located under %s',
+        glossary_id,
+        source_language,
+        target_language,
+        glossary_uri,
+    )
+    return glossary_id, source_language, target_language, glossary_uri
+
+  def create_or_replace_glossary(
+      self,
+      glossary_id: str,
+      source_language: str,
+      target_language: str,
+      input_uri: str,
+      timeout_sec: int = 300,
+  ) -> Any:
+    """Creates or replaces a Glossary.
+
+    A Glossary is created from a CSV file stored in a GCS bucket that is used to
+    make specific translations when making calls to the Cloud Translate API.
+
+    Args:
+      glossary_id: The ID of the glossary.
+      source_language: The source language code.
+      target_language: The target language code.
+      input_uri: The URI of the glossary CSV file in Google Cloud Storage.
+      timeout_sec: The timeout in seconds.
+
+    Returns:
+      The Glossary Operation response.
+    """
+
+    try:
+      self._delete_glossary(glossary_id)
+    except google.api_core.exceptions.NotFound:
+      logging.info('Creating glossary with id %s', glossary_id)
+
+    try:
+      operation = self._create_glossary(
+          glossary_id, source_language, target_language, input_uri, timeout_sec
+      )
+    except GlossaryError:
+      logging.error('Failed to create glossary with id %s', glossary_id)
+      raise
+    return operation
+
+  def _create_glossary(
+      self,
+      glossary_id: str,
+      source_language: str,
+      target_language: str,
+      input_uri: str,
+      timeout_sec: int = 300,
+  ) -> Any:
+    """Creates a new Glossary.
+
+    Args:
+      glossary_id: The ID of the glossary.
+      source_language: The source language code.
+      target_language: The target language code.
+      input_uri: The URI of the glossary CSV file in Google Cloud Storage.
+      timeout_sec: Timeout in seconds.
+
+    Returns:
+      A create glossary long running operation response.
+    """
+    url = GLOSSARIES_ENDPOINT.format(
+        api_version=self._api_version,
+        gcp_project_name=self._gcp_project_name,
+        gcp_region=self._gcp_region,
+    )
+    name = _GLOSSARY_PATH.format(
+        gcp_project_name=self._gcp_project_name,
+        gcp_region=self._gcp_region,
+        glossary_id=glossary_id,
+    )
+    params = {
+        'name': name,
+        'language_pair': {
+            'source_language_code': source_language,
+            'target_language_code': target_language,
+        },
+        'input_config': {'gcs_source': {'input_uri': input_uri}},
+    }
+
+    try:
+      operation = api_utils.send_api_request(
+          url, params, self._get_http_header()
+      )
+      logging.info(
+          'Started glossary operation: %s from %s',
+          operation['name'],
+          input_uri,
+      )
+      url = GLOSSARY_OPERATION_ENDPOINT.format(
+          api_version=self._api_version,
+          operation_name=operation['name'],
+          method='wait',
+      )
+      params = {'timeout': f'{timeout_sec}s'}
+      finished_operation = api_utils.send_api_request(
+          url, params, self._get_http_header()
+      )
+    except requests.exceptions.HTTPError as http_error:
+      logging.exception(
+          'Encountered error during calls to Translation API: %s', http_error
+      )
+      raise GlossaryError(
+          f'Failed to create glossary with id {glossary_id}: {http_error}'
+      ) from http_error
+
+    return finished_operation
+
+  def _delete_glossary(self, glossary_id: str) -> None:
+    """Deletes a Glossary.
+
+    Args:
+      glossary_id: The ID of the glossary.
+    """
+    url = os.path.join(
+        GLOSSARIES_ENDPOINT.format(
+            api_version=self._api_version,
+            gcp_project_name=self._gcp_project_name,
+            gcp_region=self._gcp_region,
+        ),
+        glossary_id,
+    )
+
+    try:
+      api_utils.send_api_request(url, {}, self._get_http_header(), 'DELETE')
+    except requests.exceptions.HTTPError as http_error:
+      logging.exception(
+          'Encountered error during calls to Translation API: %s', http_error
+      )
+      raise GlossaryError(
+          f'Failed to delete glossary with id {glossary_id}: {http_error}'
+      ) from http_error
