@@ -390,3 +390,21 @@ class ExecutionRunner:
   def list_glossaries(self) -> list[cloud_translation_client_lib.Glossary]:
     """Gets a list of available glossaries."""
     return self._cloud_translation_client.list_glossaries()
+
+  def create_or_replace_glossary(self, cloud_event_data: dict[str, Any]) -> Any:
+    """Creates or replaces a glossary.
+
+    Args:
+      cloud_event_data: A cloud event data object.
+
+    Returns:
+      The glossary operation response.
+    """
+    glossary_id, source_language, target_language, glossary_uri = (
+        self._cloud_translation_client.get_glossary_info_from_cloud_event_data(
+            cloud_event_data
+        )
+    )
+    return self._cloud_translation_client.create_or_replace_glossary(
+        glossary_id, source_language, target_language, glossary_uri
+    )
