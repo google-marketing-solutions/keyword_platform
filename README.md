@@ -134,7 +134,7 @@ resource. This opens a menu on the right side of your screen with the
 `ADD PRINCIPAL` button. Using this button you can add or remove users by
 granting or revoking the `Cloud IAP > IAP-secured Web App User` role.
 
-> [!TIP]
+> [!NOTE]
 > To make access management easier you can also grant email groups, e.g. a
 > [Google Groups](https://groups.google.com) access to the Web App.
 
