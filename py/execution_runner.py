@@ -72,6 +72,7 @@ class ExecutionRunner:
     """
     self._settings = settings
     self._gcp_project_id = os.environ['GCP_PROJECT']
+    self._gcp_region = os.environ['GCP_REGION']
     self._settings.credentials = self._get_credentials()
     self._bucket_name = os.environ['BUCKET_NAME']
     self._ga_opt_out = os.environ['GA_OPT_OUT'].lower() == 'true'
@@ -84,8 +85,8 @@ class ExecutionRunner:
     except google.api_core.exceptions.PermissionDenied as err:
       self._vertex_client = None
       logging.info(
-          'ExecutionRunner: Vertex API client could not be initialized. Vertex'
-          ' AI will not be used: %s',
+          'ExecutionRunner: Vertex API client could not be initialized.'
+          ' Vertex AI will not be used: %s',
           err,
       )
 
@@ -98,7 +99,12 @@ class ExecutionRunner:
         cloud_translation_client_lib.CloudTranslationClient(
             credentials=self._settings.credentials,
             gcp_project_name=self._gcp_project_id,
-            vertex_client=self._vertex_client)
+            gcp_region=self._gcp_region,
+            vertex_client=self._vertex_client,
+            shorten_translations_to_char_limit=(
+                self._settings.shorten_translations_to_char_limit
+            ),
+        )
     )
 
     logging.info('ExecutionRunner: initialized Cloud Translation client.')
@@ -275,7 +281,7 @@ class ExecutionRunner:
     return campaigns_lib.Campaigns(campaign_responses)
 
   def _build_ads_and_ad_groups(
-      self) -> tuple[ads_lib.Ads, ad_groups_lib.AdGroups]:
+      self) -> tuple[ads_lib.Ads | None, ad_groups_lib.AdGroups]:
     """Builds Ads and Ad Groups objects."""
     ads_data_responses = []
     campaigns = self._settings.campaigns
@@ -291,12 +297,17 @@ class ExecutionRunner:
       if isinstance(response, list):
         ads_data_responses.append(response)
 
-    ads = ads_lib.Ads(ads_data_responses)
+    if self._settings.translate_ads:
+      ads = ads_lib.Ads(ads_data_responses)
+    else:
+      logging.info('Skipping ads translation.')
+      ads = None
+
     ad_groups = ad_groups_lib.AdGroups(ads_data_responses)
 
     return ads, ad_groups
 
-  def _build_keywords(self) -> keywords_lib.Keywords:
+  def _build_keywords(self) -> keywords_lib.Keywords | None:
     """Builds a Keywords object."""
 
     keywords_responses = []
@@ -315,7 +326,12 @@ class ExecutionRunner:
       if isinstance(response, list):
         keywords_responses.append(response)
 
-    return keywords_lib.Keywords(keywords_responses)
+    if self._settings.translate_keywords:
+      keywords = keywords_lib.Keywords(keywords_responses)
+    else:
+      logging.info('Skipping keywords translation.')
+      keywords = None
+    return keywords
 
   def _run_workers(
       self, google_ads_objects: google_ads_objects_lib.GoogleAdsObjects
@@ -370,3 +386,25 @@ class ExecutionRunner:
     )
 
     return storage_client.export_google_ads_objects_to_gcs()
+
+  def list_glossaries(self) -> list[cloud_translation_client_lib.Glossary]:
+    """Gets a list of available glossaries."""
+    return self._cloud_translation_client.list_glossaries()
+
+  def create_or_replace_glossary(self, cloud_event_data: dict[str, Any]) -> Any:
+    """Creates or replaces a glossary.
+
+    Args:
+      cloud_event_data: A cloud event data object.
+
+    Returns:
+      The glossary operation response.
+    """
+    glossary_id, source_language, target_language, glossary_uri = (
+        self._cloud_translation_client.get_glossary_info_from_cloud_event_data(
+            cloud_event_data
+        )
+    )
+    return self._cloud_translation_client.create_or_replace_glossary(
+        glossary_id, source_language, target_language, glossary_uri
+    )

@@ -25,6 +25,7 @@ class Account:
 
   id: str = dataclasses.field(default_factory=str)
   name: str = dataclasses.field(default_factory=str)
+  display_name: str = dataclasses.field(default_factory=str)
 
 
 class Accounts:
@@ -49,12 +50,16 @@ class Accounts:
     self._accounts = []
     for batch in response_json:
       for result in batch['results']:
+        account_name = result['customerClient'].get(
+            'descriptiveName', '[NO NAME SET]'
+        )
+        account_id = result['customerClient']['id']
+        account_display_name = f'[{account_id}] {account_name}'
         self._accounts.append(
             Account(
-                id=result['customerClient']['id'],
-                name=result['customerClient'].get(
-                    'descriptiveName', '[NO NAME SET]'
-                ),
+                id=account_id,
+                name=account_name,
+                display_name=account_display_name,
             )
         )
     logging.info(

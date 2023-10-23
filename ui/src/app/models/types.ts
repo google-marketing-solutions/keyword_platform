@@ -20,12 +20,12 @@
  * E.g. Event data from a component event.
  */
 
-import {GoogleAds, Language} from './interfaces';
+import {GoogleAds, Language, Glossary} from './interfaces';
 
 /**
  * SelectionData type.
  */
-export type SelectionData = GoogleAds|Language;
+export type SelectionData = GoogleAds|Language|Glossary;
 
 /**
  * SelectionData type grouping.

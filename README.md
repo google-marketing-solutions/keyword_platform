@@ -91,6 +91,9 @@ authorized redirect URIs. Take note of the Client ID and Client Secret.
 Once you have completed the above mentioned steps, proceed by clicking the Open
 in Cloud Shell button below.
 
+> [!IMPORTANT]
+> To use GenAI features you have to choose `us-central1` as region.
+
 1.  Click the button to deploy:
 
     [![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fgoogle-marketing-solutions%2Fkeyword_platform&cloudshell_git_branch=main&cloudshell_tutorial=setup%2Fdocs%2Finstall.md&show=terminal)
@@ -131,7 +134,7 @@ resource. This opens a menu on the right side of your screen with the
 `ADD PRINCIPAL` button. Using this button you can add or remove users by
 granting or revoking the `Cloud IAP > IAP-secured Web App User` role.
 
-> [!TIP]
+> [!NOTE]
 > To make access management easier you can also grant email groups, e.g. a
 > [Google Groups](https://groups.google.com) access to the Web App.
 

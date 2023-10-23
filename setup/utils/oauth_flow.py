@@ -43,6 +43,7 @@ _SCOPES = [
     'https://www.googleapis.com/auth/drive.file',
     'https://www.googleapis.com/auth/drive',
     'https://www.googleapis.com/auth/cloud-translation',
+    'https://www.googleapis.com/auth/cloud-platform',
     'https://www.googleapis.com/auth/adwords',
 ]
 

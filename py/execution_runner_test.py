@@ -71,8 +71,12 @@ _ACCOUNTS_RESPONSES = [{
     }]
 
 _EXPECTED_ACCOUNTS_LIST = list([
-    accounts_lib.Account(id='5459155099', name='Account 1'),
-    accounts_lib.Account(id='8647404629', name='Account 2'),
+    accounts_lib.Account(
+        id='5459155099', name='Account 1', display_name='[5459155099] Account 1'
+    ),
+    accounts_lib.Account(
+        id='8647404629', name='Account 2', display_name='[8647404629] Account 2'
+    ),
 ])
 
 _CAMPAIGNS_RESPONSES = [
@@ -127,16 +131,111 @@ _EXPECTED_CAMPAIGNS_LIST = list([
     {
         'id': '11123',
         'name': 'Test Campaign 0',
+        'display_name': '[11123] Test Campaign 0',
     },
     {
         'id': '11124',
         'name': 'Test Campaign 1',
+        'display_name': '[11124] Test Campaign 1',
     },
     {
         'id': '11125',
         'name': 'Test Campaign 2',
+        'display_name': '[11125] Test Campaign 2',
     },
 ])
+
+_GOOGLE_ADS_RESPONSE = [{
+        'results': [{
+            'customer': {'resourceName': 'customers/123', 'id': '123'},
+            'campaign': {
+                'resourceName': 'customers/123/campaigns/456',
+                'name': 'Gmail Test Campaign',
+            },
+            'adGroup': {
+                'resourceName': 'customers/123/adGroups/789',
+                'name': 'Ad group 1',
+            },
+            'adGroupAd': {
+                'resourceName': 'customers/123/adGroupAds/789~1011',
+                'ad': {
+                    'responsiveSearchAd': {
+                        'headlines': [{
+                            'text': 'Email Login',
+                            'assetPerformanceLabels': 'PENDING',
+                            'policySummaryInfo': {
+                                'reviewStatus': 'REVIEWED',
+                                'approvalStatus': 'APPROVED',
+                            },
+                        }],
+                        'descriptions': [{
+                            'text': 'Amazing email!',
+                            'assetPerformanceLabels': 'PENDING',
+                            'policySummaryInfo': {
+                                'reviewStatus': 'REVIEWED',
+                                'approvalStatus': 'APPROVED',
+                            },
+                        }],
+                    },
+                    'resourceName': 'customers/123/ads/1011',
+                    'finalUrls': ['https://mail.google.com/'],
+                },
+            },
+        }],
+        'fieldMask': (
+            'customer.id,campaign.name,adGroup.name,'
+            'adGroupAd.ad.responsiveSearchAd.headlines,'
+            'adGroupAd.ad.responsiveSearchAd.descriptions,'
+            'adGroupAd.ad.finalUrls'
+        ),
+        'requestId': 'fake_request_id',
+    }]
+
+_KEYWORDS_RESPONSE = ([{'results':
+      [{'customer':
+        {'resourceName': 'customers/123',
+         'id': '123'},
+        'campaign':
+        {'resourceName': 'customers/123/campaigns/456',
+         'advertisingChannelType': 'SEARCH',
+         'biddingStrategyType': 'TARGET_SPEND',
+         'name': 'Gmail Test Campaign'},
+        'adGroup':
+        {'resourceName': 'customers/123/adGroups/789',
+         'name': 'Ad group 1'},
+        'adGroupCriterion':
+        {'resourceName': 'customers/123/adGroupCriteria/789~1112',
+         'keyword':
+         {'matchType': 'BROAD', 'text': 'e mail'}
+        },
+        'keywordView':
+        {'resourceName': 'customers/123/keywordViews/789~1112'}
+       },
+       {'customer':
+        {'resourceName': 'customers/123',
+         'id': '123'},
+        'campaign':
+        {'resourceName': 'customers/123/campaigns/456',
+         'advertisingChannelType': 'SEARCH',
+         'biddingStrategyType': 'TARGET_SPEND',
+         'name': 'Gmail Test Campaign'},
+        'adGroup':
+        {'resourceName': 'customers/123/adGroups/789',
+         'name': 'Ad group 1'},
+        'adGroupCriterion':
+        {'resourceName': 'customers/123/adGroupCriteria/789~1314',
+         'keyword':
+         {'matchType': 'BROAD', 'text': 'email'}
+        },
+        'keywordView':
+        {'resourceName': 'customers/123/keywordViews/789~1314'}
+        }
+       ],
+      'fieldMask': ('customer.id,campaign.name,campaign.advertisingChannelType,'
+                    'campaign.biddingStrategyType,adGroup.name,'
+                    'adGroupCriterion.keyword.text,'
+                    'adGroupCriterion.keyword.matchType'),
+      'requestId': 'fake_req_id'}])
 
 
 class ExecutionRunnerTest(parameterized.TestCase):
@@ -148,6 +247,9 @@ class ExecutionRunnerTest(parameterized.TestCase):
         mock.patch.dict(os.environ, {'GCP_PROJECT': 'fake_gcp_project'})
     )
     self.enter_context(
+        mock.patch.dict(os.environ, {'GCP_REGION': 'fake_gcp_region'})
+    )
+    self.enter_context(
         mock.patch.dict(os.environ, {'BUCKET_NAME': 'fake_bucket_name'})
     )
     self.mock_ga_opt_out = self.enter_context(
@@ -156,7 +258,7 @@ class ExecutionRunnerTest(parameterized.TestCase):
     self.mock_storage_client = self.enter_context(
         mock.patch.object(storage_client, 'StorageClient', autospec=True)
     )
-    self.enter_context(
+    self.cloud_translation_client_mock = self.enter_context(
         mock.patch.object(
             cloud_translation_client, 'CloudTranslationClient', autospec=True
         )
@@ -189,6 +291,7 @@ class ExecutionRunnerTest(parameterized.TestCase):
         customer_ids=[123, 456],
         campaigns=[789, 101],
         workers_to_run=['translationWorker'],
+        translate_ads=True,
     )
 
     # The ads API should be called for each customer ID in the request.
@@ -362,6 +465,7 @@ class ExecutionRunnerTest(parameterized.TestCase):
         customer_ids=[123, 456],
         campaigns=[789, 101],
         workers_to_run=[''],
+        translate_ads=True,
     )
 
     mock_ads = mock.create_autospec(ads.Ads)
@@ -393,6 +497,7 @@ class ExecutionRunnerTest(parameterized.TestCase):
         customer_ids=[123, 456],
         campaigns=[789, 101],
         workers_to_run=['translationWorker'],
+        translate_ads=True,
     )
 
     # Due to the way workers are dynamically loaded, they need to be mocked
@@ -421,6 +526,7 @@ class ExecutionRunnerTest(parameterized.TestCase):
         customer_ids=[123, 456],
         campaigns=[789, 101],
         workers_to_run=['translationWorker'],
+        translate_ads=True,
     )
 
     # Due to the way workers are dynamically loaded, they need to be mocked
@@ -436,6 +542,89 @@ class ExecutionRunnerTest(parameterized.TestCase):
       execution_runner_lib.ExecutionRunner(settings)
 
     self.mock_execution_analytics_client.assert_not_called()
+
+  @parameterized.named_parameters(
+      {
+          'testcase_name': 'translate_ads_false',
+          'mock_translate_ads': False,
+          'mock_translate_keywords': True,
+          'expected_cost_estimate_msg': (
+              'Estimated cost: $0.00 USD. '
+              '(0 ad chars + 20 keyword chars) * $0.000020/char.)'
+          ),
+      },
+      {
+          'testcase_name': 'translate_keywords_false',
+          'mock_translate_ads': True,
+          'mock_translate_keywords': False,
+          'expected_cost_estimate_msg': (
+              'Estimated cost: $0.00 USD. '
+              '(46 ad chars + 0 keyword chars) * $0.000020/char.)'
+          ),
+      },
+      {
+          'testcase_name': 'translate_ads_and_keywords_false',
+          'mock_translate_ads': False,
+          'mock_translate_keywords': False,
+          'expected_cost_estimate_msg': (
+              'Estimated cost: $0.00 USD. '
+              '(0 ad chars + 0 keyword chars) * $0.000020/char.)'
+          ),
+      },
+  )
+  def test_translate_ads_setting_equals_false_does_not_fetch_ads_data(
+      self,
+      mock_translate_ads,
+      mock_translate_keywords,
+      expected_cost_estimate_msg,
+  ):
+    """Tests GoogleAdsObjects.Ads is not populated when translate_ads is False.
+
+    This is tricky to test as still make the API call to populate AdGroups, and
+    the Ads field is protected. So I make sure some data is returned from the
+    API mock call, but that the Ads object has 0 characters in a get_cost()
+    call.
+    """
+    settings = settings_lib.Settings(
+        source_language_code='en',
+        target_language_codes=['es'],
+        customer_ids=[123, 456],
+        campaigns=[789, 101],
+        workers_to_run=['translationWorker'],
+        translate_ads=mock_translate_ads,
+        translate_keywords=mock_translate_keywords,
+    )
+
+    self.mock_google_ads_client.return_value.get_keywords_data_for_campaigns.return_value = (
+        _KEYWORDS_RESPONSE
+    )
+
+    self.mock_google_ads_client.return_value.get_ads_data_for_campaigns.return_value = (
+        _GOOGLE_ADS_RESPONSE
+    )
+
+    execution_runner = execution_runner_lib.ExecutionRunner(settings)
+    actual_cost_estimate_msg = execution_runner.get_cost_estimate()
+
+    self.assertEqual(expected_cost_estimate_msg, actual_cost_estimate_msg)
+
+  def test_create_or_replace_glossary(self):
+    settings = settings_lib.Settings()
+    self.cloud_translation_client_mock.return_value.get_glossary_info_from_cloud_event_data.return_value = (
+        'fake_glossary_id',
+        'en',
+        'de',
+        'fake_path',
+    )
+    execution_runner_lib.ExecutionRunner(settings).create_or_replace_glossary(
+        'fake_event_data'
+    )
+    self.cloud_translation_client_mock.return_value.get_glossary_info_from_cloud_event_data.assert_called_once_with(
+        'fake_event_data'
+    )
+    self.cloud_translation_client_mock.return_value.create_or_replace_glossary.assert_called_once_with(
+        'fake_glossary_id', 'en', 'de', 'fake_path'
+    )
 
 
 if __name__ == '__main__':

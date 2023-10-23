@@ -43,7 +43,9 @@ describe('RunService', () => {
 
   it('should use http POST method', () => {
     service
-        .run(['1'], ['1'], 'en', 'de', false, ['translationWorker'], 'aaa.bbb')
+        .run(
+            ['1'], ['1'], 'en', 'de', false, false, ['translationWorker'],
+            'aaa.bbb', true, true)
         .subscribe();
     const request = httpMock.expectOne(ENDPOINT);
     expect(request.request.method).toBe('POST');
@@ -83,7 +85,9 @@ describe('RunService', () => {
     spy = spyOn(TestBed.inject(RunService), 'run');
     spy.and.returnValue(of(httpResponse));
     service
-        .run(['1'], ['1'], 'en', 'de', false, ['translationWorker'], 'aaa.bbb')
+        .run(
+            ['1'], ['1'], 'en', 'de', false, false, ['translationWorker'],
+            'aaa.bbb', true, true)
         .subscribe(response => {
           expect(response.status).toBe(200);
           expect(response.statusText).toBe('OK');
@@ -103,7 +107,9 @@ describe('RunService', () => {
     spy = spyOn(TestBed.inject(RunService), 'run');
     spy.and.returnValue(throwError(httpError));
     service
-        .run(['1'], ['1'], 'en', 'de', false, ['translationWorker'], 'aaa.bbb')
+        .run(
+            ['1'], ['1'], 'en', 'de', false, true, ['translationWorker'],
+            'aaa.bbb', true, true)
         .subscribe(() => {}, error => {
           expect(error.message)
               .toBe(`Http failure response for ${ENDPOINT}: 500 ${statusText}`);

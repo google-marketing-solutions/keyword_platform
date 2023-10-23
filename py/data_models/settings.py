@@ -29,5 +29,9 @@ class Settings:
       default_factory=dict
   )
   workers_to_run: list[str] = dataclasses.field(default_factory=list)
+  shorten_translations_to_char_limit: bool = False
   multiple_templates: bool = False
   client_id: str = ''
+  translate_ads: bool = True
+  translate_keywords: bool = True
+  glossary_id: str = ''

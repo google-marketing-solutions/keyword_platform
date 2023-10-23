@@ -22,11 +22,16 @@ backend container.
 
 import logging
 import os
+import signal as signal_lib
+import sys
+import types
 import urllib
+
 
 import flask
 import flask_cors
 import google.auth.transport.requests
+import google.cloud.logging
 import google.oauth2.id_token
 
 
@@ -34,6 +39,8 @@ import google.oauth2.id_token
 # Cloud Run Python container.
 _BACKEND_URL_ENV_VAR = 'BACKEND_URL'
 
+client = google.cloud.logging.Client()
+client.setup_logging()
 
 app = flask.Flask(
     __name__,
@@ -104,5 +111,19 @@ def proxy() -> flask.Response:
     return urllib.request.urlopen(request)
 
 
+# [START cloudrun_sigterm_handler]
+def shutdown_handler(signal: int, frame: types.FrameType) -> None:
+  """Gracefully shutdown app."""
+  del frame  # Unused.
+  logging.info('Signal received: %s. Shutting down.', signal)
+  sys.exit(0)
+
+
 if __name__ == '__main__':
+  # handles Ctrl-C locally
+  signal_lib.signal(signal_lib.SIGINT, shutdown_handler)
+
   app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+else:
+  # handles Cloud Run container termination
+  signal_lib.signal(signal_lib.SIGTERM, shutdown_handler)

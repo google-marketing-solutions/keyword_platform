@@ -13,10 +13,12 @@
 # limitations under the License.
 
 """Entry point for Cloud Run."""
+import base64
 import http
-import logging
+import json
 import os
 
+from absl import logging
 import flask
 import flask_cors
 import google.cloud.logging
@@ -43,10 +45,22 @@ def main() -> flask.Response:
   customer_ids = flask.request.form.get('customer_ids').split(',')
   campaigns = flask.request.form.get('campaigns').split(',')
   workers_to_run = flask.request.form.get('workers_to_run').split(',')
+  shorten_translations_to_char_limit = flask.request.form.get(
+      'shorten_translations_to_char_limit',
+      default=False,
+      type=lambda v: v.lower() == 'true',
+  )
   multiple_templates = flask.request.form.get(
       'multiple_templates', default=False, type=lambda v: v.lower() == 'true'
   )
+  translate_ads = flask.request.form.get(
+      'translate_ads', default=True, type=lambda v: v.lower() == 'true'
+  )
+  translate_keywords = flask.request.form.get(
+      'translate_keywords', default=True, type=lambda v: v.lower() == 'true'
+  )
   client_id = flask.request.form.get('client_id')
+  glossary_id = flask.request.form.get('glossary_id')
 
   settings = settings_lib.Settings(
       source_language_code=source_language_code,
@@ -54,8 +68,12 @@ def main() -> flask.Response:
       customer_ids=customer_ids,
       campaigns=campaigns,
       workers_to_run=workers_to_run,
+      shorten_translations_to_char_limit=shorten_translations_to_char_limit,
       multiple_templates=multiple_templates,
       client_id=client_id,
+      translate_ads=translate_ads,
+      translate_keywords=translate_keywords,
+      glossary_id=glossary_id,
   )
 
   logging.info('Built run settings: %s', settings)
@@ -168,7 +186,7 @@ def get_cost() -> flask.Response:
   try:
     cost_estimate = execution_runner.get_cost_estimate()
   except Exception as exception:
-                                  # (Isolation block for server)
+    # (Isolation block for server)
     logging.error('Execution Runner raised an exception trying to get '
                   'cost estimate: %s', exception)
     return flask.Response(
@@ -179,6 +197,80 @@ def get_cost() -> flask.Response:
   logging.info('Request complete: /cost')
 
   return flask.make_response(cost_estimate, http.HTTPStatus.OK)
+
+
+@app.route('/list_glossaries', methods=['GET'])
+def get_glossaries() -> flask.Response:
+  """End point to get list of glossaries.
+
+  Returns:
+    A response containing a list of available glossaries.
+  """
+  logging.info('Received request: /list_glossaries')
+  settings = settings_lib.Settings()
+  execution_runner = execution_runner_lib.ExecutionRunner(settings)
+  try:
+    glossaries = execution_runner.list_glossaries()
+  except Exception as exception:
+    # (Isolation block for server)
+    logging.error(
+        'Cloud Translation Client raised an exception trying to get '
+        'glossaries: %s',
+        exception,
+    )
+    return flask.Response(
+        ('The server encountered and error and could not complete your request.'
+         ' Developers can check the logs for details.'),
+        http.HTTPStatus.INTERNAL_SERVER_ERROR)
+  logging.info('Request complete: /list_glossaries')
+
+  return flask.make_response(glossaries, http.HTTPStatus.OK)
+
+
+@app.route('/create_glossary', methods=['POST'])
+def create_glossary() -> flask.Response:
+  """End point to create a glossaries.
+
+  Returns:
+    A glossary operation response.
+  """
+  logging.info('Received request: /create_glossary')
+  envelope = flask.request.get_json()
+  if not envelope:
+    msg = 'no Pub/Sub message received'
+    logging.error('Bad Request: %s', msg)
+    return flask.make_response(f'Bad Request: {msg}', 400)
+
+  if not isinstance(envelope, dict) or 'message' not in envelope:
+    msg = 'invalid Pub/Sub message format'
+    logging.error('Bad Request: %s', msg)
+    return flask.make_response(f'Bad Request: {msg}', 400)
+
+  pubsub_message = envelope['message']
+  event_data = json.loads(
+      base64.b64decode(pubsub_message['data']).decode('utf-8').strip()
+  )
+  settings = settings_lib.Settings()
+  execution_runner = execution_runner_lib.ExecutionRunner(settings)
+  try:
+    response = execution_runner.create_or_replace_glossary(event_data)
+  except Exception as exception:
+    # (Isolation block for server)
+    logging.error(
+        'Cloud Translation Client raised an exception trying to create a'
+        ' glossary %s ',
+        exception,
+    )
+    return flask.Response(
+        (
+            'The server encountered and error and could not complete your'
+            ' request. Developers can check the logs for details.'
+        ),
+        http.HTTPStatus.INTERNAL_SERVER_ERROR,
+    )
+  logging.info('Request complete: /create_glossary')
+
+  return flask.make_response(response, http.HTTPStatus.OK)
 
 
 if __name__ == '__main__':

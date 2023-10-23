@@ -27,6 +27,9 @@ resource "google_compute_region_network_endpoint_group" "frontend_neg" {
   cloud_run {
     service = google_cloud_run_service.frontend_run.name
   }
+  lifecycle {
+   create_before_destroy = true
+ }
 }
 
 resource "google_compute_backend_service" "frontend_backend" {
@@ -61,7 +64,6 @@ resource "google_compute_url_map" "default" {
     default_service = google_compute_backend_service.frontend_backend.id
   }
 }
-
 
 resource "google_compute_target_https_proxy" "default" {
   name    = "keywordplatform-default-https-lb-proxy"
