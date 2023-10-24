@@ -16,7 +16,7 @@
  */
 
 /**
- * @fileoverview Enums for expected values.
+ * @fileoverview Enums for workers and api/service request status.
  */
 
 /** List of workers to run. */
@@ -24,7 +24,7 @@ export enum Worker {
   TRANSLATION_WORKER = 'translationWorker'
 }
 
-/** Status of server requests. */
+/** Status of api/service requests. */
 export enum RequestStatus {
   NONE = 'None',
   REQUESTED = 'Requested',
