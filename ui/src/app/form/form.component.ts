@@ -17,26 +17,29 @@
 
 import {AfterViewInit, ChangeDetectorRef, Component, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
-import {MatDialog} from '@angular/material/dialog';
-import {MatSlideToggle, MatSlideToggleChange} from '@angular/material/slide-toggle';
 import {MatCheckbox} from '@angular/material/checkbox';
+import {MatDialog} from '@angular/material/dialog';
+import {MatSlideToggle} from '@angular/material/slide-toggle';
 
 import {DialogComponent} from '../dialog/dialog.component';
-import {DropDownComponent} from '../drop-down/drop-down.component';
 import {RequestStatus, Worker} from '../models/enums';
-import {GoogleAds, Language, Output} from '../models/interfaces';
+import {Output, SelectionData} from '../models/interfaces';
 import {SelectionDataGroup} from '../models/types';
+import {MultiSelectComponent} from '../multi-select/multi-select.component';
 import {GoogleAdsService} from '../services/google-ads.service';
 import {RunService} from '../services/run.service';
 import {TranslationService} from '../services/translation.service';
+import {SingleSelectComponent} from '../single-select/single-select.component';
 
-
-const CAMPAIGN_CONTROL = 'campaigns';
+type controlGroup = MultiSelectComponent|SingleSelectComponent;
+type componentGroup = MatSlideToggle|MatCheckbox;
 
 enum LanguageControl {
   SOURCE_LANGUAGE = 'source-language',
   TARGET_LANGUAGE = 'target-language'
 }
+
+const CAMPAIGN_CONTROL = 'campaigns';
 
 /**
  * Interface for the clientId window property that is set by the Google Tag
@@ -66,14 +69,13 @@ declare interface ClientIdProperty {
 export class FormComponent implements OnInit, AfterViewInit {
   form = new FormGroup({});
 
-  accounts!: GoogleAds[];
-  campaigns!: GoogleAds[];
+  accounts!: SelectionData[];
+  campaigns!: SelectionData[];
 
-  languages!: Language[];
+  languages!: SelectionData[];
   sourceLanguageCode?: string;
   targetLanguageCode?: string;
   shortenTranslationsToCharLimit = false;
-  multipleTemplates = false;
   translateAds = true;
   translateKeywords = true;
   showSpinner = false;
@@ -83,11 +85,10 @@ export class FormComponent implements OnInit, AfterViewInit {
 
   requestStatus = RequestStatus.NONE;
 
-  @ViewChildren('component')
-  private readonly components!: QueryList<DropDownComponent>;
+  @ViewChildren('control') private readonly controls!: QueryList<controlGroup>;
 
-  @ViewChildren('disableOnLoad')
-  private readonly disableOnLoad!: QueryList<MatSlideToggle|MatCheckbox>;
+  @ViewChildren('component')
+  private readonly components!: QueryList<componentGroup>;
 
   constructor(
       private readonly changeRefDetector: ChangeDetectorRef,
@@ -102,15 +103,15 @@ export class FormComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    for (const component of this.components) {
-      this.form.addControl(component.controllerName!, component.control);
+    for (const control of this.controls) {
+      this.form.addControl(control.controllerName!, control.control);
     }
     this.addLanguageValidators();
     this.changeRefDetector.detectChanges();
   }
 
   accountSelection(value: SelectionDataGroup) {
-    const account = value as GoogleAds[];
+    const account = value as SelectionData[];
     const length = account.length;
 
     // Reset campaign selections anytime accounts get selected in order to
@@ -126,31 +127,31 @@ export class FormComponent implements OnInit, AfterViewInit {
       return;
     }
     for (let i = 0; i < length; i++) {
-      this.accountIds.push(account[i].id);
+      this.accountIds.push(account[i]['id']);
     }
     this.getCampaigns();
   }
 
   campaignSelection(value: SelectionDataGroup) {
-    const campaign = value as GoogleAds[];
+    const campaign = value as SelectionData[];
     const length = campaign.length;
     this.campaignIds = [];
     if (length === 0) {
       return;
     }
     for (let i = 0; i < length; i++) {
-      this.campaignIds.push(campaign[i].id);
+      this.campaignIds.push(campaign[i]['id']);
     }
   }
 
   sourceLanguageSelection(value: SelectionDataGroup) {
-    const language = value as Language;
-    this.sourceLanguageCode = language.code;
+    const language = value as SelectionData;
+    this.sourceLanguageCode = language['code'];
   }
 
   targetLanguageSelection(value: SelectionDataGroup) {
-    const language = value as Language;
-    this.targetLanguageCode = language.code;
+    const language = value as SelectionData;
+    this.targetLanguageCode = language['code'];
   }
 
   onSubmit() {
@@ -175,8 +176,7 @@ export class FormComponent implements OnInit, AfterViewInit {
         .run(
             this.accountIds, this.campaignIds, this.sourceLanguageCode!,
             this.targetLanguageCode!, this.shortenTranslationsToCharLimit,
-            this.multipleTemplates, workers, clientId, this.translateKeywords,
-            this.translateAds)
+            workers, clientId, this.translateKeywords, this.translateAds)
         .subscribe(
             (response => {
               this.requestStatus = RequestStatus.RESPONDED;
@@ -229,7 +229,7 @@ export class FormComponent implements OnInit, AfterViewInit {
           (languageControl === LanguageControl.SOURCE_LANGUAGE ?
                this.targetLanguageCode :
                this.sourceLanguageCode);
-      const value = control.value?.code;
+      const value = control.value?.['code'];
       // Only proceed with the validation check if the value of the language
       // field or the value of the language to compare it to is defined.
       // Otherwise the validation will trigger on load which is not desired.
@@ -246,8 +246,8 @@ export class FormComponent implements OnInit, AfterViewInit {
       (disable) ? control.disable() : control.enable();
     }
 
-    for (const element of this.disableOnLoad) {
-      element.setDisabledState(disable);
+    for (const component of this.components) {
+      component.setDisabledState(disable);
     }
   }
 

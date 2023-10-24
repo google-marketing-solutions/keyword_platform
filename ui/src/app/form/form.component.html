@@ -54,73 +54,71 @@
         <p class="sub-title">Select the accounts that contain the campaigns you want to
           translate.</p>
         <div class="component">
-          <app-drop-down
-              #component
+          <app-multi-select
+              #control
               [controllerName]="'accounts'"
               [className]="'responsive'"
               [values]="accounts"
               [label]="'Select accounts'"
               [isDisabled]=true
-              [isMultiple]=true
               [isRequired]=true
               (selectionEvent)="accountSelection($event)">
-          </app-drop-down>
+          </app-multi-select>
         </div>
         <p class="title">Campaigns</p>
         <p class="sub-title">Select the campaigns with keywords and ads to translate. All enabled ad
           groups will be pulled in automatically.</p>
         <div class="component">
-          <app-drop-down
-              #component
+          <app-multi-select
+              #control
               [controllerName]="'campaigns'"
               [className]="'responsive'"
               [values]="campaigns"
               [label]="'Select campaigns'"
               [isDisabled]=true
-              [isMultiple]=true
               [isRequired]=true
               (selectionEvent)="campaignSelection($event)">
-          </app-drop-down>
+          </app-multi-select>
         </div>
         <p class="title">Settings</p>
         <p class="sub-title">Select the source and target language for translation.</p>
         <div>
           <div class="juxtapose">
-            <app-drop-down
-                #component
+            <app-single-select
+                #control
                 [controllerName]="'source-language'"
                 [className]="'static'"
                 [values]="languages"
                 [label]="'Select source language'"
                 [isDisabled]=true
-                [isMultiple]=false
                 [isRequired]=true
                 (selectionEvent)="sourceLanguageSelection($event)">
-            </app-drop-down>
+            </app-single-select>
           </div>
           <div>
-            <app-drop-down
-                #component
+            <app-single-select
+                #control
                 [controllerName]="'target-language'"
                 [className]="'static'"
                 [values]="languages"
                 [label]="'Select target language'"
                 [isDisabled]=true
-                [isMultiple]=false
                 [isRequired]=true
                 (selectionEvent)="targetLanguageSelection($event)">
-              </app-drop-down>
+              </app-single-select>
           </div>
         </div>
         <div>
           <p class="sub-title">Select what to translate.</p>
           <mat-checkbox
-              #disableOnLoad
+              #component
+              color="primary"
               disabled="true"
               [(ngModel)]="translateKeywords"
               [ngModelOptions]="{standalone: true}">Keywords</mat-checkbox>
           <mat-checkbox
-              #disableOnLoad
+              #component
+              color="primary"
               disabled="true"
               [(ngModel)]="translateAds"
               [ngModelOptions]="{standalone: true}">Ads</mat-checkbox>
@@ -130,23 +128,12 @@
             below the Google Ads character limit for ad head and description lines. May result in
             lower quality translations.</p>
           <mat-slide-toggle
-              #disableOnLoad
+              #component
               color="primary"
               disabled="true"
               [(ngModel)]="shortenTranslationsToCharLimit"
               [ngModelOptions]="{standalone: true}">
               Shorten overflowing translations with GenAI (experimental)</mat-slide-toggle>
-        </div>
-        <div class="component">
-          <p class="sub-title">Toggle to output multiple Google Ads Editor templates for campaigns,
-            ad groups, keywords, and ads as opposed to consolidating them into a single one.</p>
-          <mat-slide-toggle
-              #disableOnLoad
-              color="primary"
-              disabled="true"
-              [(ngModel)]="multipleTemplates"
-              [ngModelOptions]="{standalone: true}">
-            Multiple Google Ads Editor Templates</mat-slide-toggle>
         </div>
         <div class="component">
           <button
