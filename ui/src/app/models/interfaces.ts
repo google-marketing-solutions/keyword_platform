@@ -20,32 +20,20 @@
  */
 
 /**
- * Google Ads interface for API request/response.
+ * Selection data interface for API requests/responses.
+ *
+ * TODO(): Declare properties that represent API responses once
+ * they're updated to share the same shape so that this interface can be
+ * stronger typed.
  */
-export interface GoogleAds {
-  id: string;
-  name: string;
-}
-
-/**
- * Glossary interface for API request/response.
- */
-export interface Glossary {
-  id: string;
-  name: string;
-}
-
-/**
- * Language interface for input/output.
- */
-export interface Language {
-  code: string;
-  name: string;
+export interface SelectionData {
+  [key: string]: string;
 }
 
 /**
  * Output interface for API response. Output of successful form submission.
  */
 export interface Output {
-  [key: string]: {[key: string]: string[]}|{[key: string]: {[key: string]: number | string}};
+  [key: string]: {[key: string]: string[]}|
+      {[key: string]: {[key: string]: number | string}};
 }
