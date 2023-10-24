@@ -81,8 +81,8 @@ export class SingleSelectComponent implements OnInit, OnChanges {
   }
 
   displaySelectOption(option: SelectionData): string {
-    if (value) {
-      return this.getDisplayName(value);
+    if (option) {
+      return this.getDisplayName(option);
     }
     return '';
   }
