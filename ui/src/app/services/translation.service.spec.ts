@@ -54,22 +54,22 @@ describe('TranslationService', () => {
 
   it('should respond successfully using getGlossaries', () => {
     const body = [
-        {
-          "id": "glossary_1",
-          "name": "projects/some-project/locations/some-location/glossary_1"
-        },
-        {
-          "id": "glossary_2",
-          "name": "projects/some-project/locations/some-location/glossary_2"
-        },
-        {
-          "id": "glossary_3",
-          "name":"projects/some-project/locations/some-location/glossary_3"
-        },
-        {
-          "id": "glossary_4",
-          "name": "projects/some-project/locations/some-location/glossary_4"
-        }
+      {
+        'id': 'glossary_1',
+        'name': 'projects/some-project/locations/some-location/glossary_1'
+      },
+      {
+        'id': 'glossary_2',
+        'name': 'projects/some-project/locations/some-location/glossary_2'
+      },
+      {
+        'id': 'glossary_3',
+        'name': 'projects/some-project/locations/some-location/glossary_3'
+      },
+      {
+        'id': 'glossary_4',
+        'name': 'projects/some-project/locations/some-location/glossary_4'
+      }
     ];
     const httpResponse =
         new HttpResponse({body, status: 200, statusText: 'OK'});
