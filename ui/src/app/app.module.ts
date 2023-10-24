@@ -18,10 +18,11 @@
 import {HttpClientModule} from '@angular/common/http';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatButtonModule} from '@angular/material/button';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
@@ -35,19 +36,22 @@ import {RouterModule} from '@angular/router';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {DialogComponent} from './dialog/dialog.component';
-import {DropDownComponent} from './drop-down/drop-down.component';
 import {FormComponent} from './form/form.component';
+import {MultiSelectComponent} from './multi-select/multi-select.component';
 import {ServicesModule} from './services/services_module';
+import {SingleSelectComponent} from './single-select/single-select.component';
 
 @NgModule({
-  declarations:
-      [AppComponent, DropDownComponent, DialogComponent, FormComponent],
+  declarations: [
+    AppComponent, DialogComponent, FormComponent, MultiSelectComponent,
+    SingleSelectComponent
+  ],
   imports: [
-    BrowserAnimationsModule, BrowserModule, AppRoutingModule, HttpClientModule,
-    MatButtonModule, MatSlideToggleModule, MatDialogModule, MatFormFieldModule,
-    MatIconModule, MatInputModule, MatProgressSpinnerModule, MatSelectModule,
-    ReactiveFormsModule, FormsModule, MatTabsModule, RouterModule,
-    ServicesModule, MatCheckboxModule
+    BrowserAnimationsModule, BrowserModule, AppRoutingModule, FormsModule,
+    HttpClientModule, MatAutocompleteModule, MatButtonModule, MatCheckboxModule,
+    MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    MatProgressSpinnerModule, MatSelectModule, MatSlideToggleModule,
+    MatTabsModule, ReactiveFormsModule, RouterModule, ServicesModule
   ],
   providers: [],
   bootstrap: [AppComponent]
