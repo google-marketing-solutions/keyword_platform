@@ -110,7 +110,8 @@ directly. Instead, running the workers creates prefilled [Google Ads Editor
 Templates](https://support.google.com/google-ads/answer/10702525?hl=en) for Ads,
 Keywords, Ad Groups and Campaign for download as CSV files.
 
-> NOTE: After running a worker the produced download URLs have an expiration of
+> [!NOTE]
+> After running a worker the produced download URLs have an expiration of
 > 1 hour for security purposes as those links are universally accessible. If you
 > need to retrieve the generated CSVs after the link expiration you can still
 > download them but you have to do so directly from the Cloud Storage Bucket you
