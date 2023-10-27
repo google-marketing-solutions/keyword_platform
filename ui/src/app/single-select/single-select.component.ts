@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {FormControl, Validators} from '@angular/forms';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
+import {AbstractControl, FormControl, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 import {MatOption} from '@angular/material/core';
-import {SelectionData} from 'app/models/interfaces';
+import {Selection} from 'app/models/interfaces';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 
@@ -32,26 +32,25 @@ export class SingleSelectComponent implements OnInit, OnChanges {
   @Input() controllerName?: string;
   @Input() label?: string;
   @Input() className?: string;
-  @Input() isDisabled?: boolean;
   @Input() isRequired?: boolean;
-  @Input({required: true}) values!: SelectionData[];
+  @Input({required: true}) values!: Selection[];
 
-  @Output() readonly selectionEvent = new EventEmitter<SelectionData>();
+  @Output() readonly selectionEvent = new EventEmitter<Selection>();
 
   control = new FormControl();
 
-  filteredValues?: Observable<SelectionData[]>;
+  options: string[] = [];
 
-  selected = false;
+  filteredValues?: Observable<Selection[]>;
 
   ngOnInit() {
     if (this.isRequired) {
       this.control.addValidators(Validators.required);
     }
 
-    if (this.isDisabled) {
-      this.control.disable();
-    }
+    // Disable control by default until it gets succesful results from parent
+    // component.
+    this.control.disable();
   }
 
   /**
@@ -62,17 +61,34 @@ export class SingleSelectComponent implements OnInit, OnChanges {
    * service (api) that doesn't return data when the OnInit callback is invoked.
    */
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['values']['currentValue']) {
+    const currentValue = changes['values']['currentValue'];
+    if (currentValue) {
       this.filteredValues = this.control.valueChanges.pipe(
           startWith(''),
           map(value => this.filter(value || '')),
       );
+      // Store results in an array for the inputTextValidator.
+      for (const value of currentValue) {
+        this.options.push(value['name']);
+      }
+      // Invoke this validator on changes as it is dependent on successful
+      // results from the parent component.
+      if (this.isRequired) {
+        this.control.addValidators(this.inputTextValidator());
+      }
     }
+  }
+
+  displaySelectOption(option: Selection): string {
+    if (option) {
+      return this.getDisplayName(option);
+    }
+    return '';
   }
 
   // TODO(): Remove this function when responses of services are
   // updated to share the same shape.
-  getDisplayName(option: SelectionData): string {
+  getDisplayName(option: Selection): string {
     let optionName = option['name'];
     if (option['display_name']) {
       optionName = option['display_name']
@@ -80,30 +96,27 @@ export class SingleSelectComponent implements OnInit, OnChanges {
     return optionName;
   }
 
-  displaySelectOption(option: SelectionData): string {
-    if (option) {
-      return this.getDisplayName(option);
+  onClosed() {
+    const value = this.control.value;
+    // Emitting the value after closing the selection panel and not selecting an
+    // option should emit an invalid value (null or empty string) which the
+    // instantiator of this component can handle as an invalid response since it
+    // would not match the expected shape of the value's object.
+    if ((!this.isRequired && !this.isValidValue(value))) {
+      this.emitSelectionEvent(value);
     }
-    return '';
   }
 
   onSelected(selection: MatOption) {
-    this.selected = true;
-    this.selectionEvent.emit(selection.value);
+    this.emitSelectionEvent(selection.value);
   }
 
-  onClosed() {
-    // If no option is selected when the selection panel is closed then set a
-    // validation error. This can occur when searching and no option is selected
-    // thus leaving the select field with an invalid selection.
-    if (!this.selected && !this.control.hasError('required')) {
-      this.control.setErrors({invalidText: true});
-    }
-    this.selected = false;
+  private emitSelectionEvent(selection: Selection) {
+    this.selectionEvent.emit(selection);
   }
 
-  private filter(value: SelectionData|string): SelectionData[] {
-    const selectionDataValue = value as SelectionData;
+  private filter(value: Selection|string): Selection[] {
+    const selectionDataValue = value as Selection;
     const selectionName = this.getDisplayName(selectionDataValue);
     const stringValue = value as string;
     let filterValue = '';
@@ -115,5 +128,24 @@ export class SingleSelectComponent implements OnInit, OnChanges {
     return this.values.filter(
         value =>
             this.getDisplayName(value).toLowerCase().includes(filterValue));
+  }
+
+  // TODO(): Consider creating abstract/base class for validators as
+  // there are other custom validators in the repository.
+  private inputTextValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors|null => {
+      const value = control.value;
+      if (!value) {
+        return null;
+      }
+      return (!this.isValidValue(control.value)) ? {invalidText: true} : null;
+    };
+  }
+
+  private isValidValue(value: Selection): boolean {
+    if (!value) {
+      return false;
+    }
+    return this.options.includes(value['name']);
   }
 }
