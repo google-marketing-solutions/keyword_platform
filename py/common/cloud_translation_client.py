@@ -377,7 +377,7 @@ class CloudTranslationClient:
     )
     try:
       response = api_utils.send_api_request(
-          url, {}, self._get_http_header(), method='GET'
+          url, None, self._get_http_header(), method='GET'
       )
     except requests.exceptions.HTTPError as http_error:
       logging.exception(
