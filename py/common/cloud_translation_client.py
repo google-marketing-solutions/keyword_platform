@@ -376,7 +376,9 @@ class CloudTranslationClient:
         gcp_region=self._gcp_region,
     )
     try:
-      response = api_utils.send_api_request(url, {}, self._get_http_header())
+      response = api_utils.send_api_request(
+          url, {}, self._get_http_header(), method='GET'
+      )
     except requests.exceptions.HTTPError as http_error:
       logging.exception(
           'Encountered error during calls to Translation API: %s', http_error
