@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse} from '@angular/common/http';
-import {Inject, Injectable} from '@angular/core';
+import {HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 import {Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
@@ -30,7 +30,8 @@ export class RunService {
   run(accountIds: string[], campaignIds: string[], sourceLanguageCode: string,
       targetLanguageCode: string, shortenTranslationsToCharLimit: boolean,
       workers: string[], client_id: string, translateKeywords: boolean,
-      translateAds: boolean): Observable<HttpResponse<Output>> {
+      translateAds: boolean, glossaryId: string
+  ): Observable<HttpResponse<Output>> {
     return this.http
         .post<Output>(
             './proxy', {
@@ -44,6 +45,7 @@ export class RunService {
               'client_id': client_id,
               'translate_keywords': translateKeywords.toString(),
               'translate_ads': translateAds.toString(),
+              'glossary_id': glossaryId,
               'endpoint': 'run'
             },
             {
