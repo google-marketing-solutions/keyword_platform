@@ -21,37 +21,39 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatDialogModule} from '@angular/material/dialog';
-import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {MatSelectModule} from '@angular/material/select';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatTabsModule} from '@angular/material/tabs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
+import {AccountsComponent} from '../accounts/accounts.component';
+import {CampaignsComponent} from '../campaigns/campaigns.component';
 import {MultiSelectComponent} from '../multi-select/multi-select.component';
 import {SingleSelectComponent} from '../single-select/single-select.component';
+import {TranslationComponent} from '../translation/translation.component';
 
-import {FormComponent} from './form.component';
+import {ContentComponent} from './content.component';
 
-describe('FormComponent', () => {
-  let component: FormComponent;
-  let fixture: ComponentFixture<FormComponent>;
+describe('ContentComponent', () => {
+  let component: ContentComponent;
+  let fixture: ComponentFixture<ContentComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations:
-          [MultiSelectComponent, SingleSelectComponent, FormComponent],
+      declarations: [
+        AccountsComponent, CampaignsComponent, ContentComponent,
+        MultiSelectComponent, SingleSelectComponent, TranslationComponent
+      ],
       imports: [
         BrowserAnimationsModule, FormsModule, HttpClientModule,
         MatAutocompleteModule, MatCheckboxModule, MatDialogModule,
-        MatFormFieldModule, MatIconModule, MatInputModule,
-        MatProgressSpinnerModule, MatSelectModule, MatSlideToggleModule,
-        MatTabsModule, ReactiveFormsModule
+        MatIconModule, MatInputModule, MatProgressSpinnerModule,
+        MatSlideToggleModule, MatTabsModule, ReactiveFormsModule
       ]
     });
-    fixture = TestBed.createComponent(FormComponent);
+    fixture = TestBed.createComponent(ContentComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
