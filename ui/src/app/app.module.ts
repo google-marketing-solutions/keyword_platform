@@ -33,18 +33,22 @@ import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterModule} from '@angular/router';
 
+import {AccountsComponent} from './accounts/accounts.component';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
+import {CampaignsComponent} from './campaigns/campaigns.component';
+import {ContentComponent} from './content/content.component';
 import {DialogComponent} from './dialog/dialog.component';
-import {FormComponent} from './form/form.component';
 import {MultiSelectComponent} from './multi-select/multi-select.component';
 import {ServicesModule} from './services/services_module';
 import {SingleSelectComponent} from './single-select/single-select.component';
+import {TranslationComponent} from './translation/translation.component';
 
 @NgModule({
   declarations: [
-    AppComponent, DialogComponent, FormComponent, MultiSelectComponent,
-    SingleSelectComponent
+    AccountsComponent, AppComponent, CampaignsComponent, ContentComponent,
+    DialogComponent, MultiSelectComponent, SingleSelectComponent,
+    TranslationComponent
   ],
   imports: [
     BrowserAnimationsModule, BrowserModule, AppRoutingModule, FormsModule,
