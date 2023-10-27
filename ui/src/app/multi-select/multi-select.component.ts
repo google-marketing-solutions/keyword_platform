@@ -18,7 +18,7 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChildren} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {MatCheckbox} from '@angular/material/checkbox';
-import {SelectionData} from 'app/models/interfaces';
+import {Selection} from 'app/models/interfaces';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 
@@ -33,7 +33,7 @@ enum SelectAllOption {
  * each option.
  */
 interface Option {
-  selectionData: SelectionData;
+  selectionData: Selection;
   selected: boolean;
 }
 
@@ -49,22 +49,14 @@ export class MultiSelectComponent implements OnInit, OnChanges {
   @Input() controllerName?: string;
   @Input() label?: string;
   @Input() className?: string;
-  @Input() isDisabled?: boolean;
   @Input() isRequired?: boolean;
-  @Input({required: true}) values!: SelectionData[];
+  @Input({required: true}) values!: Selection[];
 
-  @Output() readonly selectionEvent = new EventEmitter<SelectionData[]>();
+  @Output() readonly selectionEvent = new EventEmitter<Selection[]>();
 
   control = new FormControl();
 
-  /**
-   * Contains the inputted SelectionData values. Includes SelectAllOption
-   * by default because it is required for the select drop down.
-   */
-  selectionValues: Option[] = [{
-    selectionData: {id: SelectAllOption.id, name: SelectAllOption.name},
-    selected: false
-  }];
+  selectionValues: Option[] = [];
 
   filteredSelectionValues?: Observable<Option[]>;
   lastFilteteredSelectionValue = '';
@@ -77,9 +69,9 @@ export class MultiSelectComponent implements OnInit, OnChanges {
       this.control.addValidators(Validators.required);
     }
 
-    if (this.isDisabled) {
-      this.control.disable();
-    }
+    // Disable control by default until it gets successful results from parent
+    // component.
+    this.control.disable();
 
     this.control.statusChanges.subscribe(() => {
       // Reset all selections if the autocomplete input textfield is empty and
@@ -100,6 +92,19 @@ export class MultiSelectComponent implements OnInit, OnChanges {
    * service (api) that doesn't return data when the OnInit callback is invoked.
    */
   ngOnChanges(changes: SimpleChanges) {
+    // Reset array of options anytime data changes otherwise data would
+    // continuously be appended to the array. This can occur when this component
+    // is dependent on data from another component. For example, if a specific
+    // Google Ads account is selected then its campaigns should be appended but
+    // if that account is unselected and another account is selected after the
+    // selection panel is closed then only the campaigns from that new account
+    // selection should be appended, not campaigns from both.
+    this.selectionValues = [];
+    this.selectionValues.push({
+      selectionData: {id: SelectAllOption.id, name: SelectAllOption.name},
+      selected: false
+    });
+
     const currentValue = changes['values']['currentValue'];
     if (currentValue) {
       for (const value of currentValue) {
@@ -113,17 +118,6 @@ export class MultiSelectComponent implements OnInit, OnChanges {
                   this.lastFilteteredSelectionValue),
           map(filter => this.filter(filter)));
     }
-  }
-
-  // TODO(): Remove this function when responses of services are
-  // updated to share the same shape.
-  getDisplayName(option: Option): string {
-    const selectionData = option.selectionData;
-    let optionName = selectionData['name'];
-    if (selectionData['display_name']) {
-      optionName = selectionData['display_name'];
-    }
-    return optionName;
   }
 
   /**
@@ -159,6 +153,17 @@ export class MultiSelectComponent implements OnInit, OnChanges {
     return displayOptions;
   }
 
+  // TODO(): Remove this function when responses of services are
+  // updated to share the same shape.
+  getDisplayName(option: Option): string {
+    const selectionData = option.selectionData;
+    let optionName = selectionData['name'];
+    if (selectionData['display_name']) {
+      optionName = selectionData['display_name'];
+    }
+    return optionName;
+  }
+
   /**
    * The checkbox change callback for selecting options.
    *
@@ -177,7 +182,9 @@ export class MultiSelectComponent implements OnInit, OnChanges {
         this.removeAllSelectedOptions();
         this.appendAllSelectedOptions(true);
         this.setCheckStatusForAllSelectedOptions(true);
+        this.disableAllSelectedOptions(true);
       } else {
+        this.disableAllSelectedOptions(false);
         this.removeAndUncheckAllSelectedOptions();
         selectedOption.selected = false;
       }
@@ -213,9 +220,8 @@ export class MultiSelectComponent implements OnInit, OnChanges {
       // Clone a version of selectedOptions that only includes SelectionData
       // because the selection boolean is not a valid SelectionData property
       // and then emit it to the receiving parent element/component.
-      const selectionDataValue: SelectionData[] =
-          this.getAllSelectedOptions().map(
-              ({selectionData}) => (selectionData));
+      const selectionDataValue: Selection[] = this.getAllSelectedOptions().map(
+          ({selectionData}) => (selectionData));
       // Remove SelectAllOption when it is included because it is not a valid
       // SelectionData value.
       if (selectionDataValue[0]['id'] === SelectAllOption.id) {
@@ -226,22 +232,36 @@ export class MultiSelectComponent implements OnInit, OnChanges {
     }
   }
 
-  private appendSelectedOption(option: Option) {
-    this.selectedOptions.push(option);
-  }
-
   private appendAllSelectedOptions(selected: boolean) {
     for (const value of this.selectionValues) {
       this.appendSelectedOption({selectionData: value.selectionData, selected});
     }
   }
 
-  private removeSelectedOption(index: number) {
-    this.selectedOptions.splice(index, 1);
+  private appendSelectedOption(option: Option) {
+    this.selectedOptions.push(option);
   }
 
-  private removeAllSelectedOptions() {
-    this.selectedOptions = [];
+  private disableAllSelectedOptions(disable: boolean) {
+    if (this.checkboxes) {
+      this.checkboxes.forEach((checkbox, index) => {
+        if (index !== 0) {
+          checkbox.disabled = disable;
+        }
+      });
+    }
+  }
+
+  private filter(value: string): Option[] {
+    this.lastFilteteredSelectionValue = value;
+    if (value) {
+      return this.selectionValues.filter(option => {
+        return this.getDisplayName(option).toLowerCase().includes(
+            value.toLowerCase());
+      });
+    } else {
+      return this.selectionValues;
+    }
   }
 
   private getAllSelectedOptions(): Option[] {
@@ -255,10 +275,8 @@ export class MultiSelectComponent implements OnInit, OnChanges {
     return index;
   }
 
-  private setCheckStatusForAllSelectedOptions(checked: boolean) {
-    for (const checkbox of this.checkboxes) {
-      checkbox.checked = checked;
-    }
+  private removeAllSelectedOptions() {
+    this.selectedOptions = [];
   }
 
   private removeAndUncheckAllSelectedOptions() {
@@ -271,15 +289,13 @@ export class MultiSelectComponent implements OnInit, OnChanges {
     this.setCheckStatusForAllSelectedOptions(false);
   }
 
-  private filter(value: string): Option[] {
-    this.lastFilteteredSelectionValue = value;
-    if (value) {
-      return this.selectionValues.filter(option => {
-        return this.getDisplayName(option).toLowerCase().includes(
-            value.toLowerCase());
-      });
-    } else {
-      return this.selectionValues;
+  private removeSelectedOption(index: number) {
+    this.selectedOptions.splice(index, 1);
+  }
+
+  private setCheckStatusForAllSelectedOptions(checked: boolean) {
+    for (const checkbox of this.checkboxes) {
+      checkbox.checked = checked;
     }
   }
 }
