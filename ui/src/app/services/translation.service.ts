@@ -20,7 +20,7 @@ import {Inject, Injectable} from '@angular/core';
 import {Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
-import {SelectionData} from '../models/interfaces';
+import {Selection} from '../models/interfaces';
 import {LOCATION_TOKEN} from '../shared/tokens';
 
 /** Translation service. */
@@ -30,11 +30,11 @@ export class TranslationService {
     private readonly http: HttpClient,
     @Inject(LOCATION_TOKEN) private readonly location: Location) {}
 
-  getGlossaries(): Observable<HttpResponse<SelectionData[]>> {
+  getGlossaries(): Observable<HttpResponse<Selection[]>> {
     const params =
         new HttpParams({fromObject: {'endpoint': 'list_glossaries'}});
     return this.http
-        .get<SelectionData[]>(
+        .get<Selection[]>(
             this.getHost('list_glossaries'),
             {
               headers: this.getHeader(),
@@ -49,7 +49,7 @@ export class TranslationService {
   // TODO(): Consider obtaining list of languages from the
   // Cloud Translation API, a Keyword Platform endpoint (if in the roadmap)
   // or a JSON file.
-  getLanguages(): SelectionData[] {
+  getLanguages(): Selection[] {
     return [
       {code: 'af', name: 'Afrikaans'},
       {code: 'ak', name: 'Akan'},

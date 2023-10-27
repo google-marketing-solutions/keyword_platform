@@ -16,18 +16,30 @@
  */
 
 /**
- * @fileoverview Interfaces for data input/output and API request/response.
+ * @fileoverview Interfaces for data input/output and API requests/responses.
  */
 
 /**
- * Selection data interface for API requests/responses.
+ * Selection interface for API requests/responses.
  *
  * TODO(): Declare properties that represent API responses once
  * they're updated to share the same shape so that this interface can be
  * stronger typed.
  */
-export interface SelectionData {
+export interface Selection {
   [key: string]: string;
+}
+
+/**
+ * Translation interface for API requests.
+ */
+export interface Translation {
+  sourceLanguageCode: string;
+  targetLanguageCode: string;
+  glossaryId: string;
+  translateKeywords: boolean;
+  translateAds: boolean;
+  shortenTranslationsToCharLimit: boolean;
 }
 
 /**

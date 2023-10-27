@@ -20,7 +20,7 @@ import {Inject, Injectable} from '@angular/core';
 import {Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
-import {SelectionData} from '../models/interfaces';
+import {Selection} from '../models/interfaces';
 import {LOCATION_TOKEN} from '../shared/tokens';
 
 /** Google Ads service. */
@@ -30,11 +30,11 @@ export class GoogleAdsService {
       private readonly http: HttpClient,
       @Inject(LOCATION_TOKEN) private readonly location: Location) {}
 
-  getAccounts(): Observable<HttpResponse<SelectionData[]>> {
+  getAccounts(): Observable<HttpResponse<Selection[]>> {
     const params =
         new HttpParams({fromObject: {'endpoint': 'accessible_accounts'}});
     return this.http
-        .get<SelectionData[]>(
+        .get<Selection[]>(
             this.getHost('accessible_accounts'),
             {
               headers: this.getHeader(),
@@ -46,14 +46,13 @@ export class GoogleAdsService {
         .pipe(catchError(this.handleError), map(response => response));
   }
 
-  getCampaigns(accountIds: string[]):
-      Observable<HttpResponse<SelectionData[]>> {
+  getCampaigns(accountIds: string[]): Observable<HttpResponse<Selection[]>> {
     const params = new HttpParams({
       fromObject:
           {'selected_accounts': accountIds.join(','), 'endpoint': 'campaigns'}
     });
     return this.http
-        .get<SelectionData[]>(this.getHost('campaigns'), {
+        .get<Selection[]>(this.getHost('campaigns'), {
           headers: this.getHeader(),
           observe: 'response',
           params,

@@ -19,9 +19,9 @@
  * @fileoverview Data types for data input and/or output.
  */
 
-import {SelectionData} from './interfaces';
+import {Selection} from './interfaces';
 
 /**
- * SelectionData type grouping.
+ * Selection type grouping.
  */
-export type SelectionDataGroup = SelectionData|SelectionData[];
+export type SelectionGroup = Selection|Selection[];
