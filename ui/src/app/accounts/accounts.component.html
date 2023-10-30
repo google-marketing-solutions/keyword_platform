@@ -14,17 +14,19 @@
  limitations under the License.
 -->
 
-<div *ngIf="showSpinner" class="spinner">
-  <mat-spinner></mat-spinner>
+<div class="position">
+  <div *ngIf="showSpinner" class="spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+  <form [formGroup]="form">
+    <app-multi-select
+        #control
+        [controllerName]="'accounts'"
+        [className]="'responsive'"
+        [values]="accounts"
+        [label]="'Select accounts'"
+        [isRequired]=true
+        (selectionEvent)="accountSelection($event)">
+    </app-multi-select>
+  </form>
 </div>
-<form [formGroup]="form">
-  <app-multi-select
-      #control
-      [controllerName]="'accounts'"
-      [className]="'responsive'"
-      [values]="accounts"
-      [label]="'Select accounts'"
-      [isRequired]=true
-      (selectionEvent)="accountSelection($event)">
-  </app-multi-select>
-</form>

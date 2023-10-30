@@ -23,7 +23,7 @@ import {SelectionGroup} from '../models/types';
 import {MultiSelectComponent} from '../multi-select/multi-select.component';
 import {GoogleAdsService} from '../services/google-ads.service';
 
-const ACCOUNTS_CONTROL_NAME: string = 'accounts';
+const ACCOUNTS_CONTROL_NAME = 'accounts';
 
 /**
  * An accounts component.
@@ -37,6 +37,7 @@ const ACCOUNTS_CONTROL_NAME: string = 'accounts';
   styleUrls: ['./accounts.component.scss']
 })
 export class AccountsComponent implements OnInit, AfterViewInit {
+  @Output() readonly accountsLoadEvent = new EventEmitter<boolean>();
   @Output() readonly accountSelectionEvent = new EventEmitter<string[]>();
   @Output() readonly accountsValidationErrorEvent = new EventEmitter<boolean>();
 
@@ -93,11 +94,12 @@ export class AccountsComponent implements OnInit, AfterViewInit {
           this.showSpinner = false;
           this.accounts = response.body!;
           this.disableForm(false);
+          this.accountsLoadEvent.emit(true);
           console.log('Accounts request successful.');
         }),
         (error => {
           this.showSpinner = false;
-          this.disableForm(false);
+          this.accountsLoadEvent.emit(false);
           console.error(error);
         }));
   }

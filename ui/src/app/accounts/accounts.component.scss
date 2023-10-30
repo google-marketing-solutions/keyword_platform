@@ -15,8 +15,12 @@
  * limitations under the License.
  */
 
+.position {
+  position: relative;
+}
+
 .spinner {
   position: absolute;
   left: 45%;
-  top: 205px;
+  top: -30%;
 }
