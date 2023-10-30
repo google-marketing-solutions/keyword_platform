@@ -488,10 +488,12 @@ class CloudTranslationClientTest(parameterized.TestCase):
               cloud_translation_client_lib.Glossary(
                   id='fake-glossary-1',
                   name='projects/fake-project-id/locations/fake-region/glossaries/fake-glossary-1',
+                  display_name='fake-glossary-1',
               ),
               cloud_translation_client_lib.Glossary(
                   id='fake-glossary-2',
                   name='projects/fake-project-id/locations/fake-region/glossaries/fake-glossary-2',
+                  display_name='fake-glossary-2',
               ),
           ],
       },

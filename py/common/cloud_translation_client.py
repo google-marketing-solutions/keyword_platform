@@ -73,6 +73,7 @@ class Glossary:
 
   id: str = dataclasses.field(default_factory=str)
   name: str = dataclasses.field(default_factory=str)
+  display_name: str = dataclasses.field(default_factory=str)
 
 
 class GlossaryError(Exception):
@@ -385,8 +386,9 @@ class CloudTranslationClient:
       )
       raise
     for glossary in response['glossaries']:
+      id = glossary['name'].split('/')[-1]
       glossaries.append(
-          Glossary(id=glossary['name'].split('/')[-1], name=glossary['name'])
+          Glossary(id=id, name=glossary['name'], display_name=id)
       )
     return glossaries
 
