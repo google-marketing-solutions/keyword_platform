@@ -27,9 +27,10 @@ import {SingleSelectComponent} from '../single-select/single-select.component';
 
 type componentGroup = MatSlideToggle|MatCheckbox;
 
-enum LanguageControl {
+enum TranslationControl {
   SOURCE_LANGUAGE = 'source-language',
-  TARGET_LANGUAGE = 'target-language'
+  TARGET_LANGUAGE = 'target-language',
+  GLOSSARY = 'glossary'
 }
 
 /**
@@ -60,6 +61,7 @@ export class TranslationComponent implements OnInit, AfterViewInit {
   shortenTranslationsToCharLimit = false;
   translateAds = true;
   translateKeywords = true;
+  isGlossaryAvailable = false;
 
   @ViewChildren('component')
   private readonly components!: QueryList<componentGroup>;
@@ -79,7 +81,6 @@ export class TranslationComponent implements OnInit, AfterViewInit {
       this.form.addControl(control.controllerName!, control.control);
     }
     this.addLanguageValidators();
-    this.getGlossaries();
     this.form.valueChanges.subscribe(() => {
       this.translationValidationErrorEvent.emit(this.hasFormError());
     });
@@ -88,37 +89,67 @@ export class TranslationComponent implements OnInit, AfterViewInit {
 
   glossarySelection(value: SelectionGroup) {
     const glossary = value as Selection;
-    // If there's no glossary selected set the glossary id to the null glossary
-    // value (when there's no id present) otherwise the last glossary id from a
-    // previous selection would remain as the value. This can occur when a user
-    // selects a glossary then unselects it afterwards. This condition is the
-    // result of the glossary not being a required field.
+    // Only set the glossary ID if the glossary object is valid because the
+    // glossary selection has no validation.
     if (glossary) {
       this.glossaryId = glossary['id'];
-    } else {
-      this.glossaryId = glossary;
     }
   }
 
   sourceLanguageSelection(value: SelectionGroup) {
     const language = value as Selection;
-    if (language) {
-      this.sourceLanguageCode = language['code'];
-    }
+    this.sourceLanguageCode = language['code'];
   }
 
   targetLanguageSelection(value: SelectionGroup) {
     const language = value as Selection;
-    if (language) {
-      this.targetLanguageCode = language['code'];
-    }
+    this.targetLanguageCode = language['code'];
   }
 
   disableForm(disable: boolean) {
-    (disable) ? this.form.disable() : this.form.enable();
+    // Only include the glossary control when glossaries are available otherwise
+    // when this function gets called it'll enable/disable the glossary control
+    // regardless if it has data or not.
+    if (this.isGlossaryAvailable) {
+      this.disableFormControl(TranslationControl.GLOSSARY, disable);
+    }
+    this.disableFormControl(TranslationControl.SOURCE_LANGUAGE, disable);
+    this.disableFormControl(TranslationControl.TARGET_LANGUAGE, disable);
     for (const component of this.components) {
       component.setDisabledState(disable);
     }
+  }
+
+  disableFormControl(control: string, disable: boolean) {
+    const formControl = this.getFormControls()[control];
+    (disable) ? formControl.disable() : formControl.enable();
+  }
+
+ getGlossaries() {
+    this.showSpinner = true;
+    console.log('Glossaries requested.');
+    this.translationService.getGlossaries().subscribe(
+        (response => {
+          this.isGlossaryAvailable = true;
+          this.showSpinner = false;
+          this.glossaries = response.body!;
+          const controls = this.getFormControls();
+          const sourceLanguageControl =
+              controls[TranslationControl.SOURCE_LANGUAGE];
+          const targetLanguageControl =
+              controls[TranslationControl.TARGET_LANGUAGE];
+          // Glossary control should only be enabled when the source language
+          // and target language controls are enabled. Source and language
+          // controls are enabled when accounts are successfully loaded.
+          if (sourceLanguageControl.enabled && targetLanguageControl.enabled) {
+            this.disableFormControl(TranslationControl.GLOSSARY, false);
+          }
+          console.log('Glossaries request successful.');
+        }),
+        (error => {
+          this.showSpinner = false;
+          console.error(error);
+        }));
   }
 
   getTranslationData(): Translation {
@@ -135,14 +166,14 @@ export class TranslationComponent implements OnInit, AfterViewInit {
   private addLanguageValidators() {
     const controls = this.getFormControls();
 
-    const sourceLanguageControl = controls[LanguageControl.SOURCE_LANGUAGE];
-    const targetLanguageControl = controls[LanguageControl.TARGET_LANGUAGE];
+    const sourceLanguageControl = controls[TranslationControl.SOURCE_LANGUAGE];
+    const targetLanguageControl = controls[TranslationControl.TARGET_LANGUAGE];
 
     // See https://angular.io/api/forms/AbstractControl#addvalidators
     sourceLanguageControl.addValidators(
-        this.isSameLanguageValidator(LanguageControl.SOURCE_LANGUAGE));
+        this.isSameLanguageValidator(TranslationControl.SOURCE_LANGUAGE));
     targetLanguageControl.addValidators(
-        this.isSameLanguageValidator(LanguageControl.TARGET_LANGUAGE));
+        this.isSameLanguageValidator(TranslationControl.TARGET_LANGUAGE));
 
     sourceLanguageControl.updateValueAndValidity();
     targetLanguageControl.updateValueAndValidity();
@@ -150,24 +181,6 @@ export class TranslationComponent implements OnInit, AfterViewInit {
 
   private getFormControls(): {[key: string]: FormControl;} {
     return this.form.controls;
-  }
-
-  private getGlossaries() {
-    this.disableForm(true);
-    this.showSpinner = true;
-    console.log('Glossaries requested.');
-    this.translationService.getGlossaries().subscribe(
-        (response => {
-          this.showSpinner = false;
-          this.glossaries = response.body!;
-          this.disableForm(false);
-          console.log('Glossaries request successful.');
-        }),
-        (error => {
-          this.showSpinner = false;
-          this.disableForm(false);
-          console.error(error);
-        }));
   }
 
   private hasFormError(): boolean {
@@ -183,10 +196,10 @@ export class TranslationComponent implements OnInit, AfterViewInit {
 
   // TODO(): Consider creating abstract/base class for validators as
   // there are other custom validators in the repository.
-  private isSameLanguageValidator(languageControl: string): ValidatorFn {
+  private isSameLanguageValidator(translationControl: string): ValidatorFn {
     return (control: AbstractControl): ValidationErrors|null => {
       const language =
-          (languageControl === LanguageControl.SOURCE_LANGUAGE ?
+          (translationControl === TranslationControl.SOURCE_LANGUAGE ?
                this.targetLanguageCode :
                this.sourceLanguageCode);
       const value = control.value?.['code'];

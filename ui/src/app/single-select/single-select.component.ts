@@ -99,9 +99,9 @@ export class SingleSelectComponent implements OnInit, OnChanges {
   onClosed() {
     const value = this.control.value;
     // Emitting the value after closing the selection panel and not selecting an
-    // option should emit an invalid value (null or empty string) which the
-    // instantiator of this component can handle as an invalid response since it
-    // would not match the expected shape of the value's object.
+    // option should send an invalid value that does not match the expected
+    // shape of the value's object so it should not be read by the parent
+    // component/element when this component does not have validation.
     if ((!this.isRequired && !this.isValidValue(value))) {
       this.emitSelectionEvent(value);
     }

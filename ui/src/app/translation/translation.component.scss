@@ -34,10 +34,15 @@
   opacity: .80;
 }
 
+.position {
+  display: inline-block;
+  position:relative;
+}
+
 .spinner {
   position: absolute;
-  left: 45%;
-  top: 610px;
+  top: 10%;
+  left: 43%;
 }
 
 .non-title-content-margin {

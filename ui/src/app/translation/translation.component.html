@@ -14,14 +14,11 @@
  limitations under the License.
 -->
 
-<div *ngIf="showSpinner" class="spinner">
-  <mat-spinner></mat-spinner>
-</div>
 <form [formGroup]="form">
   <p class="title">Settings</p>
   <p class="sub-title">Select the source and target language for translation. (Optional): Apply a
     <a href="https://cloud.google.com/translate/docs/advanced/glossary"
-        target="_blank">glossary</a>.</p>
+        target="_blank">glossary</a> when available.</p>
   <div>
     <div class="juxtapose">
       <app-single-select
@@ -45,14 +42,16 @@
           (selectionEvent)="targetLanguageSelection($event)">
         </app-single-select>
     </div>
-    <div>
+    <div class="position">
+      <div *ngIf="showSpinner" class="spinner">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
       <app-single-select
           #control
           [controllerName]="'glossary'"
           [className]="'static'"
           [values]="glossaries"
           [label]="'Select glossary'"
-          [isRequired]=false
           (selectionEvent)="glossarySelection($event)">
       </app-single-select>
     </div>
