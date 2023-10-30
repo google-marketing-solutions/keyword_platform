@@ -16,26 +16,26 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatSelectModule} from '@angular/material/select';
+import {ReactiveFormsModule} from '@angular/forms';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatInputModule} from '@angular/material/input';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-import {DropDownComponent} from './drop-down.component';
+import {SingleSelectComponent} from './single-select.component';
 
-describe('DropDownComponent', () => {
-  let component: DropDownComponent;
-  let fixture: ComponentFixture<DropDownComponent>;
+describe('SingleSelectComponent', () => {
+  let component: SingleSelectComponent;
+  let fixture: ComponentFixture<SingleSelectComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [DropDownComponent],
+      declarations: [SingleSelectComponent],
       imports: [
-        BrowserAnimationsModule, FormsModule, MatFormFieldModule,
-        MatSelectModule, ReactiveFormsModule
+        BrowserAnimationsModule, MatAutocompleteModule, MatInputModule,
+        ReactiveFormsModule
       ]
     });
-    fixture = TestBed.createComponent(DropDownComponent);
+    fixture = TestBed.createComponent(SingleSelectComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

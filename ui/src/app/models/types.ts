@@ -17,17 +17,11 @@
 
 /**
  * @fileoverview Data types for data input and/or output.
- * E.g. Event data from a component event.
  */
 
-import {GoogleAds, Language, Glossary} from './interfaces';
-
-/**
- * SelectionData type.
- */
-export type SelectionData = GoogleAds|Language|Glossary;
+import {Selection} from './interfaces';
 
 /**
- * SelectionData type grouping.
+ * Selection type grouping.
  */
-export type SelectionDataGroup = SelectionData|SelectionData[];
+export type SelectionGroup = Selection|Selection[];

@@ -16,36 +16,36 @@
  */
 
 /**
- * @fileoverview Interfaces for data input/output and API request/response.
+ * @fileoverview Interfaces for data input/output and API requests/responses.
  */
 
 /**
- * Google Ads interface for API request/response.
+ * Selection interface for API requests/responses.
+ *
+ * TODO(): Declare properties that represent API responses once
+ * they're updated to share the same shape so that this interface can be
+ * stronger typed.
  */
-export interface GoogleAds {
-  id: string;
-  name: string;
+export interface Selection {
+  [key: string]: string;
 }
 
 /**
- * Glossary interface for API request/response.
+ * Translation interface for API requests.
  */
-export interface Glossary {
-  id: string;
-  name: string;
-}
-
-/**
- * Language interface for input/output.
- */
-export interface Language {
-  code: string;
-  name: string;
+export interface Translation {
+  sourceLanguageCode: string;
+  targetLanguageCode: string;
+  glossaryId: string;
+  translateKeywords: boolean;
+  translateAds: boolean;
+  shortenTranslationsToCharLimit: boolean;
 }
 
 /**
  * Output interface for API response. Output of successful form submission.
  */
 export interface Output {
-  [key: string]: {[key: string]: string[]}|{[key: string]: {[key: string]: number | string}};
+  [key: string]: {[key: string]: string[]}|
+      {[key: string]: {[key: string]: number | string}};
 }

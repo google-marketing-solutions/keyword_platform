@@ -1,0 +1,84 @@
+<!--
+ Copyright 2023 Google LLC.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<div class="content">
+  <mat-tab-group
+      fitInkBarToContent
+      mat-stretch-tabs="false"
+      animationDuration="0ms"
+      [selectedIndex]="1">
+    <!-- TODO(): Confirm header label. -->
+    <!-- TODO(): Add logo. -->
+    <mat-tab
+        label="Keyword Platform Beta"
+        disabled
+        labelClass="label">
+    </mat-tab>
+    <mat-tab label="Translate Keywords & Ads" labelClass="label">
+      <div class="tab">
+        <div class="disclaimer">
+          <mat-icon
+              aria-hidden="false"
+              aria-label="Google Cloud Translation API cost and usage note."
+              fontIcon="bookmark"
+              class="icon">
+          </mat-icon>
+          <span>Usage generates Google Cloud costs as it translates keywords and ads utilizing the
+            Google Cloud Translation API. Costs depend on the size of translation requests, see
+            <a href="https://cloud.google.com/translate/pricing" target="_blank">
+              Cloud Translation Pricing</a> for details.</span>
+        </div>
+        <div class="margin"></div>
+        <div class="forms">
+          <p class="title">Accounts</p>
+          <p class="sub-title">Select the accounts that contain the campaigns you want to translate.
+          </p>
+          <div class="component">
+            <app-accounts (accountsLoadEvent)="accountsLoad($event)"
+                          (accountSelectionEvent)="accountSelection($event)"
+                          (accountsValidationErrorEvent)="accountsValidationError($event)">
+            </app-accounts>
+          </div>
+          <p class="title">Campaigns</p>
+          <p class="sub-title">Select the campaigns with keywords and ads to translate. All enabled
+            ad groups will be pulled in automatically.</p>
+          <div class="component">
+            <app-campaigns
+                (campaignSelectionEvent)="campaignSelection($event)"
+                (campaignsValidationErrorEvent)="campaignsValidationError($event)">
+            </app-campaigns>
+          </div>
+          <app-translation
+              (translationValidationErrorEvent)="translationValidationError($event)">
+          </app-translation>
+          <div class="component">
+            <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="hasFormError()"
+                (click)="run()">
+              <span *ngIf="isRunRequestedStatus()" class="run-spinner">
+                <mat-spinner [diameter]="25"></mat-spinner>
+              </span>
+              <span>Run</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

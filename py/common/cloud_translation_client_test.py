@@ -488,10 +488,12 @@ class CloudTranslationClientTest(parameterized.TestCase):
               cloud_translation_client_lib.Glossary(
                   id='fake-glossary-1',
                   name='projects/fake-project-id/locations/fake-region/glossaries/fake-glossary-1',
+                  display_name='fake-glossary-1',
               ),
               cloud_translation_client_lib.Glossary(
                   id='fake-glossary-2',
                   name='projects/fake-project-id/locations/fake-region/glossaries/fake-glossary-2',
+                  display_name='fake-glossary-2',
               ),
           ],
       },
@@ -608,13 +610,15 @@ class CloudTranslationClientTest(parameterized.TestCase):
         # First call will be to try and delete the glossary if it exists.
         mock.call(
             expected_delete_url,
-            {},  # Parameters are empty for a delete request.
+            None,  # Parameters are empty for a delete request.
             expected_header,
             'DELETE',
         ),
         mock.call(expected_create_url, expected_create_params, expected_header),
         mock.call(
-            expected_operation_url, expected_operation_params, expected_header
+            expected_operation_url,
+            expected_operation_params,
+            expected_header,
         ),
     ])
 

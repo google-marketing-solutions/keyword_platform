@@ -110,7 +110,8 @@ directly. Instead, running the workers creates prefilled [Google Ads Editor
 Templates](https://support.google.com/google-ads/answer/10702525?hl=en) for Ads,
 Keywords, Ad Groups and Campaign for download as CSV files.
 
-> NOTE: After running a worker the produced download URLs have an expiration of
+> [!NOTE]
+> After running a worker the produced download URLs have an expiration of
 > 1 hour for security purposes as those links are universally accessible. If you
 > need to retrieve the generated CSVs after the link expiration you can still
 > download them but you have to do so directly from the Cloud Storage Bucket you
@@ -158,6 +159,66 @@ via Google Ads Editor.
 Costs depend on the size of the translation requests, see
 [Cloud Translation Pricing](https://cloud.google.com/translate/pricing) for
 details.
+
+## FAQs & Troubleshooting
+
+1.  **How do I stop certain terms (e.g., brand terms) from being translated?**
+
+    This can be avoided by using Glossaries, which are supported by Keyword
+    Platform. During installation a dedicated bucket for glossary files is
+    generated to which you can upload [unidirectional glossary files](https://cloud.google.com/translate/docs/advanced/glossary#unidirectional_glossaries). They will
+    automatically be picked up by a pub/sub subscription and processed, which
+    creates a glossary entry in your Google Cloud project. When running
+    translations you can select the glossary you want to apply from an optional
+    dropdown.
+
+1.  **How can I add terms to a glossary via the UI?**
+
+    This functionality is currently not available, but glossary entries are
+    overwritten by default. To update a previously generated glossary, simply
+    upload a new file with the same name containing previous and newly added
+    terms.
+
+1.  **Why are there no accounts in the account dropdown?**
+
+    This is likely due to credentials not being valid. To get more details, you
+    can check the logs by going to `Logs Explorer` in the Google Cloud Console.
+    To generate new credentials you can either run the installation again
+    (`./setup/install.sh`) or manually create new credentials using the [oauth
+    playground](https://developers.google.com/oauthplayground/). To do that, you
+    need to:
+    *   Add `https://developers.google.com/oauthplayground`` to the `Authorized
+        redirect URIs` in your OAuth2.0 client in the Google Cloud Console under
+        `APIs & Services > Credentials`.
+    *   On the [oauth playground page](https://developers.google.com/oauthplayground/)
+        add the client id and secret under `Settings > Use your own OAuth
+        credentials`.
+    *   Select all the [required scopes](https://github.com/google-marketing-solutions/keyword_platform/blob/main/setup/utils/oauth_flow.py#L41).
+    *   Hit `Authorize APIs` and exchange the access token for a refresh token.
+    *   In Google Cloud Console head to `Secret Manager` and update the secrets
+        accordingly.
+
+1.  **Why am I getting a `Http failure …/proxy: 500 OK` response after hitting
+    the RUN button?**
+
+    There can be various reasons for this and the logs will give you more
+    details as to what happened. Head to your Cloud Console `Logs Explorer`
+    and investigate any errors.
+
+1.  **When logging into my Google Account during installation I get "Access
+    blocked: This app's request is invalid".**
+
+    Make sure to have added http://localhost:8080 to the `Authorized redirect
+    URIs`` in your OAuth2.0 client in the Google Cloud Console under `APIs &
+    Services > Credentials`.
+
+1.  **During installation terraform command fails with `error creating Brand:
+    googleapi: Error 409: Requested entity already exists`.**
+
+    We use terraform for installation and setting up the Google Cloud resources.
+    Terraform only supports internal OAuth Consent Screens. Before installing
+    Keyword Platform, ensure that your OAuth Consent Screen is set to `internal`.
+
 
 ## Privacy Notice
 

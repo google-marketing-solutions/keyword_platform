@@ -76,9 +76,10 @@ def validate_credentials(
 
 def send_api_request(
     url: str,
-    params: dict[str, Any],
+    params: dict[str, Any] | None,
     http_header: dict[str, str],
-    method: str = 'POST') -> Any:
+    method: str = 'POST',
+) -> Any:
   """Call the requested API endpoint with the given parameters.
 
   Args:

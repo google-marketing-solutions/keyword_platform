@@ -55,7 +55,8 @@ describe('GoogleAdsService', () => {
   });
 
   it('should respond successfully using getAccounts', () => {
-    const body = [{'id': '1', 'name': 'Account 1'}];
+    const body =
+        [{'id': '1', 'name': 'Account 1', 'display_name': '[1] Account 1'}];
     const httpResponse =
         new HttpResponse({body, status: 200, statusText: 'OK'});
     getAccountsSpy = spyOn(TestBed.inject(GoogleAdsService), 'getAccounts');
@@ -76,7 +77,8 @@ describe('GoogleAdsService', () => {
   });
 
   it('should respond successfully using getCampaigns', () => {
-    const body = [{'id': '1', 'name': 'Campaign 1'}];
+    const body =
+        [{'id': '1', 'name': 'Campaign 1', 'display_name': '[1] Campaign 1'}];
     const httpResponse =
         new HttpResponse({body, status: 200, statusText: 'OK'});
     getCampaignsSpy = spyOn(TestBed.inject(GoogleAdsService), 'getCampaigns');

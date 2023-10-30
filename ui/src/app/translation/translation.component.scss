@@ -15,13 +15,48 @@
  * limitations under the License.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+.component {
+  margin-bottom: 35px;
+}
 
-import {ContentComponent} from './content/content.component';
+.juxtapose {
+  float: left;
+  margin-right: 15px;
+}
 
-const routes: Routes = [{path: '**', component: ContentComponent}];
+.margin {
+  margin-bottom: 35px;
+}
 
-@NgModule({imports: [RouterModule.forRoot(routes)], exports: [RouterModule]})
-export class AppRoutingModule {
+.note {
+  font-family: Roboto, sans-serif;
+  font-size: 10pt;
+  opacity: .80;
+}
+
+.position {
+  display: inline-block;
+  position:relative;
+}
+
+.spinner {
+  position: absolute;
+  top: 10%;
+  left: 43%;
+}
+
+.non-title-content-margin {
+  margin-top: 15px;
+}
+
+.sub-title {
+  font-family: Roboto, sans-serif;
+  opacity: .80;
+}
+
+.title {
+  font-family: Roboto, sans-serif;
+  font-size: 22px;
+  margin-bottom: 30px;
+  opacity: .80;
 }

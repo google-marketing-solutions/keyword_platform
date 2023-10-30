@@ -37,7 +37,7 @@
   padding: 15px;
 }
 
-.form {
+.forms {
   padding-left: 45px;
   padding-right: 45px;
 }
@@ -47,19 +47,8 @@
   padding-right: 5px;
 }
 
-.juxtapose {
-  float: left;
-  margin-right: 15px;
-}
-
 .margin {
   margin-bottom: 50px;
-}
-
-.spinner {
-  position: absolute;
-  left: 45%;
-  top: 350px;
 }
 
 .run-spinner {
@@ -69,13 +58,13 @@
   top: 5px;
 }
 
-.tab {
-  border-top: 1px solid rgba(0, 0, 0, 0.25);
-}
-
 .sub-title {
   font-family: Roboto, sans-serif;
   opacity: .80;
+}
+
+.tab {
+  border-top: 1px solid rgba(0, 0, 0, 0.25);
 }
 
 .title {
@@ -106,18 +95,4 @@
 ::ng-deep.mat-mdc-raised-button.mat-mdc-button-base {
   height: 50px;
   width: 150px;
-}
-
-.fade {
-  animation: fadeIn .3s ease-in;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
 }

@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-import {Inject, Injectable} from '@angular/core';
-import {Language} from '../models/interfaces';
 import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse} from '@angular/common/http';
+import {Inject, Injectable} from '@angular/core';
 import {Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
-import {Glossary} from '../models/interfaces';
+import {Selection} from '../models/interfaces';
 import {LOCATION_TOKEN} from '../shared/tokens';
 
 /** Translation service. */
@@ -31,11 +30,11 @@ export class TranslationService {
     private readonly http: HttpClient,
     @Inject(LOCATION_TOKEN) private readonly location: Location) {}
 
-  getGlossaries(): Observable<HttpResponse<Glossary[]>> {
+  getGlossaries(): Observable<HttpResponse<Selection[]>> {
     const params =
         new HttpParams({fromObject: {'endpoint': 'list_glossaries'}});
     return this.http
-        .get<Glossary[]>(
+        .get<Selection[]>(
             this.getHost('list_glossaries'),
             {
               headers: this.getHeader(),
@@ -50,7 +49,7 @@ export class TranslationService {
   // TODO(): Consider obtaining list of languages from the
   // Cloud Translation API, a Keyword Platform endpoint (if in the roadmap)
   // or a JSON file.
-  getLanguages(): Language[] {
+  getLanguages(): Selection[] {
     return [
       {code: 'af', name: 'Afrikaans'},
       {code: 'ak', name: 'Akan'},

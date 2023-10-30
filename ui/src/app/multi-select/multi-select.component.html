@@ -1,0 +1,49 @@
+<!--
+ Copyright 2023 Google LLC.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<mat-form-field appearance="outline" class="{{className}}">
+  <mat-label>{{label}}</mat-label>
+  <input
+      type="text"
+      attr.aria-label="{{label}}"
+      matInput
+      [formControl]="control"
+      [matAutocomplete]="auto">
+  <mat-autocomplete #auto="matAutocomplete"
+                    hideSingleSelectionIndicator
+                    [displayWith]="displaySelectOptions.bind(this)"
+                    (closed)="onClosed()">
+    <mat-option *ngFor="let value of filteredSelectionValues | async;"
+                [value]="selectedOptions">
+      <!-- The panel class helps prevent the autocomplete panel from auto
+      closing when checkboxes get clicked outside of their hit area because
+      stopPropagation does not fully halt the panel from closing. -->
+      <div class="panel"
+          (click)="$event.stopPropagation(); onCheckboxChange(value);">
+        <mat-checkbox #checkbox
+                      color="primary"
+                      [checked]="value.selected"
+                      (change)="onCheckboxChange(value)"
+                      (click)="$event.stopPropagation()">
+          {{getDisplayName(value)}}
+        </mat-checkbox>
+      </div>
+    </mat-option>
+  </mat-autocomplete>
+  <mat-error
+      *ngIf="control.hasError('required')"
+      class="error">Field is Required.</mat-error>
+</mat-form-field>

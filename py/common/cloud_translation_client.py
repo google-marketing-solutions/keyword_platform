@@ -73,6 +73,7 @@ class Glossary:
 
   id: str = dataclasses.field(default_factory=str)
   name: str = dataclasses.field(default_factory=str)
+  display_name: str = dataclasses.field(default_factory=str)
 
 
 class GlossaryError(Exception):
@@ -376,16 +377,17 @@ class CloudTranslationClient:
         gcp_region=self._gcp_region,
     )
     try:
-      response = api_utils.send_api_request(url, {}, self._get_http_header())
+      response = api_utils.send_api_request(
+          url, None, self._get_http_header(), method='GET'
+      )
     except requests.exceptions.HTTPError as http_error:
       logging.exception(
           'Encountered error during calls to Translation API: %s', http_error
       )
       raise
     for glossary in response['glossaries']:
-      glossaries.append(
-          Glossary(id=glossary['name'].split('/')[-1], name=glossary['name'])
-      )
+      id = glossary['name'].split('/')[-1]
+      glossaries.append(Glossary(id=id, name=glossary['name'], display_name=id))
     return glossaries
 
   def get_glossary_info_from_cloud_event_data(
@@ -455,7 +457,6 @@ class CloudTranslationClient:
 
     try:
       self._delete_glossary(glossary_id)
-      logging.info('Deleted glossary with id %s', glossary_id)
     except google.api_core.exceptions.NotFound:
       logging.info('Creating glossary with id %s', glossary_id)
 
@@ -525,6 +526,7 @@ class CloudTranslationClient:
       finished_operation = api_utils.send_api_request(
           url, params, self._get_http_header()
       )
+      logging.info('Finished glossary operation: %s.', finished_operation)
     except requests.exceptions.HTTPError as http_error:
       logging.exception(
           'Encountered error during calls to Translation API: %s', http_error
@@ -551,7 +553,8 @@ class CloudTranslationClient:
     )
 
     try:
-      api_utils.send_api_request(url, {}, self._get_http_header(), 'DELETE')
+      api_utils.send_api_request(url, None, self._get_http_header(), 'DELETE')
+      logging.info('Deleted glossary with id %s', glossary_id)
     except requests.exceptions.HTTPError as http_error:
       if http_error.response.status_code == 404:
         logging.info('Glossary with id %s not found.', glossary_id)

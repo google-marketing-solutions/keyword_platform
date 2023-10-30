@@ -17,36 +17,29 @@
 
 import {HttpClientModule} from '@angular/common/http';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MatDialogModule} from '@angular/material/dialog';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatIconModule} from '@angular/material/icon';
+import {ReactiveFormsModule} from '@angular/forms';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatInputModule} from '@angular/material/input';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {MatCheckboxModule} from '@angular/material/checkbox';
-import {MatSelectModule} from '@angular/material/select';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {MatTabsModule} from '@angular/material/tabs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-import {DropDownComponent} from '../drop-down/drop-down.component';
+import {MultiSelectComponent} from '../multi-select/multi-select.component';
 
-import {FormComponent} from './form.component';
+import {AccountsComponent} from './accounts.component';
 
-describe('FormComponent', () => {
-  let component: FormComponent;
-  let fixture: ComponentFixture<FormComponent>;
+describe('AccountsComponent', () => {
+  let component: AccountsComponent;
+  let fixture: ComponentFixture<AccountsComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [DropDownComponent, FormComponent],
+      declarations: [MultiSelectComponent, AccountsComponent],
       imports: [
-        BrowserAnimationsModule, FormsModule, HttpClientModule, MatDialogModule,
-        MatFormFieldModule, MatIconModule, MatProgressSpinnerModule,
-        MatSelectModule, ReactiveFormsModule, MatTabsModule,
-        MatSlideToggleModule, MatCheckboxModule
+        BrowserAnimationsModule, HttpClientModule, MatAutocompleteModule,
+        MatInputModule, MatProgressSpinnerModule, ReactiveFormsModule
       ]
     });
-    fixture = TestBed.createComponent(FormComponent);
+    fixture = TestBed.createComponent(AccountsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

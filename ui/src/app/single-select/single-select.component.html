@@ -16,23 +16,28 @@
 
 <mat-form-field appearance="outline" class="{{className}}">
   <mat-label>{{label}}</mat-label>
-  <mat-select
-    (selectionChange)="onChange($event.value)"
-    [multiple]="isMultiple"
-    [formControl]="control"
-    #selection>
-    <mat-option
-        *ngIf="isMultiple && values"
-        [value]="0"
-        (click)="toggleAllSelection(selection)">Select All</mat-option>
-    <mat-option *ngFor="let value of values" [value]="value">
-      {{concatenateValue(value)}}
+  <input
+      type="text"
+      attr.aria-label="{{label}}"
+      matInput
+      [formControl]="control"
+      [matAutocomplete]="auto">
+  <mat-autocomplete #auto="matAutocomplete"
+                    hideSingleSelectionIndicator
+                    [displayWith]="displaySelectOption.bind(this)"
+                    (optionSelected)="onSelected($event.option)"
+                    (closed)="onClosed()">
+    <mat-option *ngFor="let value of filteredValues | async" [value]="value">
+      {{getDisplayName(value)}}
     </mat-option>
-  </mat-select>
+  </mat-autocomplete>
   <mat-error
       *ngIf="control.hasError('required')"
       class="error">Field is Required.</mat-error>
   <mat-error
       *ngIf="control.hasError('sameLanguage')"
       class="error">Source and target language must be different.</mat-error>
+      <mat-error
+      *ngIf="control.hasError('invalidText')"
+      class="error">Text is invalid.</mat-error>
 </mat-form-field>
