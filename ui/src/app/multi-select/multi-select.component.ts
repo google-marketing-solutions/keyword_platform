@@ -79,6 +79,7 @@ export class MultiSelectComponent implements OnInit, OnChanges {
       // when all input from the text field is deleted without unchecking
       // selection options first.
       if (this.selectedOptions.length > 0 && this.control.errors) {
+        this.disableAllSelectedOptions(false);
         this.removeAndUncheckAllSelectedOptions();
       }
     });
@@ -252,13 +253,33 @@ export class MultiSelectComponent implements OnInit, OnChanges {
     }
   }
 
+  private isMatchingValue(value: string): Option[] {
+    return this.selectionValues.filter(option => {
+      return this.getDisplayName(option).toLowerCase().includes(
+          value.toLowerCase());
+    });
+  }
+
   private filter(value: string): Option[] {
     this.lastFilteteredSelectionValue = value;
     if (value) {
-      return this.selectionValues.filter(option => {
-        return this.getDisplayName(option).toLowerCase().includes(
-            value.toLowerCase());
-      });
+      // If select all is already checked then filtering is not needed.
+      const selectedOption = this.selectedOptions[0];
+      if (selectedOption &&
+          selectedOption.selectionData['id'] === SelectAllOption.id &&
+          selectedOption.selected) {
+        return this.selectionValues;
+      }
+
+      const matchingValue = this.isMatchingValue(value);
+      // Prevent select all from being filtered.
+      if (matchingValue[0] &&
+          matchingValue[0].selectionData['id'] === SelectAllOption.id &&
+          !matchingValue[0].selected) {
+        return this.selectionValues;
+      } else {
+        return matchingValue;
+      }
     } else {
       return this.selectionValues;
     }
