@@ -76,6 +76,16 @@ export class ContentComponent {
       private readonly dialog: MatDialog,
       private readonly runService: RunService) {}
 
+  accountsLoad(value: boolean) {
+    // Control enablement/disablement of translationComponent depending on
+    // whether accounts where successfully loaded or not.
+    this.translationComponent.disableForm(!value);
+    // Only make a request for glossaries if accounts successfully loaded.
+    if (value) {
+      this.translationComponent.getGlossaries();
+    }
+  }
+
   accountSelection(value: string[]) {
     // Reset campaign selections anytime accounts get selected in order to
     // force validation handling otherwise campaign values from the previous UI

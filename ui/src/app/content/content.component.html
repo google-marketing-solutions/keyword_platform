@@ -47,7 +47,8 @@
           <p class="sub-title">Select the accounts that contain the campaigns you want to translate.
           </p>
           <div class="component">
-            <app-accounts (accountSelectionEvent)="accountSelection($event)"
+            <app-accounts (accountsLoadEvent)="accountsLoad($event)"
+                          (accountSelectionEvent)="accountSelection($event)"
                           (accountsValidationErrorEvent)="accountsValidationError($event)">
             </app-accounts>
           </div>
