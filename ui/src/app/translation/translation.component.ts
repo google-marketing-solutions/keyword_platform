@@ -93,6 +93,8 @@ export class TranslationComponent implements OnInit, AfterViewInit {
     // glossary selection has no validation.
     if (glossary) {
       this.glossaryId = glossary['id'];
+    } else {
+      this.glossaryId = glossary;
     }
   }
 
