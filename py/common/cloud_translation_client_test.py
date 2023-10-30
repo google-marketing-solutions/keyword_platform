@@ -619,7 +619,6 @@ class CloudTranslationClientTest(parameterized.TestCase):
             expected_operation_url,
             expected_operation_params,
             expected_header,
-            'GET',
         ),
     ])
 

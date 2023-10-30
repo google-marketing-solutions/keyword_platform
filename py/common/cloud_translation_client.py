@@ -524,7 +524,7 @@ class CloudTranslationClient:
       )
       params = {'timeout': f'{timeout_sec}s'}
       finished_operation = api_utils.send_api_request(
-          url, params, self._get_http_header(), 'GET'
+          url, params, self._get_http_header()
       )
       logging.info('Finished glossary operation: %s.', finished_operation)
     except requests.exceptions.HTTPError as http_error:
