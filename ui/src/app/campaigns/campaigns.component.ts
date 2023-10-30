@@ -23,7 +23,7 @@ import {SelectionGroup} from '../models/types';
 import {MultiSelectComponent} from '../multi-select/multi-select.component';
 import {GoogleAdsService} from '../services/google-ads.service';
 
-const CAMPAIGN_CONTROL_NAME: string = 'campaigns';
+const CAMPAIGN_CONTROL_NAME = 'campaigns';
 
 /**
  * A campaigns component.
@@ -95,7 +95,6 @@ export class CampaignsComponent implements AfterViewInit {
             }),
             (error => {
               this.showSpinner = false;
-              this.disableForm(false);
               console.error(error);
             }));
   }
