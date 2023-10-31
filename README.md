@@ -160,6 +160,17 @@ Costs depend on the size of the translation requests, see
 [Cloud Translation Pricing](https://cloud.google.com/translate/pricing) for
 details.
 
+### Glossaries
+
+The solution supports [unidirectional Glossaries](https://cloud.google.com/translate/docs/advanced/glossary#format-glossary),
+which will be automatically created when uploaded file to a dedicated cloud
+storage bucket (`gs://my-project-glossaries`). Glossary CSV files **MUST**
+adhere to the following naming convention:
+
+`[source-language-code]-to-[target-language-code]-[your-glossary-name].csv`
+
+e.g. `en-to-de-brandterms.csv`
+
 ## FAQs & Troubleshooting
 
 1.  **How do I stop certain terms (e.g., brand terms) from being translated?**
