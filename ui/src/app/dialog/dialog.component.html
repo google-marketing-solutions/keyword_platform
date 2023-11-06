@@ -14,61 +14,41 @@
  limitations under the License.
 -->
 
-<div *ngIf="statusText === 'OK'">
-  <div>
-    <div class="juxtapose">
-      <h1 mat-dialog-title class="title">Download</h1>
-    </div>
-    <div mat-dialog-actions align="end">
-      <button mat-icon-button mat-dialog-close color="primary">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
+<div>
+  <div class="juxtapose">
+    <h1 mat-dialog-title>Download</h1>
   </div>
-  <div class="note">
-    <mat-icon
-        aria-hidden="false"
-        aria-label="Google Ads Editor template expiration note"
-        fontIcon="bookmark"
-        class="icon">
-    </mat-icon>
-    <span>Link(s) to the below Google Ads Editor template(s) automatically expire
-      in 1 hour.</span>
-  </div>
-  <div class="priority separate">
-    <mat-icon
-        aria-hidden="false"
-        aria-label="Keyword Platform tracking label warning"
-        fontIcon="priority_high"
-        class="icon">
-    </mat-icon>
-    <span>Please do not remove the <strong>Keyword Platform</strong> label from
-      the editor template(s) below.</span>
-  </div>
-  <div mat-dialog-content class="content">
-    <div *ngFor="let type of assetUrls | keyvalue">
-       <p>{{getFileTypeDescription(type.key)}}</p>
-      <div *ngFor="let assetUrl of type.value">
-        <p><a href="{{assetUrl}}" target="_blank">{{getFileNameFromUrl(assetUrl)}}</a></p>
-      </div>
-    </div>
+  <div mat-dialog-actions align="end">
+    <button mat-icon-button mat-dialog-close color="primary">
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
 </div>
-<div *ngIf="statusText !== 'OK'">
-  <div>
-    <div class="juxtapose">
-      <h1 mat-dialog-title class="title">Error</h1>
-    </div>
-    <div mat-dialog-actions align="end">
-      <button mat-icon-button mat-dialog-close color="primary">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
-  <div mat-dialog-content class="content">
-    <div class="error">
-      <mat-icon aria-hidden="false" aria-label="Error" fontIcon="error" class="icon"></mat-icon>
-      <span>{{statusText}}</span>
+<div class="note">
+  <mat-icon aria-hidden="false"
+            aria-label="Google Ads Editor template expiration note"
+            fontIcon="bookmark"
+            class="icon">
+  </mat-icon>
+  <span>Link(s) to the below Google Ads Editor template(s) automatically expire
+    in 1 hour.</span>
+</div>
+<div class="priority separate">
+  <mat-icon aria-hidden="false"
+            aria-label="Keyword Platform tracking label warning"
+            fontIcon="priority_high"
+            class="icon">
+  </mat-icon>
+  <span>Please do not remove the <strong>Keyword Platform</strong> label from
+    the editor template(s) below.</span>
+</div>
+<div mat-dialog-content class="content">
+  <div *ngFor="let type of assetUrls | keyvalue">
+    <p>{{getFileTypeDescription(type.key)}}</p>
+    <div *ngFor="let assetUrl of type.value">
+      <p>
+        <a href="{{assetUrl}}" target="_blank">{{getFileNameFromUrl(assetUrl)}}</a>
+      </p>
     </div>
   </div>
 </div>

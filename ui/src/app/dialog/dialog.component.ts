@@ -21,7 +21,7 @@ import {MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {Output} from '../models/interfaces';
 
 interface DialogData {
-  [key: string]: Output|string|null;
+  [key: string]: Output;
 }
 
 /** The dialog component to display output. */
@@ -32,15 +32,12 @@ interface DialogData {
 })
 export class DialogComponent implements OnInit {
   assetUrls?: {[key: string]: string[]};
-  message?: string;
-  statusText?: string;
 
   constructor(@Inject(MAT_DIALOG_DATA) readonly data: DialogData) {}
 
   ngOnInit() {
-    this.statusText = this.data['statusText'] as string;
-    if (this.statusText === 'OK') {
-      const value = this.data['value'] as Output;
+    const value = this.data['value'];
+    if (value) {
       this.assetUrls = value['asset_urls'] as {[key: string]: string[]};
     }
   }

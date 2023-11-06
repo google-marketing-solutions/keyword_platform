@@ -47,10 +47,6 @@
   margin-top: 20px;
 }
 
-.error {
-  @include callouts(#fbe9e7, #a52714 , #a52714);
-}
-
 .note {
   @include callouts(#e1f5fe, #1a6ebb, #1a6ebb);
 }
