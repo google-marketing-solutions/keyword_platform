@@ -29,7 +29,7 @@ import {map, startWith} from 'rxjs/operators';
   styleUrls: ['./single-select.component.scss']
 })
 export class SingleSelectComponent implements OnInit, OnChanges {
-  @Input() controllerName?: string;
+  @Input() controlName?: string;
   @Input() label?: string;
   @Input() className?: string;
   @Input() isRequired?: boolean;
