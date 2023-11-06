@@ -104,10 +104,12 @@ export class MultiSelectComponent implements OnInit, OnChanges {
 
     const currentValue = changes['values']['currentValue'];
     if (currentValue) {
-      this.selectionValues.push({
-        selectionData: {id: SelectAllOption.id, name: SelectAllOption.name},
-        selected: false
-      });
+      if (currentValue.length > 1) {
+        this.selectionValues.push({
+          selectionData: {id: SelectAllOption.id, name: SelectAllOption.name},
+          selected: false
+        });
+      }
       for (const value of currentValue) {
         this.selectionValues.push({selectionData: value, selected: false});
       }
