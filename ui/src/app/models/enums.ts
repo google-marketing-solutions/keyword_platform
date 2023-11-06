@@ -16,12 +16,21 @@
  */
 
 /**
- * @fileoverview Enums for workers and api/service request status.
+ * @fileoverview Enums for workers, api/service request status, and others.
  */
 
-/** List of workers to run. */
+/** Workers to run. */
 export enum Worker {
   TRANSLATION_WORKER = 'translationWorker'
+}
+
+/** Form control names. */
+export enum ControlName {
+  ACCOUNTS = 'accounts',
+  CAMPAIGNS = 'campaigns',
+  SOURCE_LANGUAGE = 'source-language',
+  TARGET_LANGUAGE = 'target-language',
+  GLOSSARY = 'glossary'
 }
 
 /** Status of api/service requests. */
@@ -30,4 +39,10 @@ export enum RequestStatus {
   REQUESTED = 'Requested',
   RESPONDED = 'Responded',
   ERROR = 'Error'
+}
+
+/** Font icon names. */
+export enum FontIcon {
+  ERROR = 'error',
+  PRIORITY = 'priority_high'
 }
