@@ -46,7 +46,7 @@ interface Option {
 export class MultiSelectComponent implements OnInit, OnChanges {
   @ViewChildren('checkbox') checkboxes!: QueryList<MatCheckbox>;
 
-  @Input() controllerName?: string;
+  @Input() controlName?: string;
   @Input() label?: string;
   @Input() className?: string;
   @Input() isRequired?: boolean;
@@ -101,13 +101,13 @@ export class MultiSelectComponent implements OnInit, OnChanges {
     // selection panel is closed then only the campaigns from that new account
     // selection should be appended, not campaigns from both.
     this.selectionValues = [];
-    this.selectionValues.push({
-      selectionData: {id: SelectAllOption.id, name: SelectAllOption.name},
-      selected: false
-    });
 
     const currentValue = changes['values']['currentValue'];
     if (currentValue) {
+      this.selectionValues.push({
+        selectionData: {id: SelectAllOption.id, name: SelectAllOption.name},
+        selected: false
+      });
       for (const value of currentValue) {
         this.selectionValues.push({selectionData: value, selected: false});
       }
