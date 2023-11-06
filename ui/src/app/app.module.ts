@@ -28,6 +28,7 @@ import {MatInputModule} from '@angular/material/input';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSelectModule} from '@angular/material/select';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatTabsModule} from '@angular/material/tabs';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -42,20 +43,36 @@ import {DialogComponent} from './dialog/dialog.component';
 import {MultiSelectComponent} from './multi-select/multi-select.component';
 import {ServicesModule} from './services/services_module';
 import {SingleSelectComponent} from './single-select/single-select.component';
+import {SnackbarComponent} from './snackbar/snackbar.component';
 import {TranslationComponent} from './translation/translation.component';
 
 @NgModule({
   declarations: [
     AccountsComponent, AppComponent, CampaignsComponent, ContentComponent,
     DialogComponent, MultiSelectComponent, SingleSelectComponent,
-    TranslationComponent
+    SnackbarComponent, TranslationComponent
   ],
   imports: [
-    BrowserAnimationsModule, BrowserModule, AppRoutingModule, FormsModule,
-    HttpClientModule, MatAutocompleteModule, MatButtonModule, MatCheckboxModule,
-    MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatProgressSpinnerModule, MatSelectModule, MatSlideToggleModule,
-    MatTabsModule, ReactiveFormsModule, RouterModule, ServicesModule
+    BrowserAnimationsModule,
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
+    HttpClientModule,
+    MatAutocompleteModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    MatSlideToggleModule,
+    MatSnackBarModule,
+    MatTabsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    ServicesModule
   ],
   providers: [],
   bootstrap: [AppComponent]
