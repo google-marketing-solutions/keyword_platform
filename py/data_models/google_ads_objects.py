@@ -20,6 +20,7 @@ import pandas as pd
 from data_models import ad_groups as ad_groups_lib
 from data_models import ads as ads_lib
 from data_models import campaigns as campaigns_lib
+from data_models import extensions as extensions_lib
 from data_models import keywords as keywords_lib
 
 
@@ -31,6 +32,7 @@ class GoogleAdsObjects:
   ad_groups: ad_groups_lib.AdGroups|None = None
   campaigns: campaigns_lib.Campaigns|None = None
   keywords: keywords_lib.Keywords|None = None
+  extensions: extensions_lib.Extensions | None = None
 
   def get_multiple_dataframes(self) -> dict[str, pd.DataFrame]:
     """Returns a dict of file name and data for the Google Ads objects."""
@@ -43,6 +45,8 @@ class GoogleAdsObjects:
       data[self.campaigns.file_name()] = self.campaigns.df()
     if self.keywords:
       data[self.keywords.file_name()] = self.keywords.df()
+    if self.extensions:
+      data[self.extensions.file_name()] = self.extensions.df()
     return data
 
   def get_combined_dataframe(self) -> dict[str, pd.DataFrame]:
@@ -56,6 +60,8 @@ class GoogleAdsObjects:
       df_data.append(self.campaigns.df())
     if self.keywords:
       df_data.append(self.keywords.df())
+    if self.extensions:
+      df_data.append(self.extensions.df())
     combined_data = dict()
     if df_data:
       filename = self._generate_combined_file_name()
