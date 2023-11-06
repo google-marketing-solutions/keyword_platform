@@ -33,6 +33,7 @@ from data_models import accounts as accounts_lib
 from data_models import ad_groups as ad_groups_lib
 from data_models import ads as ads_lib
 from data_models import campaigns as campaigns_lib
+from data_models import extensions as extensions_lib
 from data_models import google_ads_objects as google_ads_objects_lib
 from data_models import keywords as keywords_lib
 from data_models import settings as settings_lib
@@ -256,9 +257,11 @@ class ExecutionRunner:
     campaigns = self._build_campaigns()
     ads, ad_groups = self._build_ads_and_ad_groups()
     keywords = self._build_keywords()
+    extensions = self._build_extensions()
 
     return google_ads_objects_lib.GoogleAdsObjects(
-        ads, ad_groups, campaigns, keywords)
+        ads, ad_groups, campaigns, keywords, extensions
+    )
 
   def _build_campaigns(self) -> campaigns_lib.Campaigns:
     """Builds a Campaigns object."""
@@ -306,6 +309,33 @@ class ExecutionRunner:
     ad_groups = ad_groups_lib.AdGroups(ads_data_responses)
 
     return ads, ad_groups
+
+  def _build_extensions(
+      self,
+  ) -> extensions_lib.Extensions | None:
+    """Builds an Extensions object."""
+    extensions_data_responses = []
+    campaigns = self._settings.campaigns
+    customer_ids = self._settings.customer_ids
+
+    with futures.ThreadPoolExecutor() as executor:
+      responses = executor.map(
+          lambda customer_id: self._google_ads_client.get_extensions_for_campaigns(
+              customer_id, campaigns
+          ),
+          customer_ids,
+      )
+
+    for response in responses:
+      if isinstance(response, list):
+        extensions_data_responses.append(response)
+
+    if self._settings.translate_extensions:
+      extensions = extensions_lib.Extensions(extensions_data_responses)
+    else:
+      logging.info('Skipping extensions translation.')
+      extensions = None
+    return extensions
 
   def _build_keywords(self) -> keywords_lib.Keywords | None:
     """Builds a Keywords object."""
