@@ -20,18 +20,13 @@ import {AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn} 
 import {MatCheckbox} from '@angular/material/checkbox';
 import {MatSlideToggle} from '@angular/material/slide-toggle';
 
+import {ControlName} from '../models/enums';
 import {Selection, Translation} from '../models/interfaces';
 import {SelectionGroup} from '../models/types';
 import {TranslationService} from '../services/translation.service';
 import {SingleSelectComponent} from '../single-select/single-select.component';
 
-type componentGroup = MatSlideToggle|MatCheckbox;
-
-enum TranslationControl {
-  SOURCE_LANGUAGE = 'source-language',
-  TARGET_LANGUAGE = 'target-language',
-  GLOSSARY = 'glossary'
-}
+type MatComponentGroup = MatSlideToggle|MatCheckbox;
 
 /**
  * A translation component.
@@ -45,8 +40,7 @@ enum TranslationControl {
   styleUrls: ['./translation.component.scss']
 })
 export class TranslationComponent implements OnInit, AfterViewInit {
-  @Output()
-  readonly translationValidationErrorEvent = new EventEmitter<boolean>();
+  @Output() readonly validationErrorEvent = new EventEmitter<boolean>();
 
   form = new FormGroup({});
 
@@ -57,32 +51,38 @@ export class TranslationComponent implements OnInit, AfterViewInit {
   sourceLanguageCode?: string;
   targetLanguageCode?: string;
 
+  sourceLanguageControlName = '';
+  targetLanguageControlName = '';
+  glossaryControlName = '';
   showSpinner = false;
   shortenTranslationsToCharLimit = false;
   translateAds = true;
   translateKeywords = true;
   isGlossaryAvailable = false;
 
-  @ViewChildren('component')
-  private readonly components!: QueryList<componentGroup>;
-  @ViewChildren('control')
-  private readonly controls!: QueryList<SingleSelectComponent>;
+  @ViewChildren('matComponent')
+  private readonly matComponents!: QueryList<MatComponentGroup>;
+  @ViewChildren('controlComponent')
+  private readonly controlComponents!: QueryList<SingleSelectComponent>;
 
   constructor(
       private readonly changeRefDetector: ChangeDetectorRef,
       private readonly translationService: TranslationService) {}
 
   ngOnInit() {
+    this.sourceLanguageControlName = ControlName.SOURCE_LANGUAGE;
+    this.targetLanguageControlName = ControlName.TARGET_LANGUAGE;
+    this.glossaryControlName = ControlName.GLOSSARY;
     this.languages = this.translationService.getLanguages();
   }
 
   ngAfterViewInit() {
-    for (const control of this.controls) {
-      this.form.addControl(control.controllerName!, control.control);
+    for (const component of this.controlComponents) {
+      this.form.addControl(component.controlName!, component.control);
     }
     this.addLanguageValidators();
     this.form.valueChanges.subscribe(() => {
-      this.translationValidationErrorEvent.emit(this.hasFormError());
+      this.validationErrorEvent.emit(this.hasError());
     });
     this.changeRefDetector.detectChanges();
   }
@@ -108,23 +108,18 @@ export class TranslationComponent implements OnInit, AfterViewInit {
     this.targetLanguageCode = language['code'];
   }
 
-  disableForm(disable: boolean) {
+  disable(isDisabled: boolean) {
     // Only include the glossary control when glossaries are available otherwise
     // when this function gets called it'll enable/disable the glossary control
     // regardless if it has data or not.
     if (this.isGlossaryAvailable) {
-      this.disableFormControl(TranslationControl.GLOSSARY, disable);
+      this.disableControl(this.glossaryControlName, isDisabled);
     }
-    this.disableFormControl(TranslationControl.SOURCE_LANGUAGE, disable);
-    this.disableFormControl(TranslationControl.TARGET_LANGUAGE, disable);
-    for (const component of this.components) {
-      component.setDisabledState(disable);
+    this.disableControl(this.sourceLanguageControlName, isDisabled);
+    this.disableControl(this.targetLanguageControlName, isDisabled);
+    for (const component of this.matComponents) {
+      component.setDisabledState(isDisabled);
     }
-  }
-
-  disableFormControl(control: string, disable: boolean) {
-    const formControl = this.getFormControls()[control];
-    (disable) ? formControl.disable() : formControl.enable();
   }
 
  getGlossaries() {
@@ -135,16 +130,16 @@ export class TranslationComponent implements OnInit, AfterViewInit {
           this.isGlossaryAvailable = true;
           this.showSpinner = false;
           this.glossaries = response.body!;
-          const controls = this.getFormControls();
+          const controls = this.getControls();
           const sourceLanguageControl =
-              controls[TranslationControl.SOURCE_LANGUAGE];
+              controls[this.sourceLanguageControlName];
           const targetLanguageControl =
-              controls[TranslationControl.TARGET_LANGUAGE];
+              controls[this.targetLanguageControlName];
           // Glossary control should only be enabled when the source language
           // and target language controls are enabled. Source and language
           // controls are enabled when accounts are successfully loaded.
           if (sourceLanguageControl.enabled && targetLanguageControl.enabled) {
-            this.disableFormControl(TranslationControl.GLOSSARY, false);
+            this.disableControl(this.glossaryControlName, false);
           }
           console.log('Glossaries request successful.');
         }),
@@ -165,28 +160,17 @@ export class TranslationComponent implements OnInit, AfterViewInit {
     };
   }
 
-  private addLanguageValidators() {
-    const controls = this.getFormControls();
-
-    const sourceLanguageControl = controls[TranslationControl.SOURCE_LANGUAGE];
-    const targetLanguageControl = controls[TranslationControl.TARGET_LANGUAGE];
-
-    // See https://angular.io/api/forms/AbstractControl#addvalidators
-    sourceLanguageControl.addValidators(
-        this.isSameLanguageValidator(TranslationControl.SOURCE_LANGUAGE));
-    targetLanguageControl.addValidators(
-        this.isSameLanguageValidator(TranslationControl.TARGET_LANGUAGE));
-
-    sourceLanguageControl.updateValueAndValidity();
-    targetLanguageControl.updateValueAndValidity();
+  private disableControl(controlName: string, isDisabled: boolean) {
+    const control = this.getControls()[controlName];
+    (isDisabled) ? control.disable() : control.enable();
   }
 
-  private getFormControls(): {[key: string]: FormControl;} {
+  private getControls(): {[key: string]: FormControl;} {
     return this.form.controls;
   }
 
-  private hasFormError(): boolean {
-    const controls = this.getFormControls();
+  private hasError(): boolean {
+    const controls = this.getControls();
     const result = [];
     for (const control of Object.values(controls)) {
       if (control.errors) {
@@ -196,12 +180,28 @@ export class TranslationComponent implements OnInit, AfterViewInit {
     return result.length > 0;
   }
 
+  private addLanguageValidators() {
+    const controls = this.getControls();
+
+    const sourceLanguageControl = controls[this.sourceLanguageControlName];
+    const targetLanguageControl = controls[this.targetLanguageControlName];
+
+    // See https://angular.io/api/forms/AbstractControl#addvalidators
+    sourceLanguageControl.addValidators(
+        this.isSameLanguageValidator(this.sourceLanguageControlName));
+    targetLanguageControl.addValidators(
+        this.isSameLanguageValidator(this.targetLanguageControlName));
+
+    sourceLanguageControl.updateValueAndValidity();
+    targetLanguageControl.updateValueAndValidity();
+  }
+
   // TODO(): Consider creating abstract/base class for validators as
   // there are other custom validators in the repository.
-  private isSameLanguageValidator(translationControl: string): ValidatorFn {
+  private isSameLanguageValidator(controlName: string): ValidatorFn {
     return (control: AbstractControl): ValidationErrors|null => {
       const language =
-          (translationControl === TranslationControl.SOURCE_LANGUAGE ?
+          (controlName === this.sourceLanguageControlName ?
                this.targetLanguageCode :
                this.sourceLanguageCode);
       const value = control.value?.['code'];
