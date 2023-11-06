@@ -14,7 +14,7 @@
 
 """The Google Ads client."""
 
-from typing import Any, Optional, Union
+from typing import Any, Literal, Optional, Union
 from common import api_utils
 
 GOOGLE_ADS_API_BASE_URL = 'https://googleads.googleapis.com'
@@ -265,6 +265,80 @@ class GoogleAdsClient:
           AND ad_group.status = 'ENABLED'
           AND ad_group_criterion.type = 'KEYWORD'
         """
+    payload = {'query': ' '.join(query.split())}
+    url = SEARCH_URL.format(
+        api_version=self.api_version, customer_id=customer_id
+    )
+    return api_utils.send_api_request(url, payload, self._get_http_header())
+
+  def get_extensions_for_campaigns(
+      self,
+      customer_id: str,
+      campaign_ids: Optional[list[Union[int, str]]] = None,
+  ) -> list[Any]:
+    """Gets extension assets for campaigns and ad groups.
+
+    Gets existing structured snippets, callouts and sitelink extensions.
+
+    Args:
+      customer_id: The Google Ads customer id.
+      campaign_ids: A list of Google Ads campaign ids.
+
+    Returns:
+      The API response object containing a list of extensions.
+    """
+    results = []
+    for level in ['ad_group', 'campaign']:
+      results.extend(
+          self._get_extensions_for_campaigns_by_level(
+              customer_id, level, campaign_ids
+          )
+      )
+    return results
+
+  def _get_extensions_for_campaigns_by_level(
+      self,
+      customer_id: str,
+      level: Literal['ad_group', 'campaign'],
+      campaign_ids: Optional[list[Union[int, str]]] = None,
+  ) -> list[Any]:
+    """Gets extension assets for ad groups or campaigns.
+
+    Gets existing structured snippets, callouts and sitelink extensions.
+
+    Args:
+      customer_id: The Google Ads account id.
+      level: The level to get extensions for - ad_group or campaign.
+      campaign_ids: A list of Google Ads campaign ids.
+
+    Returns:
+      The API response object containing a list of extensions.
+    """
+    ad_group_name_col = ', ad_group.name' if level == 'ad_group' else ''
+    query = (
+        """
+        SELECT
+            campaign.name,
+            asset.type,
+            asset.structured_snippet_asset.header,
+            asset.structured_snippet_asset.values,
+            asset.callout_asset.callout_text,
+            asset.sitelink_asset.description1,
+            asset.sitelink_asset.description2,
+            asset.sitelink_asset.link_text,
+          """
+        f'{level}_asset.status{ad_group_name_col}'
+        f"""
+            FROM
+              {level}_asset
+            WHERE
+              {level}_asset.field_type IN (
+                  'STRUCTURED_SNIPPET', 'SITELINK', 'CALLOUT')
+          """
+    )
+    if campaign_ids:
+      campaign_ids_str = ', '.join([f"'{elem}'" for elem in campaign_ids])
+      query += f'AND campaign.id in ({campaign_ids_str})'
     payload = {'query': ' '.join(query.split())}
     url = SEARCH_URL.format(
         api_version=self.api_version, customer_id=customer_id

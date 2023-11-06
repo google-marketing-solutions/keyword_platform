@@ -361,6 +361,60 @@ class GoogleAdsClientTest(parameterized.TestCase):
     with self.assertRaises(requests.exceptions.HTTPError):
       self.client.get_accounts(_FAKE_CUSTOMER_ID)
 
+  @requests_mock.Mocker()
+  def test_get_extensions_for_campaigns(self, mock_requests):
+    mock_response = _FAKE_RESPONSE
+    mock_requests.post(
+        requests_mock.ANY, json=mock_response, headers=_FAKE_HEADERS
+    )
+    query_ad_group = """
+        SELECT
+            campaign.name,
+            asset.type,
+            asset.structured_snippet_asset.header,
+            asset.structured_snippet_asset.values,
+            asset.callout_asset.callout_text,
+            asset.sitelink_asset.description1,
+            asset.sitelink_asset.description2,
+            asset.sitelink_asset.link_text,
+            ad_group_asset.status,
+            ad_group.name
+        FROM
+          ad_group_asset
+        WHERE
+          ad_group_asset.field_type IN (
+              'STRUCTURED_SNIPPET', 'SITELINK', 'CALLOUT')
+        """
+    query_campaign = """
+        SELECT
+            campaign.name,
+            asset.type,
+            asset.structured_snippet_asset.header,
+            asset.structured_snippet_asset.values,
+            asset.callout_asset.callout_text,
+            asset.sitelink_asset.description1,
+            asset.sitelink_asset.description2,
+            asset.sitelink_asset.link_text,
+            campaign_asset.status
+        FROM
+          campaign_asset
+        WHERE
+          campaign_asset.field_type IN (
+              'STRUCTURED_SNIPPET', 'SITELINK', 'CALLOUT')
+        """
+    expected_request_ad_group = _expected_request_from_query(query_ad_group)
+    expected_request_campaign = _expected_request_from_query(query_campaign)
+    self.client.get_extensions_for_campaigns(_FAKE_CUSTOMER_ID)
+
+    self.assertEqual(
+        _request_record_asdict(mock_requests.request_history[0]),
+        expected_request_ad_group,
+    )
+    self.assertEqual(
+        _request_record_asdict(mock_requests.request_history[1]),
+        expected_request_campaign,
+    )
+
 
 if __name__ == '__main__':
   absltest.main()
