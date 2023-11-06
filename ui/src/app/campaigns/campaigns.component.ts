@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Output, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {AbstractControl, FormGroup} from '@angular/forms';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
+import {ControlName, FontIcon} from '../models/enums';
 import {Selection} from '../models/interfaces';
 import {SelectionGroup} from '../models/types';
 import {MultiSelectComponent} from '../multi-select/multi-select.component';
 import {GoogleAdsService} from '../services/google-ads.service';
-
-const CAMPAIGN_CONTROL_NAME = 'campaigns';
+import {SnackbarComponent} from '../snackbar/snackbar.component';
 
 /**
  * A campaigns component.
@@ -36,84 +37,104 @@ const CAMPAIGN_CONTROL_NAME = 'campaigns';
   templateUrl: './campaigns.component.html',
   styleUrls: ['./campaigns.component.scss']
 })
-export class CampaignsComponent implements AfterViewInit {
-  @Output() readonly campaignSelectionEvent = new EventEmitter<string[]>();
-  @Output()
-  readonly campaignsValidationErrorEvent = new EventEmitter<boolean>();
+export class CampaignsComponent implements OnInit, AfterViewInit {
+  @Output() readonly selectionEvent = new EventEmitter<string[]>();
+  @Output() readonly validationErrorEvent = new EventEmitter<boolean>();
 
   form = new FormGroup({});
 
-  campaigns!: Selection[];
+  entities!: Selection[];
 
   showSpinner = false;
 
-  private campaignIds: string[] = [];
+  controlName = '';
+
+  private ids: string[] = [];
 
   @ViewChild(MultiSelectComponent)
-  private readonly control!: MultiSelectComponent;
+  private readonly component!: MultiSelectComponent;
 
   constructor(
       private readonly changeRefDetector: ChangeDetectorRef,
+      private readonly snackbar: MatSnackBar,
       private readonly googleAdsService: GoogleAdsService) {}
 
+  ngOnInit(): void {
+    this.controlName = ControlName.CAMPAIGNS;
+  }
+
   ngAfterViewInit() {
-    this.form.addControl(CAMPAIGN_CONTROL_NAME, this.control.control);
-    this.getFormControl().valueChanges.subscribe(() => {
-      this.campaignsValidationErrorEvent.emit(this.hasFormError());
+    this.form.addControl(this.controlName, this.component.control);
+    this.getControl().valueChanges.subscribe(() => {
+      this.validationErrorEvent.emit(this.hasError());
     });
     this.changeRefDetector.detectChanges();
   }
 
-  campaignSelection(value: SelectionGroup) {
+  selection(value: SelectionGroup) {
     const campaign = value as Selection[];
     const length = campaign.length;
-    this.campaignIds = [];
+    this.ids = [];
     if (length === 0) {
       return;
     }
     for (let i = 0; i < length; i++) {
-      this.campaignIds.push(campaign[i]['id']);
+      this.ids.push(campaign[i]['id']);
     }
-    this.campaignSelectionEvent.emit(this.campaignIds);
+    this.selectionEvent.emit(this.ids);
   }
 
-  disableForm(disable: boolean) {
-    (disable) ? this.form.disable() : this.form.enable();
+  disable(isDisabled: boolean) {
+    (isDisabled) ? this.form.disable() : this.form.enable();
   }
 
   getCampaigns(accountIds: string[]) {
-    this.disableForm(true);
+    // Close the snackbar in case it is open.
+    this.snackbar.dismiss();
     this.showSpinner = true;
     console.log('Campaigns requested.');
     this.googleAdsService.getCampaigns(accountIds)
         .subscribe(
             (response => {
               this.showSpinner = false;
-              this.campaigns = response.body!;
-              this.disableForm(false);
-              console.log('Campaigns request successful.');
+              this.entities = response.body!;
+              if (this.entities.length > 0) {
+                this.disable(false);
+                console.log('Campaigns request successful.');
+              } else {
+                this.openSnackBar(
+                    'No eligible campaigns available. ' +
+                        'Please select other accounts.',
+                    FontIcon.PRIORITY);
+              }
             }),
             (error => {
               this.showSpinner = false;
+              this.openSnackBar(error, FontIcon.ERROR);
               console.error(error);
             }));
   }
 
-  resetCampaigns() {
+  reset() {
     this.form.reset();
   }
 
-  private getFormControl(): AbstractControl {
+  private getControl(): AbstractControl {
     const form = this.form as FormGroup;
-    return form.controls[CAMPAIGN_CONTROL_NAME];
+    return form.controls[this.controlName];
   }
 
-  private hasFormError(): boolean {
-    const control = this.getFormControl();
+  private hasError(): boolean {
+    const control = this.getControl();
     const result = [];
     if (control.errors) {
       result.push(control.errors);
     }
     return result.length > 0;
+  }
+
+  private openSnackBar(message: string, fontIcon: string) {
+    this.snackbar.openFromComponent(
+        SnackbarComponent, {data: {message, fontIcon}});
   }
 }

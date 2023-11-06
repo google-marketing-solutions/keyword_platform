@@ -21,12 +21,12 @@
   <form [formGroup]="form">
     <app-multi-select
         #control
-        [controllerName]="'campaigns'"
+        [controlName]="controlName"
         [className]="'responsive'"
-        [values]="campaigns"
+        [values]="entities"
         [label]="'Select campaigns'"
         [isRequired]=true
-        (selectionEvent)="campaignSelection($event)">
+        (selectionEvent)="selection($event)">
     </app-multi-select>
   </form>
 </div>
