@@ -36,41 +36,40 @@
               fontIcon="bookmark"
               class="icon">
           </mat-icon>
-          <span>Usage generates Google Cloud costs as it translates keywords and ads utilizing the
-            Google Cloud Translation API. Costs depend on the size of translation requests, see
+          <span>Usage generates Google Cloud costs as it translates keywords
+            and ads utilizing the Google Cloud Translation API. Costs depend on
+            the size of translation requests, see
             <a href="https://cloud.google.com/translate/pricing" target="_blank">
               Cloud Translation Pricing</a> for details.</span>
         </div>
         <div class="margin"></div>
         <div class="forms">
           <p class="title">Accounts</p>
-          <p class="sub-title">Select the accounts that contain the campaigns you want to translate.
-          </p>
+          <p class="sub-title">Select the accounts that contain the campaigns
+            you want to translate.</p>
           <div class="component">
-            <app-accounts (accountsLoadEvent)="accountsLoad($event)"
-                          (accountSelectionEvent)="accountSelection($event)"
-                          (accountsValidationErrorEvent)="accountsValidationError($event)">
+            <app-accounts (loadEvent)="accountsLoad($event)"
+                          (selectionEvent)="accountSelection($event)"
+                          (validationErrorEvent)="accountsValidationError($event)">
             </app-accounts>
           </div>
           <p class="title">Campaigns</p>
-          <p class="sub-title">Select the campaigns with keywords and ads to translate. All enabled
-            ad groups will be pulled in automatically.</p>
+          <p class="sub-title">Select the campaigns with keywords and ads to
+            translate. All enabled ad groups will be pulled in automatically.</p>
           <div class="component">
             <app-campaigns
-                (campaignSelectionEvent)="campaignSelection($event)"
-                (campaignsValidationErrorEvent)="campaignsValidationError($event)">
+                (selectionEvent)="campaignSelection($event)"
+                (validationErrorEvent)="campaignsValidationError($event)">
             </app-campaigns>
           </div>
-          <app-translation
-              (translationValidationErrorEvent)="translationValidationError($event)">
+          <app-translation (validationErrorEvent)="translationValidationError($event)">
           </app-translation>
           <div class="component">
-            <button
-                mat-raised-button
-                color="primary"
-                type="submit"
-                [disabled]="hasFormError()"
-                (click)="run()">
+            <button mat-raised-button
+                    color="primary"
+                    type="submit"
+                    [disabled]="hasError()"
+                    (click)="run()">
               <span *ngIf="isRunRequestedStatus()" class="run-spinner">
                 <mat-spinner [diameter]="25"></mat-spinner>
               </span>
