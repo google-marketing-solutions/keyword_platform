@@ -74,6 +74,16 @@ class TranslationWorker(base_worker.BaseWorker):
       )
       logging.info('Ad translation complete.')
 
+    if settings.translate_extensions:
+      logging.info('Starting extension translation...')
+      self._translate_extensions(
+          extensions=google_ads_objects.extensions,
+          source_language_code=settings.source_language_code,
+          target_language_code=settings.target_language_codes[0],
+          glossary_id=settings.glossary_id,
+      )
+      logging.info('Extension translation complete.')
+
     self._apply_translation_suffix_to_campaigns_and_ad_groups(
         campaigns=google_ads_objects.campaigns,
         ad_groups=google_ads_objects.ad_groups,

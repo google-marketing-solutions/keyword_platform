@@ -26,6 +26,7 @@ from common import cloud_translation_client as cloud_translation_client_lib
 from data_models import ad_groups as ad_groups_lib
 from data_models import ads as ads_lib
 from data_models import campaigns as campaigns_lib
+from data_models import extensions as extensions_lib
 from data_models import google_ads_objects as google_ads_objects_lib
 from data_models import keywords as keywords_lib
 from data_models import settings as settings_lib
@@ -415,6 +416,461 @@ _AD_GROUPS_GOOGLE_ADS_RESPONSE = [
     }],
 ]
 
+_EXTENSIONS_GOOGLE_ADS_API_RESPONSE = [
+    [{
+        'results': [
+            {
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/789',
+                    'name': 'Campaign 1',
+                },
+                'adGroup': {
+                    'resourceName': 'customers/123/adGroups/139665100522',
+                    'name': 'Ad group 1',
+                },
+                'asset': {
+                    'resourceName': 'customers/123/assets/110379943909',
+                    'type': 'STRUCTURED_SNIPPET',
+                    'structuredSnippetAsset': {
+                        'header': 'Brands',
+                        'values': ['Google', 'Pixel', 'Android'],
+                    },
+                },
+                'adGroupAsset': {
+                    'resourceName': (
+                        'customers/123/adGroupAssets/139665100522'
+                        '~110379943909~STRUCTURED_SNIPPET'
+                    ),
+                    'status': 'ENABLED',
+                },
+            },
+            {
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/789',
+                    'name': 'Campaign 1',
+                },
+                'adGroup': {
+                    'resourceName': 'customers/123/adGroups/139665100522',
+                    'name': 'Ad group 1',
+                },
+                'asset': {
+                    'resourceName': 'customers/123/assets/110373249611',
+                    'type': 'SITELINK',
+                    'sitelinkAsset': {
+                        'linkText': 'This is a link text',
+                        'description1': 'This is a Description 1',
+                        'description2': 'This is a Description 2',
+                    },
+                },
+                'adGroupAsset': {
+                    'resourceName': (
+                        'customers/123/adGroupAssets/139665100522'
+                        '~110373249611~SITELINK'
+                    ),
+                    'status': 'ENABLED',
+                },
+            },
+            {
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/789',
+                    'name': 'Campaign 1',
+                },
+                'adGroup': {
+                    'resourceName': 'customers/123/adGroups/139665100522',
+                    'name': 'Ad group 1',
+                },
+                'asset': {
+                    'resourceName': 'customers/123/assets/110380162771',
+                    'type': 'CALLOUT',
+                    'calloutAsset': {'calloutText': 'Buy my product now'},
+                },
+                'adGroupAsset': {
+                    'resourceName': (
+                        'customers/123/adGroupAssets/139665100522'
+                        '~110380162771~CALLOUT'
+                    ),
+                    'status': 'ENABLED',
+                },
+            },
+        ],
+        'fieldMask': (
+            'campaign.name,adGroup.campaign,'
+            'asset.type,asset.structuredSnippetAsset.header,'
+            'asset.structuredSnippetAsset.values,'
+            'asset.calloutAsset.calloutText,asset.sitelinkAsset.description1,'
+            'asset.sitelinkAsset.description2,asset.sitelinkAsset.linkText,'
+            'adGroupAsset.status,adGroup.name'
+        ),
+        'requestId': 'fake_request_id',
+    }],
+    [{
+        'results': [
+            {
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/789',
+                    'name': 'Campaign 1',
+                },
+                'asset': {
+                    'resourceName': 'customers/123/assets/110379943909',
+                    'type': 'STRUCTURED_SNIPPET',
+                    'structuredSnippetAsset': {
+                        'header': 'Brands',
+                        'values': ['Google', 'Pixel', 'Android'],
+                    },
+                },
+                'campaignAsset': {
+                    'resourceName': (
+                        'customers/123/campaignAssets/987'
+                        '~110379943909~STRUCTURED_SNIPPET'
+                    ),
+                    'status': 'ENABLED',
+                },
+            },
+            {
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/789',
+                    'name': 'Campaign 1',
+                },
+                'asset': {
+                    'resourceName': 'customers/123/assets/110373249611',
+                    'type': 'SITELINK',
+                    'sitelinkAsset': {
+                        'linkText': 'This is a link text',
+                        'description1': 'This is a Description 1',
+                        'description2': 'This is a Description 2',
+                    },
+                },
+                'campaignAsset': {
+                    'resourceName': (
+                        'customers/123/campaignAssets/987~110373249611~SITELINK'
+                    ),
+                    'status': 'ENABLED',
+                },
+            },
+            {
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/789',
+                    'name': 'Campaign 1',
+                },
+                'asset': {
+                    'resourceName': 'customers/123/assets/110373390950',
+                    'type': 'SITELINK',
+                    'sitelinkAsset': {
+                        'linkText': 'Calendar',
+                        'description1': 'Open Calendar',
+                        'description2': 'Calendar open',
+                    },
+                },
+                'campaignAsset': {
+                    'resourceName': (
+                        'customers/123/campaignAssets/987~110373390950~SITELINK'
+                    ),
+                    'status': 'ENABLED',
+                },
+            },
+            {
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/789',
+                    'name': 'Campaign 1',
+                },
+                'asset': {
+                    'resourceName': 'customers/123/assets/110380162771',
+                    'type': 'CALLOUT',
+                    'calloutAsset': {'calloutText': 'Buy my product now'},
+                },
+                'campaignAsset': {
+                    'resourceName': (
+                        'customers/123/campaignAssets/987~110380162771~CALLOUT'
+                    ),
+                    'status': 'ENABLED',
+                },
+            },
+        ],
+        'fieldMask': (
+            'campaign.name,campaign.resourceName,asset.type,'
+            'asset.structuredSnippetAsset.header,'
+            'asset.structuredSnippetAsset.values,'
+            'asset.calloutAsset.calloutText,asset.sitelinkAsset.description1,'
+            'asset.sitelinkAsset.description2,asset.sitelinkAsset.linkText,'
+            'campaignAsset.status'
+        ),
+        'requestId': 'fake_request_id',
+    }],
+]
+
+_EXPECTED_EXTENSIONS_DF = pd.DataFrame({
+    'Action': ['Add', 'Add', 'Add', 'Add', 'Add', 'Add', 'Add'],
+    'Customer ID': [
+        'Enter customer ID',
+        'Enter customer ID',
+        'Enter customer ID',
+        'Enter customer ID',
+        'Enter customer ID',
+        'Enter customer ID',
+        'Enter customer ID',
+    ],
+    'Campaign': [
+        'Campaign 1 (es)',
+        'Campaign 1 (es)',
+        'Campaign 1 (es)',
+        'Campaign 1 (es)',
+        'Campaign 1 (es)',
+        'Campaign 1 (es)',
+        'Campaign 1 (es)',
+    ],
+    'Ad group': [
+        'Ad group 1 (es)',
+        'Ad group 1 (es)',
+        'Ad group 1 (es)',
+        '',
+        '',
+        '',
+        '',
+    ],
+    'Asset type': [
+        'STRUCTURED_SNIPPET',
+        'SITELINK',
+        'CALLOUT',
+        'STRUCTURED_SNIPPET',
+        'SITELINK',
+        'SITELINK',
+        'CALLOUT',
+    ],
+    'Status': [
+        'ENABLED',
+        'ENABLED',
+        'ENABLED',
+        'ENABLED',
+        'ENABLED',
+        'ENABLED',
+        'ENABLED',
+    ],
+    'Structured snippet header': ['Brands', '', '', 'Brands', '', '', ''],
+    'Structured snippet values': [
+        'Google;Píxel;Android',
+        '',
+        '',
+        'Google;Píxel;Android',
+        '',
+        '',
+        '',
+    ],
+    'Original structured snippet values': [
+        'Google;Pixel;Android',
+        '',
+        '',
+        'Google;Pixel;Android',
+        '',
+        '',
+        '',
+    ],
+    'Callout text': [
+        '',
+        '',
+        'Comprar mi producto ahora',
+        '',
+        '',
+        '',
+        'Comprar mi producto ahora',
+    ],
+    'Original callout text': [
+        '',
+        '',
+        'Buy my product now',
+        '',
+        '',
+        '',
+        'Buy my product now',
+    ],
+    'Sitelink description 1': [
+        '',
+        'Esta es una descripción 1',
+        '',
+        '',
+        'Esta es una descripción 1',
+        'Calendario abierto',
+        '',
+    ],
+    'Original sitelink description 1': [
+        '',
+        'This is a Description 1',
+        '',
+        '',
+        'This is a Description 1',
+        'Open Calendar',
+        '',
+    ],
+    'Sitelink description 2': [
+        '',
+        'Esta es una descripción 2',
+        '',
+        '',
+        'Esta es una descripción 2',
+        'Calendario abierto',
+        '',
+    ],
+    'Original sitelink description 2': [
+        '',
+        'This is a Description 2',
+        '',
+        '',
+        'This is a Description 2',
+        'Calendar open',
+        '',
+    ],
+    'Sitelink link text': [
+        '',
+        'Este es un texto de enlace',
+        '',
+        '',
+        'Este es un texto de enlace',
+        'Calendario',
+        '',
+    ],
+    'Original sitelink link text': [
+        '',
+        'This is a link text',
+        '',
+        '',
+        'This is a link text',
+        'Calendar',
+        '',
+    ],
+    'Updates applied': [[], [], [], [], [], [], []],
+})
+
+_EXPECTED_EXTENSIONS_DF_WHEN_TRANSLATION_SKIPPED = pd.DataFrame({
+    'Action': ['Add', 'Add', 'Add', 'Add', 'Add', 'Add', 'Add'],
+    'Customer ID': [
+        'Enter customer ID',
+        'Enter customer ID',
+        'Enter customer ID',
+        'Enter customer ID',
+        'Enter customer ID',
+        'Enter customer ID',
+        'Enter customer ID',
+    ],
+    'Campaign': [
+        'Campaign 1',
+        'Campaign 1',
+        'Campaign 1',
+        'Campaign 1',
+        'Campaign 1',
+        'Campaign 1',
+        'Campaign 1',
+    ],
+    'Ad group': ['Ad group 1', 'Ad group 1', 'Ad group 1', '', '', '', ''],
+    'Asset type': [
+        'STRUCTURED_SNIPPET',
+        'SITELINK',
+        'CALLOUT',
+        'STRUCTURED_SNIPPET',
+        'SITELINK',
+        'SITELINK',
+        'CALLOUT',
+    ],
+    'Status': [
+        'ENABLED',
+        'ENABLED',
+        'ENABLED',
+        'ENABLED',
+        'ENABLED',
+        'ENABLED',
+        'ENABLED',
+    ],
+    'Structured snippet header': ['Brands', '', '', 'Brands', '', '', ''],
+    'Structured snippet values': [
+        'Google;Pixel;Android',
+        '',
+        '',
+        'Google;Pixel;Android',
+        '',
+        '',
+        '',
+    ],
+    'Original structured snippet values': [
+        'Google;Pixel;Android',
+        '',
+        '',
+        'Google;Pixel;Android',
+        '',
+        '',
+        '',
+    ],
+    'Callout text': [
+        '',
+        '',
+        'Buy my product now',
+        '',
+        '',
+        '',
+        'Buy my product now',
+    ],
+    'Original callout text': [
+        '',
+        '',
+        'Buy my product now',
+        '',
+        '',
+        '',
+        'Buy my product now',
+    ],
+    'Sitelink description 1': [
+        '',
+        'This is a Description 1',
+        '',
+        '',
+        'This is a Description 1',
+        'Open Calendar',
+        '',
+    ],
+    'Original sitelink description 1': [
+        '',
+        'This is a Description 1',
+        '',
+        '',
+        'This is a Description 1',
+        'Open Calendar',
+        '',
+    ],
+    'Sitelink description 2': [
+        '',
+        'This is a Description 2',
+        '',
+        '',
+        'This is a Description 2',
+        'Calendar open',
+        '',
+    ],
+    'Original sitelink description 2': [
+        '',
+        'This is a Description 2',
+        '',
+        '',
+        'This is a Description 2',
+        'Calendar open',
+        '',
+    ],
+    'Sitelink link text': [
+        '',
+        'This is a link text',
+        '',
+        '',
+        'This is a link text',
+        'Calendar',
+        '',
+    ],
+    'Original sitelink link text': [
+        '',
+        'This is a link text',
+        '',
+        '',
+        'This is a link text',
+        'Calendar',
+        '',
+    ],
+    'Updates applied': [[], [], [], [], [], [], []],
+})
 
 _EXPECTED_KEYWORDS_DF = pd.DataFrame(
     {
@@ -654,21 +1110,39 @@ class TranslationWorkerTest(absltest.TestCase):
     )
 
     mock_send_api_request.side_effect = [
-        {'translations': [
-            {'translatedText': 'correo electrónico'},
-            {'translatedText': 'rápido'}]},
-        {'translations': [
-            {'translatedText': 'Inicio de sesión de correo electrónico'},
-            {'translatedText': 'Correo electrónico en línea'},
-            {'translatedText': 'Iniciar sesión'},
-            {'translatedText': 'Correo electrónico intuitivo y útil'},
-            {'translatedText': '15 GB de almacenamiento y acceso móvil'},
-            {'translatedText': 'Página web oficial'},
-            {'translatedText': 'Sitio oficial'},
-            {'translatedText': 'Productos de alta calidad'},
-            {'translatedText': 'Google analitico'},
-            {'translatedText': '¡Pruebe Analytics hoy!'},
-            ]}]
+        {
+            'translations': [
+                {'translatedText': 'correo electrónico'},
+                {'translatedText': 'rápido'},
+            ]
+        },
+        {
+            'translations': [
+                {'translatedText': 'Inicio de sesión de correo electrónico'},
+                {'translatedText': 'Correo electrónico en línea'},
+                {'translatedText': 'Iniciar sesión'},
+                {'translatedText': 'Correo electrónico intuitivo y útil'},
+                {'translatedText': '15 GB de almacenamiento y acceso móvil'},
+                {'translatedText': 'Página web oficial'},
+                {'translatedText': 'Sitio oficial'},
+                {'translatedText': 'Productos de alta calidad'},
+                {'translatedText': 'Google analitico'},
+                {'translatedText': '¡Pruebe Analytics hoy!'},
+            ]
+        },
+        {
+            'translations': [
+                {'translatedText': 'Google;Píxel;Android'},
+                {'translatedText': 'Esta es una descripción 1'},
+                {'translatedText': 'Esta es una descripción 2'},
+                {'translatedText': 'Este es un texto de enlace'},
+                {'translatedText': 'Comprar mi producto ahora'},
+                {'translatedText': 'Calendario abierto'},
+                {'translatedText': 'Calendario abierto'},
+                {'translatedText': 'Calendario'},
+            ]
+        },
+    ]
 
     mock_refresh_access_token.return_value = 'fake_access_token'
 
@@ -676,7 +1150,9 @@ class TranslationWorkerTest(absltest.TestCase):
     settings = settings_lib.Settings(
         source_language_code='en',
         target_language_codes=['es'],
-        translate_ads=True
+        translate_ads=True,
+        translate_keywords=True,
+        translate_extensions=True,
     )
 
     # Arranges google ads objects
@@ -684,7 +1160,11 @@ class TranslationWorkerTest(absltest.TestCase):
         ads=ads_lib.Ads(_ADS_DATA_GOOGLE_ADS_API_RESPONSE),
         keywords=keywords_lib.Keywords(_KEYWORDS_GOOGLE_ADS_API_RESPONSE),
         campaigns=campaigns_lib.Campaigns(_CAMPAIGNS_GOOGLE_ADS_API_RESPONSE),
-        ad_groups=ad_groups_lib.AdGroups(_AD_GROUPS_GOOGLE_ADS_RESPONSE))
+        ad_groups=ad_groups_lib.AdGroups(_AD_GROUPS_GOOGLE_ADS_RESPONSE),
+        extensions=extensions_lib.Extensions(
+            _EXTENSIONS_GOOGLE_ADS_API_RESPONSE
+        ),
+    )
 
     # Arranges translation worker
     translation_worker = translation_worker_lib.TranslationWorker(
@@ -710,6 +1190,13 @@ class TranslationWorkerTest(absltest.TestCase):
 
     pd.testing.assert_frame_equal(
         actual_ads_df, _EXPECTED_ADS_DF, check_index_type=False)
+
+    # Asserts extensions translated
+    actual_extensions_df = google_ads_objects.extensions.df()
+
+    pd.testing.assert_frame_equal(
+        actual_extensions_df, _EXPECTED_EXTENSIONS_DF, check_index_type=False
+    )
 
     # Assert that suffixes were added to campaign and ad group names
     actual_campaigns_df = google_ads_objects.campaigns.df()
@@ -806,7 +1293,11 @@ class TranslationWorkerTest(absltest.TestCase):
         ads=ads_lib.Ads(_ADS_DATA_GOOGLE_ADS_API_RESPONSE),
         keywords=keywords_lib.Keywords(_KEYWORDS_GOOGLE_ADS_API_RESPONSE),
         campaigns=campaigns_lib.Campaigns(_CAMPAIGNS_GOOGLE_ADS_API_RESPONSE),
-        ad_groups=ad_groups_lib.AdGroups(_AD_GROUPS_GOOGLE_ADS_RESPONSE))
+        ad_groups=ad_groups_lib.AdGroups(_AD_GROUPS_GOOGLE_ADS_RESPONSE),
+        extensions=extensions_lib.Extensions(
+            _EXTENSIONS_GOOGLE_ADS_API_RESPONSE
+        ),
+    )
 
     # Arranges translation worker
     translation_worker = translation_worker_lib.TranslationWorker(
@@ -861,7 +1352,8 @@ class TranslationWorkerTest(absltest.TestCase):
     settings = settings_lib.Settings(
         source_language_code='en',
         target_language_codes=['es'],
-        translate_ads=False
+        translate_ads=False,
+        translate_extensions=False,
     )
 
     # Arranges google ads objects
@@ -869,7 +1361,11 @@ class TranslationWorkerTest(absltest.TestCase):
         ads=ads_lib.Ads(_ADS_DATA_GOOGLE_ADS_API_RESPONSE),
         keywords=keywords_lib.Keywords(_KEYWORDS_GOOGLE_ADS_API_RESPONSE),
         campaigns=campaigns_lib.Campaigns(_CAMPAIGNS_GOOGLE_ADS_API_RESPONSE),
-        ad_groups=ad_groups_lib.AdGroups(_AD_GROUPS_GOOGLE_ADS_RESPONSE))
+        ad_groups=ad_groups_lib.AdGroups(_AD_GROUPS_GOOGLE_ADS_RESPONSE),
+        extensions=extensions_lib.Extensions(
+            _EXTENSIONS_GOOGLE_ADS_API_RESPONSE
+        ),
+    )
 
     # Arranges translation worker
     translation_worker = translation_worker_lib.TranslationWorker(
@@ -888,6 +1384,15 @@ class TranslationWorkerTest(absltest.TestCase):
         actual_ads_df, _EXPECTED_ADS_DF_WHEN_TRANSLATION_SKIPPED,
         check_index_type=False)
 
+    # Asserts extensions not translated
+
+    actual_extensions_df = google_ads_objects.extensions.df()
+
+    pd.testing.assert_frame_equal(
+        actual_extensions_df,
+        _EXPECTED_EXTENSIONS_DF_WHEN_TRANSLATION_SKIPPED,
+        check_index_type=False,
+    )
 
 if __name__ == '__main__':
   absltest.main()
