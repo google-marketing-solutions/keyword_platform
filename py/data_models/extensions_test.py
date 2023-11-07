@@ -114,7 +114,8 @@ _GOOGLE_ADS_RESPONSE = [
             },
         ],
         'fieldMask': (
-            'campaign.name,asset.type,asset.structuredSnippetAsset.header,'
+            'campaign.name,adGroup.campaign,'
+            'asset.type,asset.structuredSnippetAsset.header,'
             'asset.structuredSnippetAsset.values,'
             'asset.calloutAsset.calloutText,asset.sitelinkAsset.description1,'
             'asset.sitelinkAsset.description2,asset.sitelinkAsset.linkText,'
@@ -217,7 +218,8 @@ _GOOGLE_ADS_RESPONSE = [
             },
         ],
         'fieldMask': (
-            'campaign.name,asset.type,asset.structuredSnippetAsset.header,'
+            'campaign.name,campaign.resourceName,asset.type,'
+            'asset.structuredSnippetAsset.header,'
             'asset.structuredSnippetAsset.values,'
             'asset.calloutAsset.calloutText,asset.sitelinkAsset.description1,'
             'asset.sitelinkAsset.description2,asset.sitelinkAsset.linkText,'
@@ -229,12 +231,7 @@ _GOOGLE_ADS_RESPONSE = [
 
 _EMPTY_GOOGLE_ADS_RESPONSE = [[{
     'results': [],
-    'fieldMask': (
-        'campaign.name,asset.type,asset.structuredSnippetAsset.header,'
-        'asset.structuredSnippetAsset.values,asset.calloutAsset.calloutText,'
-        'asset.sitelinkAsset.description1,asset.sitelinkAsset.description2,'
-        'asset.sitelinkAsset.linkText,adGroupAsset.status,adGroup.name'
-    ),
+    'fieldMask': 'fake_field_mask',
     'requestId': 'fake_request_id',
 }]]
 

@@ -315,10 +315,13 @@ class GoogleAdsClient:
       The API response object containing a list of extensions.
     """
     ad_group_name_col = ', ad_group.name' if level == 'ad_group' else ''
-    query = (
-        """
+    campaign_col = (
+        'ad_group.campaign' if level == 'ad_group' else 'campaign.resource_name'
+    )
+    query = f"""
         SELECT
             campaign.name,
+            {campaign_col},
             asset.type,
             asset.structured_snippet_asset.header,
             asset.structured_snippet_asset.values,
@@ -326,19 +329,21 @@ class GoogleAdsClient:
             asset.sitelink_asset.description1,
             asset.sitelink_asset.description2,
             asset.sitelink_asset.link_text,
-          """
-        f'{level}_asset.status{ad_group_name_col}'
-        f"""
-            FROM
-              {level}_asset
-            WHERE
-              {level}_asset.field_type IN (
-                  'STRUCTURED_SNIPPET', 'SITELINK', 'CALLOUT')
-          """
-    )
+            {level}_asset.status{ad_group_name_col}
+        FROM
+          {level}_asset
+        WHERE
+          {level}_asset.field_type IN (
+              'STRUCTURED_SNIPPET', 'SITELINK', 'CALLOUT')
+        """
     if campaign_ids:
-      campaign_ids_str = ', '.join([f"'{elem}'" for elem in campaign_ids])
-      query += f'AND campaign.id in ({campaign_ids_str})'
+      campaign_ids_str = ', '.join(
+          [
+              f"'customers/{customer_id}/campaigns/{elem}'"
+              for elem in campaign_ids
+          ]
+      )
+      query += f' AND {campaign_col} IN ({campaign_ids_str})'
     payload = {'query': ' '.join(query.split())}
     url = SEARCH_URL.format(
         api_version=self.api_version, customer_id=customer_id
