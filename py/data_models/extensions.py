@@ -117,12 +117,12 @@ class Extensions:
       response_jsons: A list of JSON responses from a Google Ads API
         searchStream request.
     """
-    self._df = self._build_assets_df(response_jsons=response_jsons)
+    self._df = self._build_extensions_df(response_jsons=response_jsons)
     logging.info(
         'Initialized Extensions DataFrame with length %d.', self.size()
     )
 
-  def _build_assets_df(self, response_jsons: list[Any]) -> pd.DataFrame:
+  def _build_extensions_df(self, response_jsons: list[Any]) -> pd.DataFrame:
     """Builds a DataFrame containing Extensions data from Google Ads API JSON.
 
     Args:

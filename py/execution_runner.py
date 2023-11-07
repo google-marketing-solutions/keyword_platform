@@ -314,23 +314,22 @@ class ExecutionRunner:
       self,
   ) -> extensions_lib.Extensions | None:
     """Builds an Extensions object."""
-    extensions_data_responses = []
-    campaigns = self._settings.campaigns
-    customer_ids = self._settings.customer_ids
-
-    with futures.ThreadPoolExecutor() as executor:
-      responses = executor.map(
-          lambda customer_id: self._google_ads_client.get_extensions_for_campaigns(
-              customer_id, campaigns
-          ),
-          customer_ids,
-      )
-
-    for response in responses:
-      if isinstance(response, list):
-        extensions_data_responses.append(response)
-
     if self._settings.translate_extensions:
+      extensions_data_responses = []
+      campaigns = self._settings.campaigns
+      customer_ids = self._settings.customer_ids
+
+      with futures.ThreadPoolExecutor() as executor:
+        responses = executor.map(
+            lambda customer_id: self._google_ads_client.get_extensions_for_campaigns(
+                customer_id, campaigns
+            ),
+            customer_ids,
+        )
+
+      for response in responses:
+        if isinstance(response, list):
+          extensions_data_responses.append(response)
       extensions = extensions_lib.Extensions(extensions_data_responses)
     else:
       logging.info('Skipping extensions translation.')
@@ -339,7 +338,6 @@ class ExecutionRunner:
 
   def _build_keywords(self) -> keywords_lib.Keywords | None:
     """Builds a Keywords object."""
-
     keywords_responses = []
     customer_ids = self._settings.customer_ids
     campaigns = self._settings.campaigns
