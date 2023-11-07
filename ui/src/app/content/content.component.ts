@@ -157,7 +157,7 @@ export class ContentComponent {
             translationData.targetLanguageCode,
             translationData.shortenTranslationsToCharLimit, workers, clientId,
             translationData.translateKeywords, translationData.translateAds,
-            translationData.glossaryId)
+            translationData.translateExtensions, translationData.glossaryId)
         .subscribe(
             (response => {
               this.requestStatus = RequestStatus.RESPONDED;

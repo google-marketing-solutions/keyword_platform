@@ -58,6 +58,7 @@ export class TranslationComponent implements OnInit, AfterViewInit {
   shortenTranslationsToCharLimit = false;
   translateAds = true;
   translateKeywords = true;
+  translateExtensions = true;
   isGlossaryAvailable = false;
 
   @ViewChildren('matComponent')
@@ -156,6 +157,7 @@ export class TranslationComponent implements OnInit, AfterViewInit {
       glossaryId: this.glossaryId!,
       translateKeywords: this.translateKeywords,
       translateAds: this.translateAds,
+      translateExtensions: this.translateExtensions,
       shortenTranslationsToCharLimit: this.shortenTranslationsToCharLimit,
     };
   }

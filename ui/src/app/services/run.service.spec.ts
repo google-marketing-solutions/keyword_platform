@@ -45,7 +45,7 @@ describe('RunService', () => {
     service
         .run(
             ['1'], ['1'], 'en', 'de', false, ['translationWorker'], 'aaa.bbb',
-            true, true, 'glossary_1')
+            true, true, true, 'glossary_1')
         .subscribe();
     const request = httpMock.expectOne(ENDPOINT);
     expect(request.request.method).toBe('POST');
@@ -87,7 +87,7 @@ describe('RunService', () => {
     service
         .run(
             ['1'], ['1'], 'en', 'de', false, ['translationWorker'], 'aaa.bbb',
-            true, true, 'glossary_1')
+            true, true, true, 'glossary_1')
         .subscribe(response => {
           expect(response.status).toBe(200);
           expect(response.statusText).toBe('OK');
@@ -109,7 +109,7 @@ describe('RunService', () => {
     service
         .run(
             ['1'], ['1'], 'en', 'de', false, ['translationWorker'], 'aaa.bbb',
-            true, true, 'glossary_1')
+            true, true, true, 'glossary_1')
         .subscribe(() => {}, error => {
           expect(error.message)
               .toBe(`Http failure response for ${ENDPOINT}: 500 ${statusText}`);
