@@ -185,6 +185,7 @@ _EXTENSIONS_RESPONSE = [
                 'asset': {
                     'resourceName': 'customers/123/assets/110373249611',
                     'type': 'SITELINK',
+                    'finalUrls': ['https://www.google.com/gmail'],
                     'sitelinkAsset': {
                         'linkText': 'This is a link text',
                         'description1': 'This is a Description 1',
@@ -263,6 +264,7 @@ _EXTENSIONS_RESPONSE = [
                 'asset': {
                     'resourceName': 'customers/123/assets/110373249611',
                     'type': 'SITELINK',
+                    'finalUrls': ['https://www.google.com/gmail'],
                     'sitelinkAsset': {
                         'linkText': 'This is a link text',
                         'description1': 'This is a Description 1',
@@ -284,6 +286,7 @@ _EXTENSIONS_RESPONSE = [
                 'asset': {
                     'resourceName': 'customers/123/assets/110373390950',
                     'type': 'SITELINK',
+                    'finalUrls': ['https://www.google.com/gmail'],
                     'sitelinkAsset': {
                         'linkText': 'Calendar',
                         'description1': 'Open Calendar',

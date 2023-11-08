@@ -329,6 +329,7 @@ class GoogleAdsClient:
             asset.sitelink_asset.description1,
             asset.sitelink_asset.description2,
             asset.sitelink_asset.link_text,
+            asset.final_urls,
             {level}_asset.status{ad_group_name_col}
         FROM
           {level}_asset

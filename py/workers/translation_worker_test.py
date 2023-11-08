@@ -34,145 +34,193 @@ from workers import translation_worker as translation_worker_lib
 from workers import worker_result
 
 
-_KEYWORDS_GOOGLE_ADS_API_RESPONSE = ([
-    [{'results':
-      [{'customer':
-        {'resourceName': 'customers/123',
-         'id': '123'},
-        'campaign':
-        {'resourceName': 'customers/123/campaigns/456',
-         'advertisingChannelType': 'SEARCH',
-         'biddingStrategyType': 'TARGET_SPEND',
-         'name': 'Gmail Test Campaign'},
-        'adGroup':
-        {'resourceName': 'customers/123/adGroups/789',
-         'name': 'Ad group 1'},
-        'adGroupCriterion':
-        {'resourceName': 'customers/123/adGroupCriteria/789~1112',
-         'keyword':
-         {'matchType': 'BROAD', 'text': 'e mail'}
+_KEYWORDS_GOOGLE_ADS_API_RESPONSE = [[{
+    'results': [
+        {
+            'customer': {'resourceName': 'customers/123', 'id': '123'},
+            'campaign': {
+                'resourceName': 'customers/123/campaigns/456',
+                'advertisingChannelType': 'SEARCH',
+                'biddingStrategyType': 'TARGET_SPEND',
+                'name': 'Gmail Test Campaign',
+            },
+            'adGroup': {
+                'resourceName': 'customers/123/adGroups/789',
+                'name': 'Ad group 1',
+            },
+            'adGroupCriterion': {
+                'resourceName': 'customers/123/adGroupCriteria/789~1112',
+                'keyword': {'matchType': 'BROAD', 'text': 'e mail'},
+            },
+            'keywordView': {
+                'resourceName': 'customers/123/keywordViews/789~1112'
+            },
         },
-        'keywordView':
-        {'resourceName': 'customers/123/keywordViews/789~1112'}
-       },
-       {'customer':
-        {'resourceName': 'customers/123',
-         'id': '123'},
-        'campaign':
-        {'resourceName': 'customers/123/campaigns/456',
-         'advertisingChannelType': 'SEARCH',
-         'biddingStrategyType': 'TARGET_SPEND',
-         'name': 'Gmail Test Campaign'},
-        'adGroup':
-        {'resourceName': 'customers/123/adGroups/789',
-         'name': 'Ad group 1'},
-        'adGroupCriterion':
-        {'resourceName': 'customers/123/adGroupCriteria/789~1314',
-         'keyword':
-         {'matchType': 'BROAD', 'text': 'fast'}
+        {
+            'customer': {'resourceName': 'customers/123', 'id': '123'},
+            'campaign': {
+                'resourceName': 'customers/123/campaigns/456',
+                'advertisingChannelType': 'SEARCH',
+                'biddingStrategyType': 'TARGET_SPEND',
+                'name': 'Gmail Test Campaign',
+            },
+            'adGroup': {
+                'resourceName': 'customers/123/adGroups/789',
+                'name': 'Ad group 1',
+            },
+            'adGroupCriterion': {
+                'resourceName': 'customers/123/adGroupCriteria/789~1314',
+                'keyword': {'matchType': 'BROAD', 'text': 'fast'},
+            },
+            'keywordView': {
+                'resourceName': 'customers/123/keywordViews/789~1314'
+            },
         },
-        'keywordView':
-        {'resourceName': 'customers/123/keywordViews/789~1314'}
-        }
-       ],
-      'fieldMask': ('customer.id,campaign.name,campaign.advertisingChannelType,'
-                    'campaign.biddingStrategyType,adGroup.name,'
-                    'adGroupCriterion.keyword.text,'
-                    'adGroupCriterion.keyword.matchType'),
-      'requestId': 'fake_req_id'}]])
+    ],
+    'fieldMask': 'fake_field_mask',
+    'requestId': 'fake_req_id',
+}]]
 
-_ADS_DATA_GOOGLE_ADS_API_RESPONSE = [
-    [{'results': [
-        {'customer':
-         {'resourceName': 'customers/123',
-          'id': '123'},
-         'campaign':
-         {'resourceName': 'customers/123/campaigns/456',
-          'name': 'Gmail Test Campaign'},
-         'adGroup':
-         {'resourceName': 'customers/123/adGroups/789',
-          'name': 'Ad group 1'},
-         'adGroupAd':
-         {'resourceName': 'customers/123/adGroupAds/789~1011',
-          'ad':
-          {'responsiveSearchAd':
-           {'headlines':
-            [{'text': 'Email Login',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}},
-             {'text': 'Online Email',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}},
-             {'text': 'Sign in',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}}],
-            'descriptions':
-            [{'text': 'Email thats intuitive, efficient, and useful',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}},
-             {'text': '15 GB of storage, less spam, and mobile access',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}}]},
-           'resourceName': 'customers/123/ads/1011',
-           'finalUrls': ['https://mail.google.com/']}}},
-        {'customer':
-         {'resourceName': 'customers/123',
-          'id': '123'},
-         'campaign':
-         {'resourceName': 'customers/123/campaigns/1213',
-          'name': 'Analytics Test Campaign'},
-         'adGroup':
-         {'resourceName': 'customers/123/adGroups/1415',
-          'name': 'Ad group 1'},
-         'adGroupAd':
-         {'resourceName':
-          'customers/123/adGroupAds/1415~1617',
-          'ad':
-          {'responsiveSearchAd':
-           {'headlines':
-            [{'text': 'Official Website',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}},
-             {'text': 'Official Site',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}},
-             {'text': 'High Quality Products',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}}],
-            'descriptions':
-            [{'text': 'Google Analytics',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}},
-             {'text': 'Try Analytics today!',
-              'assetPerformanceLabel': 'PENDING',
-              'policySummaryInfo':
-              {'reviewStatus': 'REVIEWED',
-               'approvalStatus': 'APPROVED'}}]},
-           'resourceName': 'customers/123/ads/1617',
-           'finalUrls': ['http://analytics.google.com']}}}],
-      'fieldMask': ('customer.id,campaign.name,adGroup.name,'
-                    'adGroupAd.ad.responsiveSearchAd.headlines,'
-                    'adGroupAd.ad.responsiveSearchAd.descriptions,'
-                    'adGroupAd.ad.finalUrls'),
-      'requestId': 'fake_request_id'}]]
+_ADS_DATA_GOOGLE_ADS_API_RESPONSE = [[{
+    'results': [
+        {
+            'customer': {'resourceName': 'customers/123', 'id': '123'},
+            'campaign': {
+                'resourceName': 'customers/123/campaigns/456',
+                'name': 'Gmail Test Campaign',
+            },
+            'adGroup': {
+                'resourceName': 'customers/123/adGroups/789',
+                'name': 'Ad group 1',
+            },
+            'adGroupAd': {
+                'resourceName': 'customers/123/adGroupAds/789~1011',
+                'ad': {
+                    'responsiveSearchAd': {
+                        'headlines': [
+                            {
+                                'text': 'Email Login',
+                                'assetPerformanceLabel': 'PENDING',
+                                'policySummaryInfo': {
+                                    'reviewStatus': 'REVIEWED',
+                                    'approvalStatus': 'APPROVED',
+                                },
+                            },
+                            {
+                                'text': 'Online Email',
+                                'assetPerformanceLabel': 'PENDING',
+                                'policySummaryInfo': {
+                                    'reviewStatus': 'REVIEWED',
+                                    'approvalStatus': 'APPROVED',
+                                },
+                            },
+                            {
+                                'text': 'Sign in',
+                                'assetPerformanceLabel': 'PENDING',
+                                'policySummaryInfo': {
+                                    'reviewStatus': 'REVIEWED',
+                                    'approvalStatus': 'APPROVED',
+                                },
+                            },
+                        ],
+                        'descriptions': [
+                            {
+                                'text': (
+                                    'Email thats intuitive, efficient, and'
+                                    ' useful'
+                                ),
+                                'assetPerformanceLabel': 'PENDING',
+                                'policySummaryInfo': {
+                                    'reviewStatus': 'REVIEWED',
+                                    'approvalStatus': 'APPROVED',
+                                },
+                            },
+                            {
+                                'text': (
+                                    '15 GB of storage, less spam, and mobile'
+                                    ' access'
+                                ),
+                                'assetPerformanceLabel': 'PENDING',
+                                'policySummaryInfo': {
+                                    'reviewStatus': 'REVIEWED',
+                                    'approvalStatus': 'APPROVED',
+                                },
+                            },
+                        ],
+                    },
+                    'resourceName': 'customers/123/ads/1011',
+                    'finalUrls': ['https://mail.google.com/'],
+                },
+            },
+        },
+        {
+            'customer': {'resourceName': 'customers/123', 'id': '123'},
+            'campaign': {
+                'resourceName': 'customers/123/campaigns/1213',
+                'name': 'Analytics Test Campaign',
+            },
+            'adGroup': {
+                'resourceName': 'customers/123/adGroups/1415',
+                'name': 'Ad group 1',
+            },
+            'adGroupAd': {
+                'resourceName': 'customers/123/adGroupAds/1415~1617',
+                'ad': {
+                    'responsiveSearchAd': {
+                        'headlines': [
+                            {
+                                'text': 'Official Website',
+                                'assetPerformanceLabel': 'PENDING',
+                                'policySummaryInfo': {
+                                    'reviewStatus': 'REVIEWED',
+                                    'approvalStatus': 'APPROVED',
+                                },
+                            },
+                            {
+                                'text': 'Official Site',
+                                'assetPerformanceLabel': 'PENDING',
+                                'policySummaryInfo': {
+                                    'reviewStatus': 'REVIEWED',
+                                    'approvalStatus': 'APPROVED',
+                                },
+                            },
+                            {
+                                'text': 'High Quality Products',
+                                'assetPerformanceLabel': 'PENDING',
+                                'policySummaryInfo': {
+                                    'reviewStatus': 'REVIEWED',
+                                    'approvalStatus': 'APPROVED',
+                                },
+                            },
+                        ],
+                        'descriptions': [
+                            {
+                                'text': 'Google Analytics',
+                                'assetPerformanceLabel': 'PENDING',
+                                'policySummaryInfo': {
+                                    'reviewStatus': 'REVIEWED',
+                                    'approvalStatus': 'APPROVED',
+                                },
+                            },
+                            {
+                                'text': 'Try Analytics today!',
+                                'assetPerformanceLabel': 'PENDING',
+                                'policySummaryInfo': {
+                                    'reviewStatus': 'REVIEWED',
+                                    'approvalStatus': 'APPROVED',
+                                },
+                            },
+                        ],
+                    },
+                    'resourceName': 'customers/123/ads/1617',
+                    'finalUrls': ['http://analytics.google.com'],
+                },
+            },
+        },
+    ],
+    'fieldMask': 'fake_field_mask',
+    'requestId': 'fake_request_id',
+}]]
 
 
 _CAMPAIGNS_GOOGLE_ADS_API_RESPONSE = [
@@ -188,10 +236,7 @@ _CAMPAIGNS_GOOGLE_ADS_API_RESPONSE = [
                 }
             }
         ],
-        'fieldMask': (
-            'campaign.id,campaign.name,campaign.advertisingChannelType,'
-            'campaign.biddingStrategyType'
-        ),
+        'fieldMask': 'fake_field_mask',
         'requestId': 'fake_req_id',
     }],
     [{
@@ -215,10 +260,7 @@ _CAMPAIGNS_GOOGLE_ADS_API_RESPONSE = [
                 }
             },
         ],
-        'fieldMask': (
-            'campaign.id,campaign.name,campaign.advertisingChannelType,'
-            'campaign.biddingStrategyType'
-        ),
+        'fieldMask': 'fake_field_mask',
         'requestId': 'fake_req_id',
     }],
 ]
@@ -261,12 +303,7 @@ _AD_GROUPS_GOOGLE_ADS_RESPONSE = [
                 },
             },
         }],
-        'fieldMask': (
-            'customer.id,campaign.name,adGroup.name,'
-            'adGroupAd.ad.responsiveSearchAd.headlines,'
-            'adGroupAd.ad.responsiveSearchAd.descriptions,'
-            'adGroupAd.ad.finalUrls'
-        ),
+        'fieldMask': 'fake_field_mask',
         'requestId': 'fake_request_id',
     }],
     [{
@@ -406,12 +443,7 @@ _AD_GROUPS_GOOGLE_ADS_RESPONSE = [
                 },
             },
         ],
-        'fieldMask': (
-            'customer.id,campaign.name,adGroup.name,'
-            'adGroupAd.ad.responsiveSearchAd.headlines,'
-            'adGroupAd.ad.responsiveSearchAd.descriptions,'
-            'adGroupAd.ad.finalUrls'
-        ),
+        'fieldMask': 'fake_field_mask',
         'requestId': 'fake_request_id',
     }],
 ]
@@ -456,6 +488,7 @@ _EXTENSIONS_GOOGLE_ADS_API_RESPONSE = [
                 'asset': {
                     'resourceName': 'customers/123/assets/110373249611',
                     'type': 'SITELINK',
+                    'finalUrls': ['https://www.google.com/gmail'],
                     'sitelinkAsset': {
                         'linkText': 'This is a link text',
                         'description1': 'This is a Description 1',
@@ -493,14 +526,7 @@ _EXTENSIONS_GOOGLE_ADS_API_RESPONSE = [
                 },
             },
         ],
-        'fieldMask': (
-            'campaign.name,adGroup.campaign,'
-            'asset.type,asset.structuredSnippetAsset.header,'
-            'asset.structuredSnippetAsset.values,'
-            'asset.calloutAsset.calloutText,asset.sitelinkAsset.description1,'
-            'asset.sitelinkAsset.description2,asset.sitelinkAsset.linkText,'
-            'adGroupAsset.status,adGroup.name'
-        ),
+        'fieldMask': 'fake_field_mask',
         'requestId': 'fake_request_id',
     }],
     [{
@@ -534,6 +560,7 @@ _EXTENSIONS_GOOGLE_ADS_API_RESPONSE = [
                 'asset': {
                     'resourceName': 'customers/123/assets/110373249611',
                     'type': 'SITELINK',
+                    'finalUrls': ['https://www.google.com/gmail'],
                     'sitelinkAsset': {
                         'linkText': 'This is a link text',
                         'description1': 'This is a Description 1',
@@ -555,6 +582,7 @@ _EXTENSIONS_GOOGLE_ADS_API_RESPONSE = [
                 'asset': {
                     'resourceName': 'customers/123/assets/110373390950',
                     'type': 'SITELINK',
+                    'finalUrls': ['https://www.google.com/gmail'],
                     'sitelinkAsset': {
                         'linkText': 'Calendar',
                         'description1': 'Open Calendar',
@@ -586,14 +614,7 @@ _EXTENSIONS_GOOGLE_ADS_API_RESPONSE = [
                 },
             },
         ],
-        'fieldMask': (
-            'campaign.name,campaign.resourceName,asset.type,'
-            'asset.structuredSnippetAsset.header,'
-            'asset.structuredSnippetAsset.values,'
-            'asset.calloutAsset.calloutText,asset.sitelinkAsset.description1,'
-            'asset.sitelinkAsset.description2,asset.sitelinkAsset.linkText,'
-            'campaignAsset.status'
-        ),
+        'fieldMask': 'fake_field_mask',
         'requestId': 'fake_request_id',
     }],
 ]
@@ -645,21 +666,21 @@ _EXPECTED_EXTENSIONS_DF = pd.DataFrame({
         'ENABLED',
         'ENABLED',
     ],
-    'Structured snippet header': ['Brands', '', '', 'Brands', '', '', ''],
-    'Structured snippet values': [
-        'Google;Píxel;Android',
+    'Header': ['Brands', '', '', 'Brands', '', '', ''],
+    'Snippet values': [
+        '"Google\nPíxel\nAndroid"',
         '',
         '',
-        'Google;Píxel;Android',
+        '"Google\nPíxel\nAndroid"',
         '',
         '',
         '',
     ],
-    'Original structured snippet values': [
-        'Google;Pixel;Android',
+    'Original snippet values': [
+        '"Google\nPixel\nAndroid"',
         '',
         '',
-        'Google;Pixel;Android',
+        '"Google\nPixel\nAndroid"',
         '',
         '',
         '',
@@ -682,7 +703,7 @@ _EXPECTED_EXTENSIONS_DF = pd.DataFrame({
         '',
         'Buy my product now',
     ],
-    'Sitelink description 1': [
+    'Description 1': [
         '',
         'Esta es una descripción 1',
         '',
@@ -691,7 +712,7 @@ _EXPECTED_EXTENSIONS_DF = pd.DataFrame({
         'Calendario abierto',
         '',
     ],
-    'Original sitelink description 1': [
+    'Original description 1': [
         '',
         'This is a Description 1',
         '',
@@ -700,7 +721,7 @@ _EXPECTED_EXTENSIONS_DF = pd.DataFrame({
         'Open Calendar',
         '',
     ],
-    'Sitelink description 2': [
+    'Description 2': [
         '',
         'Esta es una descripción 2',
         '',
@@ -709,7 +730,7 @@ _EXPECTED_EXTENSIONS_DF = pd.DataFrame({
         'Calendario abierto',
         '',
     ],
-    'Original sitelink description 2': [
+    'Original description 2': [
         '',
         'This is a Description 2',
         '',
@@ -718,7 +739,7 @@ _EXPECTED_EXTENSIONS_DF = pd.DataFrame({
         'Calendar open',
         '',
     ],
-    'Sitelink link text': [
+    'Link text': [
         '',
         'Este es un texto de enlace',
         '',
@@ -727,13 +748,22 @@ _EXPECTED_EXTENSIONS_DF = pd.DataFrame({
         'Calendario',
         '',
     ],
-    'Original sitelink link text': [
+    'Original link text': [
         '',
         'This is a link text',
         '',
         '',
         'This is a link text',
         'Calendar',
+        '',
+    ],
+    'Final URLs': [
+        '',
+        'https://www.google.com/gmail',
+        '',
+        '',
+        'https://www.google.com/gmail',
+        'https://www.google.com/gmail',
         '',
     ],
     'Updates applied': [[], [], [], [], [], [], []],
@@ -778,21 +808,21 @@ _EXPECTED_EXTENSIONS_DF_WHEN_TRANSLATION_SKIPPED = pd.DataFrame({
         'ENABLED',
         'ENABLED',
     ],
-    'Structured snippet header': ['Brands', '', '', 'Brands', '', '', ''],
-    'Structured snippet values': [
-        'Google;Pixel;Android',
+    'Header': ['Brands', '', '', 'Brands', '', '', ''],
+    'Snippet values': [
+        '"Google\nPixel\nAndroid"',
         '',
         '',
-        'Google;Pixel;Android',
+        '"Google\nPixel\nAndroid"',
         '',
         '',
         '',
     ],
-    'Original structured snippet values': [
-        'Google;Pixel;Android',
+    'Original snippet values': [
+        '"Google\nPixel\nAndroid"',
         '',
         '',
-        'Google;Pixel;Android',
+        '"Google\nPixel\nAndroid"',
         '',
         '',
         '',
@@ -815,7 +845,7 @@ _EXPECTED_EXTENSIONS_DF_WHEN_TRANSLATION_SKIPPED = pd.DataFrame({
         '',
         'Buy my product now',
     ],
-    'Sitelink description 1': [
+    'Description 1': [
         '',
         'This is a Description 1',
         '',
@@ -824,7 +854,7 @@ _EXPECTED_EXTENSIONS_DF_WHEN_TRANSLATION_SKIPPED = pd.DataFrame({
         'Open Calendar',
         '',
     ],
-    'Original sitelink description 1': [
+    'Original description 1': [
         '',
         'This is a Description 1',
         '',
@@ -833,7 +863,7 @@ _EXPECTED_EXTENSIONS_DF_WHEN_TRANSLATION_SKIPPED = pd.DataFrame({
         'Open Calendar',
         '',
     ],
-    'Sitelink description 2': [
+    'Description 2': [
         '',
         'This is a Description 2',
         '',
@@ -842,7 +872,7 @@ _EXPECTED_EXTENSIONS_DF_WHEN_TRANSLATION_SKIPPED = pd.DataFrame({
         'Calendar open',
         '',
     ],
-    'Original sitelink description 2': [
+    'Original description 2': [
         '',
         'This is a Description 2',
         '',
@@ -851,7 +881,7 @@ _EXPECTED_EXTENSIONS_DF_WHEN_TRANSLATION_SKIPPED = pd.DataFrame({
         'Calendar open',
         '',
     ],
-    'Sitelink link text': [
+    'Link text': [
         '',
         'This is a link text',
         '',
@@ -860,13 +890,22 @@ _EXPECTED_EXTENSIONS_DF_WHEN_TRANSLATION_SKIPPED = pd.DataFrame({
         'Calendar',
         '',
     ],
-    'Original sitelink link text': [
+    'Original link text': [
         '',
         'This is a link text',
         '',
         '',
         'This is a link text',
         'Calendar',
+        '',
+    ],
+    'Final URLs': [
+        '',
+        'https://www.google.com/gmail',
+        '',
+        '',
+        'https://www.google.com/gmail',
+        'https://www.google.com/gmail',
         '',
     ],
     'Updates applied': [[], [], [], [], [], [], []],
@@ -1132,7 +1171,7 @@ class TranslationWorkerTest(absltest.TestCase):
         },
         {
             'translations': [
-                {'translatedText': 'Google;Píxel;Android'},
+                {'translatedText': '"Google\nPíxel\nAndroid"'},
                 {'translatedText': 'Esta es una descripción 1'},
                 {'translatedText': 'Esta es una descripción 2'},
                 {'translatedText': 'Este es un texto de enlace'},

@@ -34,17 +34,18 @@ CAMPAIGN = 'Campaign'
 AD_GROUP = 'Ad group'
 STATUS = 'Status'
 TYPE = 'Asset type'
-STRUCTURED_SNIPPET_HEADER = 'Structured snippet header'
-STRUCTURED_SNIPPET_VALUES = 'Structured snippet values'
-ORIGINAL_STRUCTURED_SNIPPET_VALUES = 'Original structured snippet values'
+STRUCTURED_SNIPPET_HEADER = 'Header'
+STRUCTURED_SNIPPET_VALUES = 'Snippet values'
+ORIGINAL_STRUCTURED_SNIPPET_VALUES = 'Original snippet values'
 CALLOUT_TEXT = 'Callout text'
 ORIGINAL_CALLOUT_TEXT = 'Original callout text'
-SITELINK_DESCRIPTION_1 = 'Sitelink description 1'
-ORIGINAL_SITELINK_DESCRIPTION_1 = 'Original sitelink description 1'
-SITELINK_DESCRIPTION_2 = 'Sitelink description 2'
-ORIGINAL_SITELINK_DESCRIPTION_2 = 'Original sitelink description 2'
-SITELINK_LINK_TEXT = 'Sitelink link text'
-ORIGINAL_SITELINK_LINK_TEXT = 'Original sitelink link text'
+SITELINK_DESCRIPTION_1 = 'Description 1'
+ORIGINAL_SITELINK_DESCRIPTION_1 = 'Original description 1'
+SITELINK_DESCRIPTION_2 = 'Description 2'
+ORIGINAL_SITELINK_DESCRIPTION_2 = 'Original description 2'
+SITELINK_LINK_TEXT = 'Link text'
+ORIGINAL_SITELINK_LINK_TEXT = 'Original link text'
+SITELINK_FINAL_URLS = 'Final URLs'
 UPDATES_APPLIED = 'Updates applied'
 
 _COLS = [
@@ -65,6 +66,7 @@ _COLS = [
     ORIGINAL_SITELINK_DESCRIPTION_2,
     SITELINK_LINK_TEXT,
     ORIGINAL_SITELINK_LINK_TEXT,
+    SITELINK_FINAL_URLS,
     UPDATES_APPLIED,  # Updates applied to this DataFrame / Row.
 ]
 
@@ -157,7 +159,9 @@ class Extensions:
               else ''
           )
           structured_snippet_values = (
-              ';'.join(result['asset']['structuredSnippetAsset']['values'])
+              '"'
+              + '\n'.join(result['asset']['structuredSnippetAsset']['values'])
+              + '"'
               if result['asset'].get('structuredSnippetAsset')
               else ''
           )
@@ -193,6 +197,12 @@ class Extensions:
           )
           extension[SITELINK_LINK_TEXT] = sitelink_link_text
           extension[ORIGINAL_SITELINK_LINK_TEXT] = sitelink_link_text
+          final_urls = (
+              ' '.join(result['asset']['finalUrls'])
+              if result['asset'].get('sitelinkAsset')
+              else ''
+          )
+          extension[SITELINK_FINAL_URLS] = final_urls
           assets.append(extension)
 
     return pd.DataFrame(assets, columns=_COLS)
@@ -250,8 +260,8 @@ class Extensions:
         # separated we add those to the char limit.
         terms_with_metadata[row[STRUCTURED_SNIPPET_VALUES]].char_limit = (
             _STRUCTURED_SNIPPET_VALUE_CHAR_LIMIT
-            * len(row[STRUCTURED_SNIPPET_VALUES].split(';'))
-            + len(row[STRUCTURED_SNIPPET_VALUES].split(';'))
+            * len(row[STRUCTURED_SNIPPET_VALUES].split('\n'))
+            + len(row[STRUCTURED_SNIPPET_VALUES].split('\n'))
             - 1
         )
 
@@ -296,7 +306,7 @@ class Extensions:
 
     for _, row in self.df().iterrows():
       count += self._count_col_chars(
-          row, 'Sitelink description', _NUM_SITELINK_DESCRIPTIONS
+          row, 'Description', _NUM_SITELINK_DESCRIPTIONS
       )
       count += (
           len(row[CALLOUT_TEXT])

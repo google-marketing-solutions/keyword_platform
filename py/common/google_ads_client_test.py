@@ -409,6 +409,7 @@ class GoogleAdsClientTest(parameterized.TestCase):
             asset.sitelink_asset.description1,
             asset.sitelink_asset.description2,
             asset.sitelink_asset.link_text,
+            asset.final_urls,
             ad_group_asset.status, ad_group.name
         FROM
           ad_group_asset
@@ -427,6 +428,7 @@ class GoogleAdsClientTest(parameterized.TestCase):
             asset.sitelink_asset.description1,
             asset.sitelink_asset.description2,
             asset.sitelink_asset.link_text,
+            asset.final_urls,
             campaign_asset.status
         FROM
           campaign_asset
@@ -442,10 +444,10 @@ class GoogleAdsClientTest(parameterized.TestCase):
         _request_record_asdict(mock_requests.request_history[0]),
         expected_request_ad_group,
     )
-  #  self.assertEqual(
-  #      _request_record_asdict(mock_requests.request_history[1]),
-  #      expected_request_campaign,
-  #  )
+    self.assertEqual(
+        _request_record_asdict(mock_requests.request_history[1]),
+        expected_request_campaign,
+    )
 
 
 if __name__ == '__main__':

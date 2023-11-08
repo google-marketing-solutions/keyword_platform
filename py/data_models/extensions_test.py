@@ -72,6 +72,7 @@ _GOOGLE_ADS_RESPONSE = [
                 'asset': {
                     'resourceName': 'customers/8112880374/assets/110373249611',
                     'type': 'SITELINK',
+                    'finalUrls': ['https://www.google.com/gmail'],
                     'sitelinkAsset': {
                         'linkText': 'This is a link text',
                         'description1': 'This is a Description 1',
@@ -113,14 +114,7 @@ _GOOGLE_ADS_RESPONSE = [
                 },
             },
         ],
-        'fieldMask': (
-            'campaign.name,adGroup.campaign,'
-            'asset.type,asset.structuredSnippetAsset.header,'
-            'asset.structuredSnippetAsset.values,'
-            'asset.calloutAsset.calloutText,asset.sitelinkAsset.description1,'
-            'asset.sitelinkAsset.description2,asset.sitelinkAsset.linkText,'
-            'adGroupAsset.status,adGroup.name'
-        ),
+        'fieldMask': 'fake_field_mask',
         'requestId': 'fake_request_id',
     }],
     [{
@@ -158,6 +152,7 @@ _GOOGLE_ADS_RESPONSE = [
                 'asset': {
                     'resourceName': 'customers/8112880374/assets/110373249611',
                     'type': 'SITELINK',
+                    'finalUrls': ['https://www.google.com/gmail'],
                     'sitelinkAsset': {
                         'linkText': 'This is a link text',
                         'description1': 'This is a Description 1',
@@ -182,6 +177,7 @@ _GOOGLE_ADS_RESPONSE = [
                 'asset': {
                     'resourceName': 'customers/8112880374/assets/110373390950',
                     'type': 'SITELINK',
+                    'finalUrls': ['https://www.google.com/gmail'],
                     'sitelinkAsset': {
                         'linkText': 'Calendar',
                         'description1': 'Open Calendar',
@@ -217,14 +213,7 @@ _GOOGLE_ADS_RESPONSE = [
                 },
             },
         ],
-        'fieldMask': (
-            'campaign.name,campaign.resourceName,asset.type,'
-            'asset.structuredSnippetAsset.header,'
-            'asset.structuredSnippetAsset.values,'
-            'asset.calloutAsset.calloutText,asset.sitelinkAsset.description1,'
-            'asset.sitelinkAsset.description2,asset.sitelinkAsset.linkText,'
-            'campaignAsset.status'
-        ),
+        'fieldMask': 'fake_field_mask',
         'requestId': 'fake_request_id',
     }],
 ]
@@ -274,21 +263,21 @@ _EXPECTED_DF = pd.DataFrame({
         'ENABLED',
         'ENABLED',
     ],
-    'Structured snippet header': ['Brands', '', '', 'Brands', '', '', ''],
-    'Structured snippet values': [
-        'Google;Pixel;Android',
+    'Header': ['Brands', '', '', 'Brands', '', '', ''],
+    'Snippet values': [
+        '"Google\nPixel\nAndroid"',
         '',
         '',
-        'Google;Pixel;Android',
+        '"Google\nPixel\nAndroid"',
         '',
         '',
         '',
     ],
-    'Original structured snippet values': [
-        'Google;Pixel;Android',
+    'Original snippet values': [
+        '"Google\nPixel\nAndroid"',
         '',
         '',
-        'Google;Pixel;Android',
+        '"Google\nPixel\nAndroid"',
         '',
         '',
         '',
@@ -311,7 +300,7 @@ _EXPECTED_DF = pd.DataFrame({
         '',
         'Buy my product now',
     ],
-    'Sitelink description 1': [
+    'Description 1': [
         '',
         'This is a Description 1',
         '',
@@ -320,7 +309,7 @@ _EXPECTED_DF = pd.DataFrame({
         'Open Calendar',
         '',
     ],
-    'Original sitelink description 1': [
+    'Original description 1': [
         '',
         'This is a Description 1',
         '',
@@ -329,7 +318,7 @@ _EXPECTED_DF = pd.DataFrame({
         'Open Calendar',
         '',
     ],
-    'Sitelink description 2': [
+    'Description 2': [
         '',
         'This is a Description 2',
         '',
@@ -338,7 +327,7 @@ _EXPECTED_DF = pd.DataFrame({
         'Calendar open',
         '',
     ],
-    'Original sitelink description 2': [
+    'Original description 2': [
         '',
         'This is a Description 2',
         '',
@@ -347,7 +336,7 @@ _EXPECTED_DF = pd.DataFrame({
         'Calendar open',
         '',
     ],
-    'Sitelink link text': [
+    'Link text': [
         '',
         'This is a link text',
         '',
@@ -356,38 +345,50 @@ _EXPECTED_DF = pd.DataFrame({
         'Calendar',
         '',
     ],
-    'Original sitelink link text': [
+    'Original link text': [
         '',
         'This is a link text',
         '',
         '',
         'This is a link text',
         'Calendar',
+        '',
+    ],
+    'Final URLs': [
+        '',
+        'https://www.google.com/gmail',
+        '',
+        '',
+        'https://www.google.com/gmail',
+        'https://www.google.com/gmail',
         '',
     ],
     'Updates applied': [[], [], [], [], [], [], []],
 })
 
 _EXPECTED_CSV_DATA = (
-    'Action,Customer ID,Campaign,Ad group,Asset type,Status,Structured snippet'
-    ' header,Structured snippet values,Original structured snippet'
-    ' values,Callout text,Original callout text,Sitelink description 1,Original'
-    ' sitelink description 1,Sitelink description 2,Original sitelink'
-    ' description 2,Sitelink link text,Original sitelink link text,Updates'
+    'Action,Customer ID,Campaign,Ad group,Asset type,Status,Header,Snippet'
+    ' values,Original snippet values,Callout text,Original callout'
+    ' text,Description 1,Original description 1,Description 2,Original'
+    ' description 2,Link text,Original link text,Final URLs,Updates'
     ' applied\nAdd,Enter customer ID,Campaign 1,Ad group'
-    ' 1,STRUCTURED_SNIPPET,ENABLED,Brands,Google;Pixel;Android,Google;Pixel;Android,,,,,,,,,[]\nAdd,Enter'
+    ' 1,STRUCTURED_SNIPPET,ENABLED,Brands,"""Google\nPixel\nAndroid""","""Google\nPixel\nAndroid""",,,,,,,,,,[]\nAdd,Enter'
     ' customer ID,Campaign 1,Ad group 1,SITELINK,ENABLED,,,,,,This is a'
     ' Description 1,This is a Description 1,This is a Description 2,This is a'
-    ' Description 2,This is a link text,This is a link text,[]\nAdd,Enter'
-    ' customer ID,Campaign 1,Ad group 1,CALLOUT,ENABLED,,,,Buy my product'
-    ' now,Buy my product now,,,,,,,[]\nAdd,Enter customer ID,Campaign'
-    ' 1,,STRUCTURED_SNIPPET,ENABLED,Brands,Google;Pixel;Android,Google;Pixel;Android,,,,,,,,,[]\nAdd,Enter'
+    ' Description 2,This is a link text,This is a link'
+    ' text,https://www.google.com/gmail,[]\nAdd,Enter customer ID,Campaign 1,Ad'
+    ' group 1,CALLOUT,ENABLED,,,,Buy my product now,Buy my product'
+    ' now,,,,,,,,[]\nAdd,Enter customer ID,Campaign'
+    ' 1,,STRUCTURED_SNIPPET,ENABLED,Brands,"""Google\nPixel\nAndroid""","""Google\nPixel\nAndroid""",,,,,,,,,,[]\nAdd,Enter'
     ' customer ID,Campaign 1,,SITELINK,ENABLED,,,,,,This is a Description'
     ' 1,This is a Description 1,This is a Description 2,This is a Description'
-    ' 2,This is a link text,This is a link text,[]\nAdd,Enter customer'
-    ' ID,Campaign 1,,SITELINK,ENABLED,,,,,,Open Calendar,Open Calendar,Calendar'
-    ' open,Calendar open,Calendar,Calendar,[]\nAdd,Enter customer ID,Campaign'
-    ' 1,,CALLOUT,ENABLED,,,,Buy my product now,Buy my product now,,,,,,,[]\n'
+    ' 2,This is a link text,This is a link'
+    ' text,https://www.google.com/gmail,[]\nAdd,Enter customer ID,Campaign'
+    ' 1,,SITELINK,ENABLED,,,,,,Open Calendar,Open Calendar,Calendar'
+    ' open,Calendar'
+    ' open,Calendar,Calendar,https://www.google.com/gmail,[]\nAdd,Enter'
+    ' customer ID,Campaign 1,,CALLOUT,ENABLED,,,,Buy my product now,Buy my'
+    ' product now,,,,,,,,[]\n'
 )
 
 _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame({
@@ -429,21 +430,21 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame({
         'ENABLED',
         'ENABLED',
     ],
-    'Structured snippet header': ['Brands', '', '', 'Brands', '', '', ''],
-    'Structured snippet values': [
-        'Google;Pixel;Android',
+    'Header': ['Brands', '', '', 'Brands', '', '', ''],
+    'Snippet values': [
+        '"Google\nPixel\nAndroid"',
         '',
         '',
-        'Google;Pixel;Android',
+        '"Google\nPixel\nAndroid"',
         '',
         '',
         '',
     ],
-    'Original structured snippet values': [
-        'Google;Pixel;Android',
+    'Original snippet values': [
+        '"Google\nPixel\nAndroid"',
         '',
         '',
-        'Google;Pixel;Android',
+        '"Google\nPixel\nAndroid"',
         '',
         '',
         '',
@@ -466,7 +467,7 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame({
         '',
         'Buy my product now',
     ],
-    'Sitelink description 1': [
+    'Description 1': [
         '',
         'This is a Description 1',
         '',
@@ -475,7 +476,7 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame({
         'Open Calendar',
         '',
     ],
-    'Original sitelink description 1': [
+    'Original description 1': [
         '',
         'This is a Description 1',
         '',
@@ -484,7 +485,7 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame({
         'Open Calendar',
         '',
     ],
-    'Sitelink description 2': [
+    'Description 2': [
         '',
         'This is a Description 2',
         '',
@@ -493,7 +494,7 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame({
         'Calendar open',
         '',
     ],
-    'Original sitelink description 2': [
+    'Original description 2': [
         '',
         'This is a Description 2',
         '',
@@ -502,7 +503,7 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame({
         'Calendar open',
         '',
     ],
-    'Sitelink link text': [
+    'Link text': [
         '',
         'This is a link text',
         '',
@@ -511,13 +512,22 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame({
         'Calendar',
         '',
     ],
-    'Original sitelink link text': [
+    'Original link text': [
         '',
         'This is a link text',
         '',
         '',
         'This is a link text',
         'Calendar',
+        '',
+    ],
+    'Final URLs': [
+        '',
+        'https://www.google.com/gmail',
+        '',
+        '',
+        'https://www.google.com/gmail',
+        'https://www.google.com/gmail',
         '',
     ],
     'Updates applied': [
@@ -578,21 +588,21 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame({
         'ENABLED',
         'ENABLED',
     ],
-    'Structured snippet header': ['Brands', '', '', 'Brands', '', '', ''],
-    'Structured snippet values': [
-        'Google;Pixel;Android',
+    'Header': ['Brands', '', '', 'Brands', '', '', ''],
+    'Snippet values': [
+        '"Google\nPixel\nAndroid"',
         '',
         '',
-        'Google;Pixel;Android',
+        '"Google\nPixel\nAndroid"',
         '',
         '',
         '',
     ],
-    'Original structured snippet values': [
-        'Google;Pixel;Android',
+    'Original snippet values': [
+        '"Google\nPixel\nAndroid"',
         '',
         '',
-        'Google;Pixel;Android',
+        '"Google\nPixel\nAndroid"',
         '',
         '',
         '',
@@ -615,7 +625,7 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame({
         '',
         'Buy my product now',
     ],
-    'Sitelink description 1': [
+    'Description 1': [
         '',
         'This is a Description 1',
         '',
@@ -624,7 +634,7 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame({
         'Open Calendar',
         '',
     ],
-    'Original sitelink description 1': [
+    'Original description 1': [
         '',
         'This is a Description 1',
         '',
@@ -633,7 +643,7 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame({
         'Open Calendar',
         '',
     ],
-    'Sitelink description 2': [
+    'Description 2': [
         '',
         'This is a Description 2',
         '',
@@ -642,7 +652,7 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame({
         'Calendar open',
         '',
     ],
-    'Original sitelink description 2': [
+    'Original description 2': [
         '',
         'This is a Description 2',
         '',
@@ -651,7 +661,7 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame({
         'Calendar open',
         '',
     ],
-    'Sitelink link text': [
+    'Link text': [
         '',
         'This is a link text',
         '',
@@ -660,13 +670,22 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame({
         'Calendar',
         '',
     ],
-    'Original sitelink link text': [
+    'Original link text': [
         '',
         'This is a link text',
         '',
         '',
         'This is a link text',
         'Calendar',
+        '',
+    ],
+    'Final URLs': [
+        '',
+        'https://www.google.com/gmail',
+        '',
+        '',
+        'https://www.google.com/gmail',
+        'https://www.google.com/gmail',
         '',
     ],
     'Updates applied': [[], [], [], [], [], [], []],
@@ -680,28 +699,27 @@ _EXPECTED_DF_EMPTY = pd.DataFrame(
         'Ad group': pd.Series([], dtype='object'),
         'Asset type': pd.Series([], dtype='object'),
         'Status': pd.Series([], dtype='object'),
-        'Structured snippet header': pd.Series([], dtype='object'),
-        'Structured snippet values': pd.Series([], dtype='object'),
-        'Original structured snippet values': pd.Series([], dtype='object'),
+        'Header': pd.Series([], dtype='object'),
+        'Snippet values': pd.Series([], dtype='object'),
+        'Original snippet values': pd.Series([], dtype='object'),
         'Callout text': pd.Series([], dtype='object'),
         'Original callout text': pd.Series([], dtype='object'),
-        'Sitelink description 1': pd.Series([], dtype='object'),
-        'Original sitelink description 1': pd.Series([], dtype='object'),
-        'Sitelink description 2': pd.Series([], dtype='object'),
-        'Original sitelink description 2': pd.Series([], dtype='object'),
-        'Sitelink link text': pd.Series([], dtype='object'),
-        'Original sitelink link text': pd.Series([], dtype='object'),
+        'Description 1': pd.Series([], dtype='object'),
+        'Original description 1': pd.Series([], dtype='object'),
+        'Description 2': pd.Series([], dtype='object'),
+        'Original description 2': pd.Series([], dtype='object'),
+        'Link text': pd.Series([], dtype='object'),
+        'Original link text': pd.Series([], dtype='object'),
+        'Final URLs': pd.Series([], dtype='object'),
         'Updates applied': pd.Series([], dtype='object'),
     },
 )
 
 _EXPECTED_CSV_DATA_EMPTY = (
-    'Action,Customer ID,Campaign,Ad group,Asset type,Status,Structured snippet'
-    ' header,Structured snippet values,Original structured snippet'
-    ' values,Callout text,Original callout text,Sitelink description 1,Original'
-    ' sitelink description 1,Sitelink description 2,Original sitelink'
-    ' description 2,Sitelink link text,Original sitelink link text,Updates'
-    ' applied\n'
+    'Action,Customer ID,Campaign,Ad group,Asset type,Status,Header,Snippet'
+    ' values,Original snippet values,Callout text,Original callout'
+    ' text,Description 1,Original description 1,Description 2,Original'
+    ' description 2,Link text,Original link text,Final URLs,Updates applied\n'
 )
 
 _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame({
@@ -743,21 +761,21 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame({
         'ENABLED',
         'ENABLED',
     ],
-    'Structured snippet header': ['Brands', '', '', 'Brands', '', '', ''],
-    'Structured snippet values': [
-        'Google;Pixel;Android',
+    'Header': ['Brands', '', '', 'Brands', '', '', ''],
+    'Snippet values': [
+        '"Google\nPixel\nAndroid"',
         '',
         '',
-        'Google;Pixel;Android',
+        '"Google\nPixel\nAndroid"',
         '',
         '',
         '',
     ],
-    'Original structured snippet values': [
-        'Google;Pixel;Android',
+    'Original snippet values': [
+        '"Google\nPixel\nAndroid"',
         '',
         '',
-        'Google;Pixel;Android',
+        '"Google\nPixel\nAndroid"',
         '',
         '',
         '',
@@ -780,7 +798,7 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame({
         '',
         'Buy my product now',
     ],
-    'Sitelink description 1': [
+    'Description 1': [
         '',
         'Dies ist eine Beschreibung 1',
         '',
@@ -789,7 +807,7 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame({
         'Kalender öffnen',
         '',
     ],
-    'Original sitelink description 1': [
+    'Original description 1': [
         '',
         'This is a Description 1',
         '',
@@ -798,7 +816,7 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame({
         'Open Calendar',
         '',
     ],
-    'Sitelink description 2': [
+    'Description 2': [
         '',
         'Dies ist eine Beschreibung 2',
         '',
@@ -807,7 +825,7 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame({
         'Kalender geöffnet',
         '',
     ],
-    'Original sitelink description 2': [
+    'Original description 2': [
         '',
         'This is a Description 2',
         '',
@@ -816,7 +834,7 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame({
         'Calendar open',
         '',
     ],
-    'Sitelink link text': [
+    'Link text': [
         '',
         'Dies ist ein Linktext',
         '',
@@ -825,13 +843,22 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame({
         'Kalender',
         '',
     ],
-    'Original sitelink link text': [
+    'Original link text': [
         '',
         'This is a link text',
         '',
         '',
         'This is a link text',
         'Calendar',
+        '',
+    ],
+    'Final URLs': [
+        '',
+        'https://www.google.com/gmail',
+        '',
+        '',
+        'https://www.google.com/gmail',
+        'https://www.google.com/gmail',
         '',
     ],
     'Updates applied': [[], [], [], [], [], [], []],
@@ -884,21 +911,21 @@ _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame({
         'ENABLED',
         'ENABLED',
     ],
-    'Structured snippet header': ['Brands', '', '', 'Brands', '', '', ''],
-    'Structured snippet values': [
-        'Google;Pixel;Android',
+    'Header': ['Brands', '', '', 'Brands', '', '', ''],
+    'Snippet values': [
+        '"Google\nPixel\nAndroid"',
         '',
         '',
-        'Google;Pixel;Android',
+        '"Google\nPixel\nAndroid"',
         '',
         '',
         '',
     ],
-    'Original structured snippet values': [
-        'Google;Pixel;Android',
+    'Original snippet values': [
+        '"Google\nPixel\nAndroid"',
         '',
         '',
-        'Google;Pixel;Android',
+        '"Google\nPixel\nAndroid"',
         '',
         '',
         '',
@@ -921,7 +948,7 @@ _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame({
         '',
         'Buy my product now',
     ],
-    'Sitelink description 1': [
+    'Description 1': [
         '',
         'Dies ist eine Beschreibung 1',
         '',
@@ -930,7 +957,7 @@ _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame({
         'Kalender öffnen',
         '',
     ],
-    'Original sitelink description 1': [
+    'Original description 1': [
         '',
         'This is a Description 1',
         '',
@@ -939,7 +966,7 @@ _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame({
         'Open Calendar',
         '',
     ],
-    'Sitelink description 2': [
+    'Description 2': [
         '',
         'Dies ist eine Beschreibung 2',
         '',
@@ -948,7 +975,7 @@ _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame({
         'Kalender geöffnet',
         '',
     ],
-    'Original sitelink description 2': [
+    'Original description 2': [
         '',
         'This is a Description 2',
         '',
@@ -957,7 +984,7 @@ _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame({
         'Calendar open',
         '',
     ],
-    'Sitelink link text': [
+    'Link text': [
         '',
         'Dies ist ein Linktext',
         '',
@@ -966,13 +993,22 @@ _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame({
         'Kalender',
         '',
     ],
-    'Original sitelink link text': [
+    'Original link text': [
         '',
         'This is a link text',
         '',
         '',
         'This is a link text',
         'Calendar',
+        '',
+    ],
+    'Final URLs': [
+        '',
+        'https://www.google.com/gmail',
+        '',
+        '',
+        'https://www.google.com/gmail',
+        'https://www.google.com/gmail',
         '',
     ],
     'Updates applied': [[], [], [], [], [], [], []],
@@ -1046,17 +1082,18 @@ class ExtensionsTest(parameterized.TestCase):
         'Ad group',
         'Asset type',
         'Status',
-        'Structured snippet header',
-        'Structured snippet values',
-        'Original structured snippet values',
+        'Header',
+        'Snippet values',
+        'Original snippet values',
         'Callout text',
         'Original callout text',
-        'Sitelink description 1',
-        'Original sitelink description 1',
-        'Sitelink description 2',
-        'Original sitelink description 2',
-        'Sitelink link text',
-        'Original sitelink link text',
+        'Description 1',
+        'Original description 1',
+        'Description 2',
+        'Original description 2',
+        'Link text',
+        'Original link text',
+        'Final URLs',
         'Updates applied',
     ]
 
@@ -1087,7 +1124,7 @@ class ExtensionsTest(parameterized.TestCase):
   def test_get_translation_frame(self):
     expected_df = pd.DataFrame({
         'source_term': [
-            'Google;Pixel;Android',
+            '"Google\nPixel\nAndroid"',
             'This is a Description 1',
             'This is a Description 2',
             'This is a link text',
@@ -1108,16 +1145,16 @@ class ExtensionsTest(parameterized.TestCase):
         ],
         'dataframe_locations': [
             [
-                (0, 'Structured snippet values'),
-                (3, 'Structured snippet values'),
+                (0, 'Snippet values'),
+                (3, 'Snippet values'),
             ],
-            [(1, 'Sitelink description 1'), (4, 'Sitelink description 1')],
-            [(1, 'Sitelink description 2'), (4, 'Sitelink description 2')],
-            [(1, 'Sitelink link text'), (4, 'Sitelink link text')],
+            [(1, 'Description 1'), (4, 'Description 1')],
+            [(1, 'Description 2'), (4, 'Description 2')],
+            [(1, 'Link text'), (4, 'Link text')],
             [(2, 'Callout text'), (6, 'Callout text')],
-            [(5, 'Sitelink description 1')],
-            [(5, 'Sitelink description 2')],
-            [(5, 'Sitelink link text')],
+            [(5, 'Description 1')],
+            [(5, 'Description 2')],
+            [(5, 'Link text')],
         ],
         'char_limit': [
             92,
@@ -1160,7 +1197,7 @@ class ExtensionsTest(parameterized.TestCase):
         start_index=0,
         target_language_code='de',
         translations=[
-            'Google;Pixel;Android',
+            '"Google\nPixel\nAndroid"',
             'Dies ist eine Beschreibung 1',
             'Dies ist eine Beschreibung 2',
             'Dies ist ein Linktext',
@@ -1185,7 +1222,7 @@ class ExtensionsTest(parameterized.TestCase):
   def test_char_count(self):
     extensions = extensions_lib.Extensions(_GOOGLE_ADS_RESPONSE)
 
-    expected_char_count = 222
+    expected_char_count = 226
 
     actual_char_count = extensions.char_count()
 
