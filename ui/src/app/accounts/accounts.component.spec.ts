@@ -21,6 +21,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatInputModule} from '@angular/material/input';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {MultiSelectComponent} from '../multi-select/multi-select.component';
@@ -36,7 +37,8 @@ describe('AccountsComponent', () => {
       declarations: [MultiSelectComponent, AccountsComponent],
       imports: [
         BrowserAnimationsModule, HttpClientModule, MatAutocompleteModule,
-        MatInputModule, MatProgressSpinnerModule, ReactiveFormsModule
+        MatInputModule, MatProgressSpinnerModule, MatSnackBarModule,
+        ReactiveFormsModule
       ]
     });
     fixture = TestBed.createComponent(AccountsComponent);

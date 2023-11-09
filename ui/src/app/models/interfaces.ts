@@ -39,6 +39,7 @@ export interface Translation {
   glossaryId: string;
   translateKeywords: boolean;
   translateAds: boolean;
+  translateExtensions: boolean;
   shortenTranslationsToCharLimit: boolean;
 }
 

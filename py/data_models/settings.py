@@ -34,4 +34,5 @@ class Settings:
   client_id: str = ''
   translate_ads: bool = True
   translate_keywords: bool = True
+  translate_extensions: bool = False
   glossary_id: str = ''

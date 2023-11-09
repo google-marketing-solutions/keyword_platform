@@ -25,6 +25,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatTabsModule} from '@angular/material/tabs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
@@ -50,7 +51,8 @@ describe('ContentComponent', () => {
         BrowserAnimationsModule, FormsModule, HttpClientModule,
         MatAutocompleteModule, MatCheckboxModule, MatDialogModule,
         MatIconModule, MatInputModule, MatProgressSpinnerModule,
-        MatSlideToggleModule, MatTabsModule, ReactiveFormsModule
+        MatSlideToggleModule, MatSnackBarModule, MatTabsModule,
+        ReactiveFormsModule
       ]
     });
     fixture = TestBed.createComponent(ContentComponent);

@@ -30,7 +30,7 @@ export class RunService {
   run(accountIds: string[], campaignIds: string[], sourceLanguageCode: string,
       targetLanguageCode: string, shortenTranslationsToCharLimit: boolean,
       workers: string[], client_id: string, translateKeywords: boolean,
-      translateAds: boolean, glossaryId: string
+      translateAds: boolean, translateExtensions: boolean, glossaryId: string
   ): Observable<HttpResponse<Output>> {
     return this.http
         .post<Output>(
@@ -45,6 +45,7 @@ export class RunService {
               'client_id': client_id,
               'translate_keywords': translateKeywords.toString(),
               'translate_ads': translateAds.toString(),
+              'translate_extensions': translateExtensions.toString(),
               'glossary_id': glossaryId,
               'endpoint': 'run'
             },

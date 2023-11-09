@@ -15,16 +15,17 @@
  * limitations under the License.
  */
 
-.error {
-  color: #F44336;
-  font-family: Roboto, sans-serif;
-  font-size: 14px;
-}
+import {Component, Inject, inject} from '@angular/core';
+import {MatSnackBarRef, MAT_SNACK_BAR_DATA} from '@angular/material/snack-bar';
 
-.responsive {
-  width: 100%;
-}
+@Component({
+  selector: 'app-snackbar',
+  templateUrl: './snackbar.component.html',
+  styleUrls: ['./snackbar.component.scss']
+})
+export class SnackbarComponent {
+  constructor(
+      @Inject(MAT_SNACK_BAR_DATA) readonly data: {[key: string]: string}) {}
 
-.static {
-  width: 280px;
+  snackBarRef = inject(MatSnackBarRef);
 }

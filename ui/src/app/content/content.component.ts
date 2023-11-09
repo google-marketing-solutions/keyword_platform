@@ -18,14 +18,16 @@
 import {Component, ViewChild} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatTabGroup} from '@angular/material/tabs';
 
 import {AccountsComponent} from '../accounts/accounts.component';
 import {CampaignsComponent} from '../campaigns/campaigns.component';
 import {DialogComponent} from '../dialog/dialog.component';
-import {RequestStatus, Worker} from '../models/enums';
+import {FontIcon, RequestStatus, Worker} from '../models/enums';
 import {Output} from '../models/interfaces';
 import {RunService} from '../services/run.service';
+import {SnackbarComponent} from '../snackbar/snackbar.component';
 import {TranslationComponent} from '../translation/translation.component';
 
 /**
@@ -74,12 +76,13 @@ export class ContentComponent {
 
   constructor(
       private readonly dialog: MatDialog,
+      private readonly snackbar: MatSnackBar,
       private readonly runService: RunService) {}
 
   accountsLoad(value: boolean) {
     // Control enablement/disablement of translationComponent depending on
     // whether accounts where successfully loaded or not.
-    this.translationComponent.disableForm(!value);
+    this.translationComponent.disable(!value);
     // Only make a request for glossaries if accounts successfully loaded.
     if (value) {
       this.translationComponent.getGlossaries();
@@ -91,7 +94,7 @@ export class ContentComponent {
     // force validation handling otherwise campaign values from the previous UI
     // interaction gets used even though they aren't visible in the campaign's
     // selection field.
-    this.campaignsComponent.resetCampaigns();
+    this.campaignsComponent.reset();
 
     this.accountIds = value;
     this.campaignsComponent.getCampaigns(this.accountIds);
@@ -113,7 +116,7 @@ export class ContentComponent {
     this.translationHasValidationError = value;
   }
 
-  hasFormError(): boolean {
+  hasError(): boolean {
     const error = this.translationHasValidationError ||
         this.accountsHasValidationError || this.campaignsHasValidationError;
     return error;
@@ -124,6 +127,9 @@ export class ContentComponent {
   }
 
   run() {
+    // Close the snackbar in case it is open.
+    this.snackbar.dismiss();
+
     this.requestStatus = RequestStatus.REQUESTED;
 
     // The clientId property is defined as a window object by the Google Tag
@@ -140,7 +146,7 @@ export class ContentComponent {
       workers.push(Worker.TRANSLATION_WORKER);
     }
 
-    this.disableForm(true);
+    this.disable(true);
 
     const translationData = this.translationComponent.getTranslationData();
 
@@ -151,34 +157,39 @@ export class ContentComponent {
             translationData.targetLanguageCode,
             translationData.shortenTranslationsToCharLimit, workers, clientId,
             translationData.translateKeywords, translationData.translateAds,
-            translationData.glossaryId)
+            translationData.translateExtensions, translationData.glossaryId)
         .subscribe(
             (response => {
               this.requestStatus = RequestStatus.RESPONDED;
-              this.disableForm(false);
-              this.openDialog(response.statusText!, response.body!);
+              this.disable(false);
+              this.openDialog(response.body!);
               console.log('Run service request for translation successful.');
             }),
             (error => {
               this.requestStatus = RequestStatus.ERROR;
-              this.disableForm(false);
-              this.openDialog(error, null);
+              this.disable(false);
+              this.openSnackBar(error, FontIcon.ERROR);
               console.error(error);
             }));
   }
 
-  private disableForm(disable: boolean) {
+  private disable(isDisabled: boolean) {
     // TODO(): Enabling/disabling each control individually seems
     // like the only way to manipulate the state of the entire form. Still
     // haven't found how to disable all content through a single call.
     // E.g. this.tab[1].setDisable().
-    this.accountsComponent.disableForm(disable);
-    this.campaignsComponent.disableForm(disable);
-    this.translationComponent.disableForm(disable);
-    this.button.disabled = disable;
+    this.accountsComponent.disable(isDisabled);
+    this.campaignsComponent.disable(isDisabled);
+    this.translationComponent.disable(isDisabled);
+    this.button.disabled = isDisabled;
   }
 
-  private openDialog(statusText: string, value: Output|null) {
-    this.dialog.open(DialogComponent, {data: {statusText, value}});
+  private openDialog(value: Output) {
+    this.dialog.open(DialogComponent, {data: {value}});
+  }
+
+  private openSnackBar(message: string, fontIcon: string) {
+    this.snackbar.openFromComponent(
+        SnackbarComponent, {data: {message, fontIcon}});
   }
 }

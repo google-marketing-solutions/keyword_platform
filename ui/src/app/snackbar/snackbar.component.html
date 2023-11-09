@@ -14,19 +14,17 @@
  limitations under the License.
 -->
 
-<div class="position">
-  <div *ngIf="showSpinner" class="spinner">
-    <mat-spinner></mat-spinner>
-  </div>
-  <form [formGroup]="form">
-    <app-multi-select
-        #control
-        [controlName]="controlName"
-        [className]="'responsive'"
-        [values]="entities"
-        [label]="'Select campaigns'"
-        [isRequired]=true
-        (selectionEvent)="selection($event)">
-    </app-multi-select>
-  </form>
-</div>
+<span matSnackBarLabel class="content">
+  <mat-icon *ngIf="data['fontIcon']"
+            aria-hidden="false"
+            aria-label="Message"
+            fontIcon="{{data['fontIcon']}}"
+            class="{{data['fontIcon']}} icon-message">
+  </mat-icon>
+  <span class="message">{{data['message']}}</span>
+</span>
+<span matSnackBarActions>
+  <button mat-icon-button matSnackBarAction (click)="snackBarRef.dismissWithAction()">
+    <mat-icon  aria-hidden="false" aria-label="Close" class="icon-button">close</mat-icon>
+  </button>
+</span>

@@ -145,51 +145,236 @@ _EXPECTED_CAMPAIGNS_LIST = list([
     },
 ])
 
-_GOOGLE_ADS_RESPONSE = [{
-        'results': [{
-            'customer': {'resourceName': 'customers/123', 'id': '123'},
-            'campaign': {
-                'resourceName': 'customers/123/campaigns/456',
-                'name': 'Gmail Test Campaign',
-            },
-            'adGroup': {
-                'resourceName': 'customers/123/adGroups/789',
-                'name': 'Ad group 1',
-            },
-            'adGroupAd': {
-                'resourceName': 'customers/123/adGroupAds/789~1011',
-                'ad': {
-                    'responsiveSearchAd': {
-                        'headlines': [{
-                            'text': 'Email Login',
-                            'assetPerformanceLabels': 'PENDING',
-                            'policySummaryInfo': {
-                                'reviewStatus': 'REVIEWED',
-                                'approvalStatus': 'APPROVED',
-                            },
-                        }],
-                        'descriptions': [{
-                            'text': 'Amazing email!',
-                            'assetPerformanceLabels': 'PENDING',
-                            'policySummaryInfo': {
-                                'reviewStatus': 'REVIEWED',
-                                'approvalStatus': 'APPROVED',
-                            },
-                        }],
+_EXTENSIONS_RESPONSE = [
+    [{
+        'results': [
+            {
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/789',
+                    'name': 'Campaign 1',
+                },
+                'adGroup': {
+                    'resourceName': 'customers/123/adGroups/139665100522',
+                    'name': 'Ad group 1',
+                },
+                'asset': {
+                    'resourceName': 'customers/123/assets/110379943909',
+                    'type': 'STRUCTURED_SNIPPET',
+                    'structuredSnippetAsset': {
+                        'header': 'Brands',
+                        'values': ['Google', 'Pixel', 'Android'],
                     },
-                    'resourceName': 'customers/123/ads/1011',
-                    'finalUrls': ['https://mail.google.com/'],
+                },
+                'adGroupAsset': {
+                    'resourceName': (
+                        'customers/123/adGroupAssets/139665100522'
+                        '~110379943909~STRUCTURED_SNIPPET'
+                    ),
+                    'status': 'ENABLED',
                 },
             },
-        }],
+            {
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/789',
+                    'name': 'Campaign 1',
+                },
+                'adGroup': {
+                    'resourceName': 'customers/123/adGroups/139665100522',
+                    'name': 'Ad group 1',
+                },
+                'asset': {
+                    'resourceName': 'customers/123/assets/110373249611',
+                    'type': 'SITELINK',
+                    'finalUrls': ['https://www.google.com/gmail'],
+                    'sitelinkAsset': {
+                        'linkText': 'This is a link text',
+                        'description1': 'This is a Description 1',
+                        'description2': 'This is a Description 2',
+                    },
+                },
+                'adGroupAsset': {
+                    'resourceName': (
+                        'customers/123/adGroupAssets/139665100522'
+                        '~110373249611~SITELINK'
+                    ),
+                    'status': 'ENABLED',
+                },
+            },
+            {
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/789',
+                    'name': 'Campaign 1',
+                },
+                'adGroup': {
+                    'resourceName': 'customers/123/adGroups/139665100522',
+                    'name': 'Ad group 1',
+                },
+                'asset': {
+                    'resourceName': 'customers/123/assets/110380162771',
+                    'type': 'CALLOUT',
+                    'calloutAsset': {'calloutText': 'Buy my product now'},
+                },
+                'adGroupAsset': {
+                    'resourceName': (
+                        'customers/123/adGroupAssets/139665100522'
+                        '~110380162771~CALLOUT'
+                    ),
+                    'status': 'ENABLED',
+                },
+            },
+        ],
         'fieldMask': (
-            'customer.id,campaign.name,adGroup.name,'
-            'adGroupAd.ad.responsiveSearchAd.headlines,'
-            'adGroupAd.ad.responsiveSearchAd.descriptions,'
-            'adGroupAd.ad.finalUrls'
+            'campaign.name,adGroup.campaign,'
+            'asset.type,asset.structuredSnippetAsset.header,'
+            'asset.structuredSnippetAsset.values,'
+            'asset.calloutAsset.calloutText,asset.sitelinkAsset.description1,'
+            'asset.sitelinkAsset.description2,asset.sitelinkAsset.linkText,'
+            'adGroupAsset.status,adGroup.name'
         ),
         'requestId': 'fake_request_id',
-    }]
+    }],
+    [{
+        'results': [
+            {
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/789',
+                    'name': 'Campaign 1',
+                },
+                'asset': {
+                    'resourceName': 'customers/123/assets/110379943909',
+                    'type': 'STRUCTURED_SNIPPET',
+                    'structuredSnippetAsset': {
+                        'header': 'Brands',
+                        'values': ['Google', 'Pixel', 'Android'],
+                    },
+                },
+                'campaignAsset': {
+                    'resourceName': (
+                        'customers/123/campaignAssets/987'
+                        '~110379943909~STRUCTURED_SNIPPET'
+                    ),
+                    'status': 'ENABLED',
+                },
+            },
+            {
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/789',
+                    'name': 'Campaign 1',
+                },
+                'asset': {
+                    'resourceName': 'customers/123/assets/110373249611',
+                    'type': 'SITELINK',
+                    'finalUrls': ['https://www.google.com/gmail'],
+                    'sitelinkAsset': {
+                        'linkText': 'This is a link text',
+                        'description1': 'This is a Description 1',
+                        'description2': 'This is a Description 2',
+                    },
+                },
+                'campaignAsset': {
+                    'resourceName': (
+                        'customers/123/campaignAssets/987~110373249611~SITELINK'
+                    ),
+                    'status': 'ENABLED',
+                },
+            },
+            {
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/789',
+                    'name': 'Campaign 1',
+                },
+                'asset': {
+                    'resourceName': 'customers/123/assets/110373390950',
+                    'type': 'SITELINK',
+                    'finalUrls': ['https://www.google.com/gmail'],
+                    'sitelinkAsset': {
+                        'linkText': 'Calendar',
+                        'description1': 'Open Calendar',
+                        'description2': 'Calendar open',
+                    },
+                },
+                'campaignAsset': {
+                    'resourceName': (
+                        'customers/123/campaignAssets/987~110373390950~SITELINK'
+                    ),
+                    'status': 'ENABLED',
+                },
+            },
+            {
+                'campaign': {
+                    'resourceName': 'customers/123/campaigns/789',
+                    'name': 'Campaign 1',
+                },
+                'asset': {
+                    'resourceName': 'customers/123/assets/110380162771',
+                    'type': 'CALLOUT',
+                    'calloutAsset': {'calloutText': 'Buy my product now'},
+                },
+                'campaignAsset': {
+                    'resourceName': (
+                        'customers/123/campaignAssets/987~110380162771~CALLOUT'
+                    ),
+                    'status': 'ENABLED',
+                },
+            },
+        ],
+        'fieldMask': (
+            'campaign.name,campaign.resourceName,asset.type,'
+            'asset.structuredSnippetAsset.header,'
+            'asset.structuredSnippetAsset.values,'
+            'asset.calloutAsset.calloutText,asset.sitelinkAsset.description1,'
+            'asset.sitelinkAsset.description2,asset.sitelinkAsset.linkText,'
+            'campaignAsset.status'
+        ),
+        'requestId': 'fake_request_id',
+    }],
+]
+
+_ADS_RESPONSE = [{
+    'results': [{
+        'customer': {'resourceName': 'customers/123', 'id': '123'},
+        'campaign': {
+            'resourceName': 'customers/123/campaigns/456',
+            'name': 'Gmail Test Campaign',
+        },
+        'adGroup': {
+            'resourceName': 'customers/123/adGroups/789',
+            'name': 'Ad group 1',
+        },
+        'adGroupAd': {
+            'resourceName': 'customers/123/adGroupAds/789~1011',
+            'ad': {
+                'responsiveSearchAd': {
+                    'headlines': [{
+                        'text': 'Email Login',
+                        'assetPerformanceLabels': 'PENDING',
+                        'policySummaryInfo': {
+                            'reviewStatus': 'REVIEWED',
+                            'approvalStatus': 'APPROVED',
+                        },
+                    }],
+                    'descriptions': [{
+                        'text': 'Amazing email!',
+                        'assetPerformanceLabels': 'PENDING',
+                        'policySummaryInfo': {
+                            'reviewStatus': 'REVIEWED',
+                            'approvalStatus': 'APPROVED',
+                        },
+                    }],
+                },
+                'resourceName': 'customers/123/ads/1011',
+                'finalUrls': ['https://mail.google.com/'],
+            },
+        },
+    }],
+    'fieldMask': (
+        'customer.id,campaign.name,adGroup.name,'
+        'adGroupAd.ad.responsiveSearchAd.headlines,'
+        'adGroupAd.ad.responsiveSearchAd.descriptions,'
+        'adGroupAd.ad.finalUrls'
+    ),
+    'requestId': 'fake_request_id',
+}]
 
 _KEYWORDS_RESPONSE = ([{'results':
       [{'customer':
@@ -292,6 +477,7 @@ class ExecutionRunnerTest(parameterized.TestCase):
         campaigns=[789, 101],
         workers_to_run=['translationWorker'],
         translate_ads=True,
+        translate_extensions=True,
     )
 
     # The ads API should be called for each customer ID in the request.
@@ -302,6 +488,10 @@ class ExecutionRunnerTest(parameterized.TestCase):
     expected_get_ads_data_calls = [mock.call(123, settings.campaigns),
                                    mock.call(456, settings.campaigns)]
     expected_get_keywords_calls = [
+        mock.call(123, settings.campaigns),
+        mock.call(456, settings.campaigns),
+    ]
+    expected_get_extensions_calls = [
         mock.call(123, settings.campaigns),
         mock.call(456, settings.campaigns),
     ]
@@ -343,6 +533,9 @@ class ExecutionRunnerTest(parameterized.TestCase):
       )
       self.mock_google_ads_client.return_value.get_keywords_data_for_campaigns.assert_has_calls(
           expected_get_keywords_calls, any_order=True
+      )
+      self.mock_google_ads_client.return_value.get_extensions_for_campaigns.assert_has_calls(
+          expected_get_extensions_calls, any_order=True
       )
 
       # Asserts translation worker called
@@ -600,13 +793,45 @@ class ExecutionRunnerTest(parameterized.TestCase):
     )
 
     self.mock_google_ads_client.return_value.get_ads_data_for_campaigns.return_value = (
-        _GOOGLE_ADS_RESPONSE
+        _ADS_RESPONSE
     )
 
     execution_runner = execution_runner_lib.ExecutionRunner(settings)
     actual_cost_estimate_msg = execution_runner.get_cost_estimate()
 
     self.assertEqual(expected_cost_estimate_msg, actual_cost_estimate_msg)
+
+  def test_translate_extensions_setting_equals_false_does_not_fetch_extensions_data(
+      self,
+  ):
+    """Tests Extensions object is not populated when translate_extensions is False."""
+    settings = settings_lib.Settings(
+        source_language_code='en',
+        target_language_codes=['es'],
+        customer_ids=[123, 456],
+        campaigns=[789, 101],
+        workers_to_run=['translationWorker'],
+        translate_extensions=False,
+    )
+
+    self.mock_google_ads_client.return_value.get_extensions_for_campaigns.return_value = (
+        _EXTENSIONS_RESPONSE
+    )
+
+    # Due to the way workers are dynamically loaded, they need to be mocked
+    # using mock.path.dict.
+    mock_translation_worker = mock.create_autospec(
+        translation_worker.TranslationWorker
+    )
+
+    with mock.patch.dict(
+        execution_runner_lib._WORKERS,
+        {'translationWorker': mock_translation_worker},
+    ):
+      execution_runner = execution_runner_lib.ExecutionRunner(settings)
+      execution_runner.run_workers()
+
+    self.mock_google_ads_client.return_value.get_extensions_for_campaigns.assert_not_called()
 
   def test_create_or_replace_glossary(self):
     settings = settings_lib.Settings()

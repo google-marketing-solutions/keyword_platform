@@ -21,6 +21,7 @@ import requests
 from data_models import ad_groups as ad_groups_lib
 from data_models import ads as ads_lib
 from data_models import campaigns as campaigns_lib
+from data_models import extensions as extensions_lib
 from data_models import google_ads_objects as google_ads_objects_lib
 from data_models import keywords as keywords_lib
 from data_models import settings as settings_lib
@@ -72,6 +73,16 @@ class TranslationWorker(base_worker.BaseWorker):
           glossary_id=settings.glossary_id,
       )
       logging.info('Ad translation complete.')
+
+    if settings.translate_extensions:
+      logging.info('Starting extension translation...')
+      self._translate_extensions(
+          extensions=google_ads_objects.extensions,
+          source_language_code=settings.source_language_code,
+          target_language_code=settings.target_language_codes[0],
+          glossary_id=settings.glossary_id,
+      )
+      logging.info('Extension translation complete.')
 
     self._apply_translation_suffix_to_campaigns_and_ad_groups(
         campaigns=google_ads_objects.campaigns,
@@ -189,6 +200,52 @@ class TranslationWorker(base_worker.BaseWorker):
     )
 
     logging.info('Finished ad translation.')
+
+  def _translate_extensions(
+      self,
+      extensions: extensions_lib.Extensions,
+      source_language_code: str,
+      target_language_code: str,
+      glossary_id: str | None = None,
+  ) -> None:
+    """Translates the extensions data model.
+
+    Args:
+      extensions: The extensions data object to translate.
+      source_language_code: The language code to translate from.
+      target_language_code: The language code to translate to.
+      glossary_id: The glossary to use during translation.
+    """
+    logging.info('Starting ad translation...')
+
+    extensions_translation_frame = extensions.get_translation_frame()
+
+    try:
+      self._cloud_translation_client.translate(
+          translation_frame=extensions_translation_frame,
+          source_language_code=source_language_code,
+          target_language_code=target_language_code,
+          glossary_id=glossary_id,
+      )
+    except requests.exceptions.HTTPError as http_error:
+      # Catch the exception so we can write the data we did manage to
+      # translate.
+      logging.exception(
+          'Encountered error during calls to Translation API: %s', http_error
+      )
+      self._warning_msg += (
+          'Encountered an error during extensions translation. Check the output'
+          ' files  before uploading. A developer can check logs for more'
+          ' details.'
+      )
+
+    extensions.apply_translations(
+        target_language=target_language_code,
+        translation_frame=extensions_translation_frame,
+        update_ad_group_and_campaign_names=True,
+    )
+
+    logging.info('Finished extensions translation.')
 
   def _apply_translation_suffix_to_campaigns_and_ad_groups(
       self,

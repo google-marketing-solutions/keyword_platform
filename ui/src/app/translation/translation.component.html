@@ -16,14 +16,15 @@
 
 <form [formGroup]="form">
   <p class="title">Settings</p>
-  <p class="sub-title">Select the source and target language for translation. (Optional): Apply a
+  <p class="sub-title">Select the source and target language for translation.
+    (Optional): Apply a
     <a href="https://cloud.google.com/translate/docs/advanced/glossary"
         target="_blank">glossary</a> when available.</p>
   <div>
     <div class="juxtapose">
       <app-single-select
-          #control
-          [controllerName]="'source-language'"
+          #controlComponent
+          [controlName]="sourceLanguageControlName"
           [className]="'static'"
           [values]="languages"
           [label]="'Select source language'"
@@ -33,8 +34,8 @@
     </div>
     <div class="juxtapose">
       <app-single-select
-          #control
-          [controllerName]="'target-language'"
+          #controlComponent
+          [controlName]="targetLanguageControlName"
           [className]="'static'"
           [values]="languages"
           [label]="'Select target language'"
@@ -47,8 +48,8 @@
         <mat-spinner [diameter]="40"></mat-spinner>
       </div>
       <app-single-select
-          #control
-          [controllerName]="'glossary'"
+          #controlComponent
+          [controlName]="glossaryControlName"
           [className]="'static'"
           [values]="glossaries"
           [label]="'Select glossary'"
@@ -59,28 +60,34 @@
   <div>
     <p class="sub-title">Select what to translate.</p>
     <mat-checkbox
-        #component
+        #matComponent
         color="primary"
         disabled="true"
         [(ngModel)]="translateKeywords"
         [ngModelOptions]="{standalone: true}">Keywords</mat-checkbox>
     <mat-checkbox
-        #component
+        #matComponent
         color="primary"
         disabled="true"
         [(ngModel)]="translateAds"
         [ngModelOptions]="{standalone: true}">Ads</mat-checkbox>
+    <mat-checkbox
+        #matComponent
+        color="primary"
+        disabled="true"
+        [(ngModel)]="translateExtensions"
+        [ngModelOptions]="{standalone: true}">Extensions</mat-checkbox>
   </div>
   <div class="margin non-title-content-margin">
     <mat-slide-toggle
-        #component
+        #matComponent
         color="primary"
         disabled="true"
         [(ngModel)]="shortenTranslationsToCharLimit"
         [ngModelOptions]="{standalone: true}">
       Shorten overflowing translations with GenAI (experimental)</mat-slide-toggle>
     <p class="note">If enabled, will use generative AI to ensure translations are below the
-      Google Ads character limit for ad head and description lines.<br>May result in lower quality
-      translations.</p>
+      Google Ads character limit for ad head and description lines.<br>May
+      result in lower quality translations.</p>
   </div>
 </form>

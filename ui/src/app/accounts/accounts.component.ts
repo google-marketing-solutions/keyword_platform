@@ -17,13 +17,14 @@
 
 import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {AbstractControl, FormGroup} from '@angular/forms';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
+import {ControlName, FontIcon} from '../models/enums';
 import {Selection} from '../models/interfaces';
 import {SelectionGroup} from '../models/types';
 import {MultiSelectComponent} from '../multi-select/multi-select.component';
 import {GoogleAdsService} from '../services/google-ads.service';
-
-const ACCOUNTS_CONTROL_NAME = 'accounts';
+import {SnackbarComponent} from '../snackbar/snackbar.component';
 
 /**
  * An accounts component.
@@ -37,53 +38,57 @@ const ACCOUNTS_CONTROL_NAME = 'accounts';
   styleUrls: ['./accounts.component.scss']
 })
 export class AccountsComponent implements OnInit, AfterViewInit {
-  @Output() readonly accountsLoadEvent = new EventEmitter<boolean>();
-  @Output() readonly accountSelectionEvent = new EventEmitter<string[]>();
-  @Output() readonly accountsValidationErrorEvent = new EventEmitter<boolean>();
+  @Output() readonly loadEvent = new EventEmitter<boolean>();
+  @Output() readonly selectionEvent = new EventEmitter<string[]>();
+  @Output() readonly validationErrorEvent = new EventEmitter<boolean>();
 
   form = new FormGroup({});
 
-  accounts!: Selection[];
+  entities!: Selection[];
 
   showSpinner = false;
 
-  private accountIds: string[] = [];
+  controlName = '';
+
+  private ids: string[] = [];
 
   @ViewChild(MultiSelectComponent)
-  private readonly control!: MultiSelectComponent;
+  private readonly component!: MultiSelectComponent;
 
   constructor(
       private readonly changeRefDetector: ChangeDetectorRef,
+      private readonly snackbar: MatSnackBar,
       private readonly googleAdsService: GoogleAdsService) {}
 
   ngOnInit() {
+    this.controlName = ControlName.ACCOUNTS;
     this.getAccounts();
   }
 
   ngAfterViewInit() {
-    this.form.addControl(ACCOUNTS_CONTROL_NAME, this.control.control);
-    this.getFormControl().valueChanges.subscribe(() => {
-      this.accountsValidationErrorEvent.emit(this.hasFormError());
+    this.form.addControl(this.controlName, this.component.control);
+    this.getControl().valueChanges.subscribe(() => {
+      this.validationErrorEvent.emit(this.hasError());
     });
     this.changeRefDetector.detectChanges();
   }
 
-  accountSelection(value: SelectionGroup) {
+  selection(value: SelectionGroup) {
     const account = value as Selection[];
     const length = account.length;
 
-    this.accountIds = [];
+    this.ids = [];
     if (length === 0) {
       return;
     }
     for (let i = 0; i < length; i++) {
-      this.accountIds.push(account[i]['id']);
+      this.ids.push(account[i]['id']);
     }
-    this.accountSelectionEvent.emit(this.accountIds);
+    this.selectionEvent.emit(this.ids);
   }
 
-  disableForm(disable: boolean) {
-    (disable) ? this.form.disable() : this.form.enable();
+  disable(isdisabled: boolean) {
+    (isdisabled) ? this.form.disable() : this.form.enable();
   }
 
   private getAccounts() {
@@ -92,29 +97,41 @@ export class AccountsComponent implements OnInit, AfterViewInit {
     this.googleAdsService.getAccounts().subscribe(
         (response => {
           this.showSpinner = false;
-          this.accounts = response.body!;
-          this.disableForm(false);
-          this.accountsLoadEvent.emit(true);
-          console.log('Accounts request successful.');
+          this.entities = response.body!;
+          if (this.entities.length > 0) {
+            this.disable(false);
+            this.loadEvent.emit(true);
+            console.log('Accounts request successful.');
+          } else {
+            this.openSnackBar(
+                'No eligible accounts available.', FontIcon.PRIORITY);
+            this.loadEvent.emit(false);
+          }
         }),
         (error => {
           this.showSpinner = false;
-          this.accountsLoadEvent.emit(false);
+          this.openSnackBar(error, FontIcon.ERROR);
+          this.loadEvent.emit(false);
           console.error(error);
         }));
   }
 
-  private getFormControl(): AbstractControl {
+  private getControl(): AbstractControl {
     const form = this.form as FormGroup;
-    return form.controls[ACCOUNTS_CONTROL_NAME];
+    return form.controls[this.controlName];
   }
 
-  private hasFormError(): boolean {
-    const control = this.getFormControl();
+  private hasError(): boolean {
+    const control = this.getControl();
     const result = [];
     if (control.errors) {
       result.push(control.errors);
     }
     return result.length > 0;
+  }
+
+  private openSnackBar(message: string, fontIcon: string) {
+    this.snackbar.openFromComponent(
+        SnackbarComponent, {data: {message, fontIcon}});
   }
 }
