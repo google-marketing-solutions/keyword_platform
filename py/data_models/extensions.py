@@ -159,9 +159,7 @@ class Extensions:
               else ''
           )
           structured_snippet_values = (
-              '"'
-              + '\n'.join(result['asset']['structuredSnippetAsset']['values'])
-              + '"'
+              '\n'.join(result['asset']['structuredSnippetAsset']['values'])
               if result['asset'].get('structuredSnippetAsset')
               else ''
           )

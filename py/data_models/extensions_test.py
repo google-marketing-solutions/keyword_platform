@@ -265,19 +265,19 @@ _EXPECTED_DF = pd.DataFrame({
     ],
     'Header': ['Brands', '', '', 'Brands', '', '', ''],
     'Snippet values': [
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
         '',
     ],
     'Original snippet values': [
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
         '',
@@ -372,14 +372,14 @@ _EXPECTED_CSV_DATA = (
     ' text,Description 1,Original description 1,Description 2,Original'
     ' description 2,Link text,Original link text,Final URLs,Updates'
     ' applied\nAdd,Enter customer ID,Campaign 1,Ad group'
-    ' 1,STRUCTURED_SNIPPET,ENABLED,Brands,"""Google\nPixel\nAndroid""","""Google\nPixel\nAndroid""",,,,,,,,,,[]\nAdd,Enter'
+    ' 1,STRUCTURED_SNIPPET,ENABLED,Brands,"Google\nPixel\nAndroid","Google\nPixel\nAndroid",,,,,,,,,,[]\nAdd,Enter'
     ' customer ID,Campaign 1,Ad group 1,SITELINK,ENABLED,,,,,,This is a'
     ' Description 1,This is a Description 1,This is a Description 2,This is a'
     ' Description 2,This is a link text,This is a link'
     ' text,https://www.google.com/gmail,[]\nAdd,Enter customer ID,Campaign 1,Ad'
     ' group 1,CALLOUT,ENABLED,,,,Buy my product now,Buy my product'
     ' now,,,,,,,,[]\nAdd,Enter customer ID,Campaign'
-    ' 1,,STRUCTURED_SNIPPET,ENABLED,Brands,"""Google\nPixel\nAndroid""","""Google\nPixel\nAndroid""",,,,,,,,,,[]\nAdd,Enter'
+    ' 1,,STRUCTURED_SNIPPET,ENABLED,Brands,"Google\nPixel\nAndroid","Google\nPixel\nAndroid",,,,,,,,,,[]\nAdd,Enter'
     ' customer ID,Campaign 1,,SITELINK,ENABLED,,,,,,This is a Description'
     ' 1,This is a Description 1,This is a Description 2,This is a Description'
     ' 2,This is a link text,This is a link'
@@ -432,19 +432,19 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame({
     ],
     'Header': ['Brands', '', '', 'Brands', '', '', ''],
     'Snippet values': [
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
         '',
     ],
     'Original snippet values': [
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
         '',
@@ -590,19 +590,19 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame({
     ],
     'Header': ['Brands', '', '', 'Brands', '', '', ''],
     'Snippet values': [
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
         '',
     ],
     'Original snippet values': [
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
         '',
@@ -763,19 +763,19 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame({
     ],
     'Header': ['Brands', '', '', 'Brands', '', '', ''],
     'Snippet values': [
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
         '',
     ],
     'Original snippet values': [
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
         '',
@@ -913,19 +913,19 @@ _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame({
     ],
     'Header': ['Brands', '', '', 'Brands', '', '', ''],
     'Snippet values': [
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
         '',
     ],
     'Original snippet values': [
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
-        '"Google\nPixel\nAndroid"',
+        'Google\nPixel\nAndroid',
         '',
         '',
         '',
@@ -1124,7 +1124,7 @@ class ExtensionsTest(parameterized.TestCase):
   def test_get_translation_frame(self):
     expected_df = pd.DataFrame({
         'source_term': [
-            '"Google\nPixel\nAndroid"',
+            'Google\nPixel\nAndroid',
             'This is a Description 1',
             'This is a Description 2',
             'This is a link text',
@@ -1197,7 +1197,7 @@ class ExtensionsTest(parameterized.TestCase):
         start_index=0,
         target_language_code='de',
         translations=[
-            '"Google\nPixel\nAndroid"',
+            'Google\nPixel\nAndroid',
             'Dies ist eine Beschreibung 1',
             'Dies ist eine Beschreibung 2',
             'Dies ist ein Linktext',
@@ -1222,7 +1222,7 @@ class ExtensionsTest(parameterized.TestCase):
   def test_char_count(self):
     extensions = extensions_lib.Extensions(_GOOGLE_ADS_RESPONSE)
 
-    expected_char_count = 226
+    expected_char_count = 222
 
     actual_char_count = extensions.char_count()
 
