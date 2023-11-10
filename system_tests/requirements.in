@@ -1,2 +1,5 @@
 google-auth
 google-cloud-logging
+pytest
+pytest-cov
+urllib3
