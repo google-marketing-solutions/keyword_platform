@@ -621,10 +621,22 @@ class ExecutionRunnerTest(parameterized.TestCase):
 
     self.mock_vertex_client.assert_called_once_with()
 
-  def test_vertex_client_does_not_initialize(self):
-    self.mock_vertex_client.side_effect = (
-        google.api_core.exceptions.PermissionDenied(message='Permission denied')
-    )
+  @parameterized.named_parameters(
+      {
+          'testcase_name': 'permission_denied',
+          'error': google.api_core.exceptions.PermissionDenied(
+              message='Permission denied'
+          ),
+      },
+      {
+          'testcase_name': 'internal_server_error',
+          'error': google.api_core.exceptions.InternalServerError(
+              message='Internal server error'
+          ),
+      },
+  )
+  def test_vertex_client_does_not_initialize(self, error):
+    self.mock_vertex_client.side_effect = error
     settings = settings_lib.Settings(
         source_language_code='en',
         target_language_codes=['es'],
