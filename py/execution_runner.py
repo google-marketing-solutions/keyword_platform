@@ -90,6 +90,13 @@ class ExecutionRunner:
           ' Vertex AI will not be used: %s',
           err,
       )
+    except google.api_core.exceptions.InternalServerError as err:
+      self._vertex_client = None
+      logging.exception(
+          'ExecutionRunner: Vertex API client could not be initialized.'
+          ' Vertex AI will not be used: %s',
+          err,
+      )
 
     self._google_ads_client = google_ads_client_lib.GoogleAdsClient(
         self._settings.credentials)
