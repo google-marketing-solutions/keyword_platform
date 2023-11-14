@@ -46,9 +46,14 @@ export class TranslationService {
         .pipe(catchError(this.handleError), map(response => response));
   }
 
-  // TODO(): Consider obtaining list of languages from the
-  // Cloud Translation API, a Keyword Platform endpoint (if in the roadmap)
-  // or a JSON file.
+  /**
+   * Returns list of supported languages for translation.
+   * See https://cloud.google.com/translate/docs/languages
+   *
+   * TODO(): Consider obtaining list of languages from the
+   * Cloud Translation API, a Keyword Platform endpoint (if in the roadmap)
+   * or a JSON file.
+   */
   getLanguages(): Selection[] {
     return [
       {code: 'af', name: 'Afrikaans'},
@@ -70,9 +75,7 @@ export class TranslationService {
       {code: 'ca', name: 'Batalan'},
       {code: 'ceb', name: 'Cebuano'},
       {code: 'ny', name: 'Chichewa'},
-      // TODO(): Confirm version of language.
-      // {code: 'zh', name: 'Chinese (simplified)'},
-      {code: 'zh_cn', name: 'Chinese (simplified)'},
+      {code: 'zh', name: 'Chinese (simplified)'},
       {code: 'zh_tw', name: 'Chinese (traditional)'},
       {code: 'co', name: 'Corsican'},
       {code: 'hr', name: 'Croatian'},
@@ -100,8 +103,6 @@ export class TranslationService {
       {code: 'ht', name: 'Haitian creole'},
       {code: 'ha', name: 'Hausa'},
       {code: 'haw', name: 'Hawaiian'},
-      // TODO(): Confirm version of language.
-      // {code: 'iw', name: 'Hebrew'},
       {code: 'he', name: 'Hebrew'},
       {code: 'hi', name: 'Hindi'},
       {code: 'hmn', name: 'Hmong'},
@@ -113,8 +114,6 @@ export class TranslationService {
       {code: 'ga', name: 'Irish'},
       {code: 'it', name: 'Italian'},
       {code: 'ja', name: 'Japanese'},
-      // TODO(): Confirm version of language.
-      // {code: 'jw', name: 'Javanese'},
       {code: 'jv', name: 'Javanese'},
       {code: 'kn', name: 'Kannada'},
       {code: 'kk', name: 'Kazakh'},

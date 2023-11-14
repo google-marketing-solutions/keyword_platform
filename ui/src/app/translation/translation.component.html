@@ -60,19 +60,19 @@
   <div>
     <p class="sub-title">Select what to translate.</p>
     <mat-checkbox
-        #matComponent
+        #checkbox
         color="primary"
         disabled="true"
         [(ngModel)]="translateKeywords"
         [ngModelOptions]="{standalone: true}">Keywords</mat-checkbox>
     <mat-checkbox
-        #matComponent
+        #checkbox
         color="primary"
         disabled="true"
         [(ngModel)]="translateAds"
         [ngModelOptions]="{standalone: true}">Ads</mat-checkbox>
     <mat-checkbox
-        #matComponent
+        #checkbox
         color="primary"
         disabled="true"
         [(ngModel)]="translateExtensions"
@@ -80,14 +80,15 @@
   </div>
   <div class="margin non-title-content-margin">
     <mat-slide-toggle
-        #matComponent
+        #shortenTranslationsToCharLimitSlideToggle
         color="primary"
-        disabled="true"
+        [disabled]="!isShortenTranslationLanguageCodesSupported"
         [(ngModel)]="shortenTranslationsToCharLimit"
         [ngModelOptions]="{standalone: true}">
-      Shorten overflowing translations with GenAI (experimental)</mat-slide-toggle>
-    <p class="note">If enabled, will use generative AI to ensure translations are below the
-      Google Ads character limit for ad head and description lines.<br>May
-      result in lower quality translations.</p>
+      Shorten overflowing translations with GenAI (experimental)
+    </mat-slide-toggle>
+    <p class="note">If enabled, will use generative AI to ensure translations
+      are below the Google Ads character limit for ad head and description
+      lines.<br>May result in lower quality translations.</p>
   </div>
 </form>
