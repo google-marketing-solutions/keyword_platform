@@ -365,7 +365,8 @@ export class ContentComponent {
       component.disable(isDisabled);
     }
     // Only disable/enable button in selected active tab.
-    this.getButtonByTabIndex(this.tabGroup.selectedIndex!);
+    this.getButtonByTabIndex(this.tabGroup.selectedIndex!).disabled =
+        isDisabled;
     // Make sure all tabs are not selectable when isDisabled is true.
     for (const component of this.tabs) {
       component.disabled = isDisabled;
