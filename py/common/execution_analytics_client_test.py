@@ -42,6 +42,9 @@ _FAKE_SETTINGS = settings_lib.Settings(
     workers_to_run=['fake_worker_id'],
     multiple_templates=False,
     client_id='fake_client_id',
+    translate_ads=False,
+    translate_keywords=True,
+    translate_extensions=False,
 )
 
 
@@ -87,6 +90,9 @@ class ExecutionAnalyticsClientTest(absltest.TestCase):
                     {'item_id': 'fake_campaign_id', 'affiliation': 'campaign'},
                     {'item_id': 'fake_customer_id', 'affiliation': 'customer'},
                 ],
+                'translate_ads': 0,
+                'translate_keywords': 1,
+                'translate_extensions': 0,
             },
         }],
     }
