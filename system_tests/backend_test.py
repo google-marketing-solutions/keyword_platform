@@ -19,6 +19,7 @@ import os
 import urllib
 
 
+import google.auth
 import google.auth.transport.requests
 import google.cloud.logging
 import google.oauth2.id_token
@@ -26,6 +27,7 @@ import pytest
 
 
 _BACKEND_URL_ENV_VAR = 'BACKEND_URL'
+_SERVICE_ACCOUNT = 'SERVICE_ACCOUNT'  # The service account to impersonate.
 
 client = google.cloud.logging.Client()
 client.setup_logging()
@@ -33,10 +35,30 @@ client.setup_logging()
 
 @pytest.mark.systemtest
 def test_accessible_accounts():
-  auth_request = google.auth.transport.requests.Request()
   url = os.environ.get(_BACKEND_URL_ENV_VAR)
+  service_account = os.environ.get(_SERVICE_ACCOUNT)
 
-  id_token = google.oauth2.id_token.fetch_id_token(auth_request, url)
+  service_account_credentials_url = (
+      f'https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/'
+      f'{service_account}:generateIdToken')
+
+  # Generates access token
+  credentials, _ = google.auth.default(
+      scopes='https://www.googleapis.com/auth/cloud-platform')
+
+  # Creates an AuthorizedSession that includes the access_token based on
+  # credentials
+  authorized_session = google.auth.transport.requests.AuthorizedSession(
+      credentials)
+
+  token_response = authorized_session.request(
+      'POST',
+      service_account_credentials_url,
+      data=json.dumps({'audience': url}),
+      headers={'Content-Type': 'application/json'})
+
+  jwt = token_response.json()
+  id_token = jwt['token']
 
   assert id_token is not None, 'Could not fetch id token for get accounts.'
 
