@@ -23,7 +23,12 @@ import {catchError, map} from 'rxjs/operators';
 import {Selection} from '../models/interfaces';
 import {LOCATION_TOKEN} from '../shared/tokens';
 
-/** Google Ads service. */
+/**
+ * Google Ads service.
+ *
+ * TODO(): Consider creating abstract/base class for this service
+ * as there are other services that follow the same pattern/logic.
+ */
 @Injectable({providedIn: 'root'})
 export class GoogleAdsService {
   constructor(
@@ -35,9 +40,9 @@ export class GoogleAdsService {
         new HttpParams({fromObject: {'endpoint': 'accessible_accounts'}});
     return this.http
         .get<Selection[]>(
-            this.getHost('accessible_accounts'),
+            this.getPathname('accessible_accounts'),
             {
-              headers: this.getHeader(),
+              headers: this.getHeaders(),
               observe: 'response',
               params,
               responseType: 'json'
@@ -47,31 +52,52 @@ export class GoogleAdsService {
   }
 
   getCampaigns(accountIds: string[]): Observable<HttpResponse<Selection[]>> {
-    const params = new HttpParams({
-      fromObject:
-          {'selected_accounts': accountIds.join(','), 'endpoint': 'campaigns'}
-    });
-    return this.http
-        .get<Selection[]>(this.getHost('campaigns'), {
-          headers: this.getHeader(),
-          observe: 'response',
-          params,
-          responseType: 'json'
+    return this
+        .getRequestMethod('campaigns', {
+          'selected_accounts': accountIds.join(','),
+          'endpoint': 'campaigns'
         })
         .pipe(map(response => response), catchError(this.handleError));
   }
 
-  private getHost(api: string) {
+  private getPathname(api: string): string {
     return (
         this.location.hostname === 'localhost' ? './test-api/' + api + '.json' :
                                                  './proxy');
   }
 
-  private getHeader() {
+  private getHeaders(): HttpHeaders {
     return new HttpHeaders({'Content-Type': 'application/json'});
   }
 
-  private handleError(error: HttpErrorResponse) {
+  /**
+   * Returns observable http response depending on whether http request is being
+   * made locally or live/prod. Useful when viewing or testing locally as post
+   * requests natively respond with 404 errors on localhost.
+   * @param api Name of the api.
+   * @param values Values of the parameters provided.
+   * @returns An observable http response.
+   */
+  private getRequestMethod(api: string, values: {[key: string]: string}):
+      Observable<HttpResponse<Selection[]>> {
+    const pathname = this.getPathname(api);
+    const headers = this.getHeaders();
+    const params = new HttpParams({fromObject: values});
+    let request: Observable<HttpResponse<Selection[]>>;
+    if (this.location.hostname === 'localhost') {
+      request = this.http.get<Selection[]>(
+          pathname,
+          {headers, observe: 'response', params, responseType: 'json'});
+    } else {
+      request = this.http.post<Selection[]>(
+          pathname, values,
+          {headers, observe: 'response', responseType: 'json'});
+    }
+    return request;
+  }
+
+  private handleError(error: HttpErrorResponse):
+      Observable<HttpResponse<Selection[]>> {
     return throwError(error.message);
   }
 }
