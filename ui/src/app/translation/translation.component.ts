@@ -32,7 +32,10 @@ import {SingleSelectComponent} from '../single-select/single-select.component';
  *
  * See keyword_platform/py/common/vertex_client.py
  */
-const SHORTEN_TRANSLATION_LANGUAGE_CODES = ['en', 'es', 'de', 'ko', 'hi', 'zh'];
+const SHORTEN_TRANSLATION_LANGUAGE_CODES = [
+  'ar', 'bn', 'bg', 'zh', 'hr', 'cs', 'da', 'nl', 'en', 'et', 'fi', 'fr', 'de',
+  'el', 'iw', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'pl', 'pt',
+  'ro', 'ru', 'sr', 'sk', 'sl', 'es', 'sw', 'sv', 'th', 'tr', 'uk', 'vi'];
 
 /**
  * A translation component.
