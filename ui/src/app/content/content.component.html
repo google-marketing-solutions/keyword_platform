@@ -19,7 +19,8 @@
       fitInkBarToContent
       mat-stretch-tabs="false"
       animationDuration="0ms"
-      [selectedIndex]="1">
+      [selectedIndex]="1"
+      (selectedTabChange)="onSelectedTabChange($event.index)">
     <!-- TODO(): Confirm header label. -->
     <!-- TODO(): Add logo. -->
     <mat-tab
@@ -48,9 +49,10 @@
           <p class="sub-title">Select the accounts that contain the campaigns
             you want to translate.</p>
           <div class="component">
-            <app-accounts (loadEvent)="accountsLoad($event)"
-                          (selectionEvent)="accountSelection($event)"
-                          (validationErrorEvent)="accountsValidationError($event)">
+            <app-accounts
+                (loadEvent)="accountsLoad($event)"
+                (selectionEvent)="accountSelection($event)"
+                (validationErrorEvent)="accountsValidationError($event)">
             </app-accounts>
           </div>
           <p class="title">Campaigns</p>
@@ -62,13 +64,14 @@
                 (validationErrorEvent)="campaignsValidationError($event)">
             </app-campaigns>
           </div>
-          <app-translation (validationErrorEvent)="translationValidationError($event)">
+          <app-translation
+              (validationErrorEvent)="translationValidationError($event)">
           </app-translation>
           <div class="component">
             <button mat-raised-button
                     color="primary"
                     type="submit"
-                    [disabled]="hasError()"
+                    [disabled]="hasTranslationError()"
                     (click)="run()">
               <span *ngIf="isRunRequestedStatus()" class="run-spinner">
                 <mat-spinner [diameter]="25"></mat-spinner>
@@ -79,5 +82,45 @@
         </div>
       </div>
     </mat-tab>
+    <!-- When adding a new <mat-tab> make sure all content/components are
+    nested within a <div> that has an ngIf directive that sets the availability
+    of the content based on the <mat-tab-group> selectedTabChange event.
+    Showing content of the new tab on tab selection prevents data in all tabs
+    from being requested at the same time on initial load.
+    See ./content.component.
+    In the example below the value of someOtherTab is set to true when the
+    selectedTabChange event triggers which allows its content to be shown. Make
+    sure the value of the new run button’s [disabled] attribute is the error
+    function of the new component:
+    <mat-tab label="Some Other Feature" labelClass="label">
+      <div class="tab" *ngIf="someOtherTab">
+        <div class="forms">
+          <p class="title">Accounts</p>
+          <p class="sub-title">Select accounts.</p>
+          <div class="component">
+            <app-accounts
+                (loadEvent)="accountsLoad($event)"
+                (selectionEvent)="accountSelection($event)"
+                (validationErrorEvent)="accountsValidationError($event)">
+            </app-accounts>
+          </div>
+          <app-someo-other-component
+              (validationErrorEvent)="someOtherValidationError($event)">
+          </app-someo-other-component>
+          <div class="component">
+            <button mat-raised-button
+                    color="primary"
+                    type="submit"
+                    [disabled]="hasSomeOtherError()"
+                    (click)="run()">
+              <span *ngIf="isRunRequestedStatus()" class="run-spinner">
+                <mat-spinner [diameter]="25"></mat-spinner>
+              </span>
+              <span>Run</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-tab> -->
   </mat-tab-group>
 </div>

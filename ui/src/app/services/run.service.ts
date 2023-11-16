@@ -29,9 +29,9 @@ export class RunService {
 
   run(accountIds: string[], campaignIds: string[], sourceLanguageCode: string,
       targetLanguageCode: string, shortenTranslationsToCharLimit: boolean,
-      workers: string[], client_id: string, translateKeywords: boolean,
-      translateAds: boolean, translateExtensions: boolean, glossaryId: string
-  ): Observable<HttpResponse<Output>> {
+      translateKeywords: boolean, translateAds: boolean,
+      translateExtensions: boolean, glossaryId: string, workers: string[],
+      client_id: string): Observable<HttpResponse<Output>> {
     return this.http
         .post<Output>(
             './proxy', {
@@ -40,13 +40,13 @@ export class RunService {
               'source_language_code': sourceLanguageCode,
               'target_language_codes': targetLanguageCode,
               'shorten_translations_to_char_limit':
-                  shortenTranslationsToCharLimit,
-              'workers_to_run': workers.join(','),
-              'client_id': client_id,
+                  shortenTranslationsToCharLimit.toString(),
               'translate_keywords': translateKeywords.toString(),
               'translate_ads': translateAds.toString(),
               'translate_extensions': translateExtensions.toString(),
               'glossary_id': glossaryId,
+              'workers_to_run': workers.join(','),
+              'client_id': client_id,
               'endpoint': 'run'
             },
             {

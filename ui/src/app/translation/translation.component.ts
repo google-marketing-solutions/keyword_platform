@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, QueryList, ViewChildren} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {MatSlideToggle} from '@angular/material/slide-toggle';
@@ -26,7 +26,13 @@ import {SelectionGroup} from '../models/types';
 import {TranslationService} from '../services/translation.service';
 import {SingleSelectComponent} from '../single-select/single-select.component';
 
-type MatComponentGroup = MatSlideToggle|MatCheckbox;
+/**
+ * List of language codes available for shortening translations to Google ads
+ * headline and description character limits.
+ *
+ * See keyword_platform/py/common/vertex_client.py
+ */
+const SHORTEN_TRANSLATION_LANGUAGE_CODES = ['en', 'es', 'de', 'ko', 'hi', 'zh'];
 
 /**
  * A translation component.
@@ -55,14 +61,17 @@ export class TranslationComponent implements OnInit, AfterViewInit {
   targetLanguageControlName = '';
   glossaryControlName = '';
   showSpinner = false;
+  isShortenTranslationLanguageCodesSupported = false;
   shortenTranslationsToCharLimit = false;
   translateAds = true;
   translateKeywords = true;
   translateExtensions = true;
   isGlossaryAvailable = false;
 
-  @ViewChildren('matComponent')
-  private readonly matComponents!: QueryList<MatComponentGroup>;
+  @ViewChild('shortenTranslationsToCharLimitSlideToggle')
+  private readonly shortenTranslationsToCharLimitSlideToggle!: MatSlideToggle;
+  @ViewChildren('checkbox')
+  private readonly checkboxes!: QueryList<MatCheckbox>;
   @ViewChildren('controlComponent')
   private readonly controlComponents!: QueryList<SingleSelectComponent>;
 
@@ -107,6 +116,12 @@ export class TranslationComponent implements OnInit, AfterViewInit {
   targetLanguageSelection(value: SelectionGroup) {
     const language = value as Selection;
     this.targetLanguageCode = language['code'];
+    this.isShortenTranslationLanguageCodesSupported =
+        SHORTEN_TRANSLATION_LANGUAGE_CODES.includes(this.targetLanguageCode);
+    if (!this.isShortenTranslationLanguageCodesSupported &&
+        this.shortenTranslationsToCharLimit) {
+      this.shortenTranslationsToCharLimit = false;
+    }
   }
 
   disable(isDisabled: boolean) {
@@ -118,8 +133,12 @@ export class TranslationComponent implements OnInit, AfterViewInit {
     }
     this.disableControl(this.sourceLanguageControlName, isDisabled);
     this.disableControl(this.targetLanguageControlName, isDisabled);
-    for (const component of this.matComponents) {
-      component.setDisabledState(isDisabled);
+    for (const checkbox of this.checkboxes) {
+      checkbox.setDisabledState(isDisabled);
+    }
+    if (this.isShortenTranslationLanguageCodesSupported) {
+      this.shortenTranslationsToCharLimitSlideToggle.setDisabledState(
+          isDisabled);
     }
   }
 

@@ -111,6 +111,12 @@ yn=$(tr '[:upper:]' '[:lower:]' <<< "$yn")
 if [[ "$yn" == "y" || "$yn" == "yes" ]]; then
   echo "You have opted out."
   OPT_OUT=true
+  pattern_to_replace="<script async src=\"https:\/\/www.googletagmanager.com\/gtag\/js?id=G-C0ZGCTLG7Z\"><\/script>"
+  ui_index_file="./ui/src/index.html"
+  out_out_message="<!-- User opted out of Google Analytics. -->"
+  sed -i "s|$pattern_to_replace|$out_out_message|g" $ui_index_file
+  pattern_to_delete="<!-- Google tag (gtag.js) -->"
+  sed -i "s|$pattern_to_delete||g" $ui_index_file
 else
   echo "You have not opted out."
   OPT_OUT=false

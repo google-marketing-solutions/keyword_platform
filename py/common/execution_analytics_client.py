@@ -96,6 +96,13 @@ class ExecutionAnalyticsClient:
                 'target_language': self._settings.target_language_codes[0],
                 'backend_errors': 1 if worker_result.error_msg else 0,
                 'items': self._generate_items(),
+                'translate_ads': 1 if self._settings.translate_ads else 0,
+                'translate_keywords': (
+                    1 if self._settings.translate_keywords else 0
+                ),
+                'translate_extensions': (
+                    1 if self._settings.translate_extensions else 0
+                ),
             },
         }],
     }
