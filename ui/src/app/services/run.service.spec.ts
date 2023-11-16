@@ -20,6 +20,8 @@ import {HttpClientTestingModule, HttpTestingController} from '@angular/common/ht
 import {TestBed} from '@angular/core/testing';
 import {of, throwError} from 'rxjs';
 
+import {LOCATION_TOKEN} from '../shared/tokens';
+
 import {RunService} from './run.service';
 
 describe('RunService', () => {
@@ -30,9 +32,13 @@ describe('RunService', () => {
   let spy: jasmine.Spy;
 
   beforeEach(() => {
-    TestBed.configureTestingModule(
-        {imports: [HttpClientModule, HttpClientTestingModule]});
-
+    TestBed.configureTestingModule({
+      imports: [HttpClientModule, HttpClientTestingModule],
+      providers: [{
+        provide: LOCATION_TOKEN,
+        useValue: {hostname: 'hostname.0.0.0.0.nip.io'}
+      }]
+    });
     service = TestBed.inject(RunService);
     httpMock = TestBed.inject(HttpTestingController);
   });
@@ -45,7 +51,7 @@ describe('RunService', () => {
     service
         .run(
             ['1'], ['1'], 'en', 'de', false, true, true, true, 'glossary_1',
-            ['translationWorker'], 'aaa.bbb')
+            'translationWorker', 'aaa.bbb')
         .subscribe();
     const request = httpMock.expectOne(ENDPOINT);
     expect(request.request.method).toBe('POST');
@@ -87,7 +93,7 @@ describe('RunService', () => {
     service
         .run(
             ['1'], ['1'], 'en', 'de', false, true, true, true, 'glossary_1',
-            ['translationWorker'], 'aaa.bbb')
+            'translationWorker', 'aaa.bbb')
         .subscribe(response => {
           expect(response.status).toBe(200);
           expect(response.statusText).toBe('OK');
@@ -97,7 +103,7 @@ describe('RunService', () => {
 
   it('should throw internal server error', () => {
     const statusText = 'The server encountered and error and could not ' +
-        'complete your request. Developers can check the logs for details.'
+        'complete your request. Developers can check the logs for details.';
     const httpError = new HttpErrorResponse({
       error: 'Internal Service Error',
       status: 500,
@@ -109,7 +115,7 @@ describe('RunService', () => {
     service
         .run(
             ['1'], ['1'], 'en', 'de', false, true, true, true, 'glossary_1',
-            ['translationWorker'], 'aaa.bbb')
+            'translationWorker', 'aaa.bbb')
         .subscribe(() => {}, error => {
           expect(error.message)
               .toBe(`Http failure response for ${ENDPOINT}: 500 ${statusText}`);
