@@ -274,7 +274,7 @@ export class ContentComponent {
 
     const accountIds = [];
     const campaignIds = [];
-    const workers = [];
+    const workers: string[] = [];
 
     let translationData: Translation;
     if (!this.hasTranslationError()) {
@@ -305,14 +305,16 @@ export class ContentComponent {
             translationData!? translationData!.translateKeywords : false,
             translationData!? translationData!.translateAds : false,
             translationData!? translationData!.translateExtensions : false,
-            translationData!? translationData!.glossaryId : '', workers,
-            clientId)
+            translationData!? translationData!.glossaryId : '',
+            workers.join(','), clientId)
         .subscribe(
             (response => {
               this.requestStatus = RequestStatus.RESPONDED;
               this.disable(false);
               this.openDialog(response.body!);
-              console.log('Run service request for translation successful.');
+              console.log(
+                  'Run service request for (' + workers.join(',') +
+                  ') successful.');
             }),
             (error => {
               this.requestStatus = RequestStatus.ERROR;
