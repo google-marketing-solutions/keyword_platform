@@ -139,7 +139,7 @@ def get_campaigns() -> flask.Response:
   """
   logging.info('Received request: /campaigns')
 
-  selected_accounts = flask.request.args.get('selected_accounts').split(',')
+  selected_accounts = flask.request.form.get('selected_accounts').split(',')
   settings = settings_lib.Settings()
   execution_runner = execution_runner_lib.ExecutionRunner(settings)
 
