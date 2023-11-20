@@ -168,19 +168,32 @@ def get_cost() -> flask.Response:
   """End point to get cost estimate for translation.
 
   The endpoints expects a post request containing a list of selected customer
-  ids and campaign ids.
+  ids and campaign ids along with whether ads, extensions, and/or keywords
+  should be translated or not.
 
   Returns:
-    A response containing a string with the cost estimate and explanation.
+    A response containing a dict with the cost estimate.
   """
   logging.info('Received request: /cost')
 
   customer_ids = flask.request.form.get('customer_ids', '').split(',')
   campaigns = flask.request.form.get('campaigns', '').split(',')
+  translate_ads = flask.request.form.get(
+      'translate_ads', default=True, type=lambda v: v.lower() == 'true'
+  )
+  translate_extensions = flask.request.form.get(
+      'translate_extensions', default=True, type=lambda v: v.lower() == 'true'
+  )
+  translate_keywords = flask.request.form.get(
+      'translate_keywords', default=True, type=lambda v: v.lower() == 'true'
+  )
 
   settings = settings_lib.Settings(
       customer_ids=customer_ids,
       campaigns=campaigns,
+      translate_ads=translate_ads,
+      translate_extensions=translate_extensions,
+      translate_keywords=translate_keywords,
   )
 
   execution_runner = execution_runner_lib.ExecutionRunner(settings)
@@ -200,7 +213,7 @@ def get_cost() -> flask.Response:
 
   logging.info('Request complete: /cost')
 
-  return flask.make_response(cost_estimate, http.HTTPStatus.OK)
+  return flask.make_response(flask.jsonify(cost_estimate), http.HTTPStatus.OK)
 
 
 @app.route('/list_glossaries', methods=['GET'])
