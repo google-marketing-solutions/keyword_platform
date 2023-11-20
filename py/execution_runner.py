@@ -224,7 +224,7 @@ class ExecutionRunner:
 
     return campaigns_list
 
-  def get_cost_estimate(self) -> str:
+  def get_cost_estimate(self) -> dict[str, str]:
     """Gets an estimated cost for translation.
 
     Returns:
@@ -236,21 +236,31 @@ class ExecutionRunner:
     ads_char_count = (
         google_ads_objects.ads.char_count() if google_ads_objects.ads else 0
     )
+    extensions_char_count = (
+        google_ads_objects.extensions.char_count()
+        if google_ads_objects.extensions
+        else 0
+    )
     keywords_char_count = (
         google_ads_objects.keywords.char_count()
         if google_ads_objects.keywords
         else 0
     )
 
-    total_cost_usd = '{:.2f}'.format((
-        ads_char_count + keywords_char_count
-    ) * _TRANSLATION_PRICE_PER_CHAR_USD)
+    total_cost_usd_str = '{:.2f}'.format(
+        (ads_char_count + extensions_char_count + keywords_char_count)
+        * _TRANSLATION_PRICE_PER_CHAR_USD
+    )
 
     cost_per_char_str = '{:f}'.format(_TRANSLATION_PRICE_PER_CHAR_USD)
 
-    return (f'Estimated cost: ${total_cost_usd} USD. '
-            f'({ads_char_count} ad chars + {keywords_char_count} keyword chars)'
-            f' * ${cost_per_char_str}/char.)')
+    return {
+        'total_cost_usd': total_cost_usd_str,
+        'ads_char_count': str(ads_char_count),
+        'extensions_char_count': str(extensions_char_count),
+        'keywords_char_count': str(keywords_char_count),
+        'cost_per_char': cost_per_char_str,
+    }
 
   def _build_google_ads_objects(
       self,
@@ -258,8 +268,8 @@ class ExecutionRunner:
     """Calls the Google Ads API to fetch Google Ads data.
 
     Returns:
-      A GoogleAdsObjects instance containing Campaigns, Ad Groups, Ads, and
-        Keywords.
+      A GoogleAdsObjects instance containing Campaigns, Ad Groups, Ads,
+      Keywords, and Extensions.
     """
     campaigns = self._build_campaigns()
     ads, ad_groups = self._build_ads_and_ad_groups()

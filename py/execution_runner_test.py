@@ -30,6 +30,7 @@ from common import storage_client
 from common import vertex_client as vertex_client_lib
 from data_models import accounts as accounts_lib
 from data_models import ads
+from data_models import extensions
 from data_models import google_ads_objects as google_ads_objects_lib
 from data_models import keywords
 from data_models import settings as settings_lib
@@ -146,7 +147,7 @@ _EXPECTED_CAMPAIGNS_LIST = list([
 ])
 
 _EXTENSIONS_RESPONSE = [
-    [{
+    {
         'results': [
             {
                 'campaign': {
@@ -232,8 +233,8 @@ _EXTENSIONS_RESPONSE = [
             'adGroupAsset.status,adGroup.name'
         ),
         'requestId': 'fake_request_id',
-    }],
-    [{
+    },
+    {
         'results': [
             {
                 'campaign': {
@@ -327,7 +328,7 @@ _EXTENSIONS_RESPONSE = [
             'campaignAsset.status'
         ),
         'requestId': 'fake_request_id',
-    }],
+    },
 ]
 
 _ADS_RESPONSE = [{
@@ -376,51 +377,57 @@ _ADS_RESPONSE = [{
     'requestId': 'fake_request_id',
 }]
 
-_KEYWORDS_RESPONSE = ([{'results':
-      [{'customer':
-        {'resourceName': 'customers/123',
-         'id': '123'},
-        'campaign':
-        {'resourceName': 'customers/123/campaigns/456',
-         'advertisingChannelType': 'SEARCH',
-         'biddingStrategyType': 'TARGET_SPEND',
-         'name': 'Gmail Test Campaign'},
-        'adGroup':
-        {'resourceName': 'customers/123/adGroups/789',
-         'name': 'Ad group 1'},
-        'adGroupCriterion':
-        {'resourceName': 'customers/123/adGroupCriteria/789~1112',
-         'keyword':
-         {'matchType': 'BROAD', 'text': 'e mail'}
+_KEYWORDS_RESPONSE = [{
+    'results': [
+        {
+            'customer': {'resourceName': 'customers/123', 'id': '123'},
+            'campaign': {
+                'resourceName': 'customers/123/campaigns/456',
+                'advertisingChannelType': 'SEARCH',
+                'biddingStrategyType': 'TARGET_SPEND',
+                'name': 'Gmail Test Campaign',
+            },
+            'adGroup': {
+                'resourceName': 'customers/123/adGroups/789',
+                'name': 'Ad group 1',
+            },
+            'adGroupCriterion': {
+                'resourceName': 'customers/123/adGroupCriteria/789~1112',
+                'keyword': {'matchType': 'BROAD', 'text': 'e mail'},
+            },
+            'keywordView': {
+                'resourceName': 'customers/123/keywordViews/789~1112'
+            },
         },
-        'keywordView':
-        {'resourceName': 'customers/123/keywordViews/789~1112'}
-       },
-       {'customer':
-        {'resourceName': 'customers/123',
-         'id': '123'},
-        'campaign':
-        {'resourceName': 'customers/123/campaigns/456',
-         'advertisingChannelType': 'SEARCH',
-         'biddingStrategyType': 'TARGET_SPEND',
-         'name': 'Gmail Test Campaign'},
-        'adGroup':
-        {'resourceName': 'customers/123/adGroups/789',
-         'name': 'Ad group 1'},
-        'adGroupCriterion':
-        {'resourceName': 'customers/123/adGroupCriteria/789~1314',
-         'keyword':
-         {'matchType': 'BROAD', 'text': 'email'}
+        {
+            'customer': {'resourceName': 'customers/123', 'id': '123'},
+            'campaign': {
+                'resourceName': 'customers/123/campaigns/456',
+                'advertisingChannelType': 'SEARCH',
+                'biddingStrategyType': 'TARGET_SPEND',
+                'name': 'Gmail Test Campaign',
+            },
+            'adGroup': {
+                'resourceName': 'customers/123/adGroups/789',
+                'name': 'Ad group 1',
+            },
+            'adGroupCriterion': {
+                'resourceName': 'customers/123/adGroupCriteria/789~1314',
+                'keyword': {'matchType': 'BROAD', 'text': 'email'},
+            },
+            'keywordView': {
+                'resourceName': 'customers/123/keywordViews/789~1314'
+            },
         },
-        'keywordView':
-        {'resourceName': 'customers/123/keywordViews/789~1314'}
-        }
-       ],
-      'fieldMask': ('customer.id,campaign.name,campaign.advertisingChannelType,'
-                    'campaign.biddingStrategyType,adGroup.name,'
-                    'adGroupCriterion.keyword.text,'
-                    'adGroupCriterion.keyword.matchType'),
-      'requestId': 'fake_req_id'}])
+    ],
+    'fieldMask': (
+        'customer.id,campaign.name,campaign.advertisingChannelType,'
+        'campaign.biddingStrategyType,adGroup.name,'
+        'adGroupCriterion.keyword.text,'
+        'adGroupCriterion.keyword.matchType'
+    ),
+    'requestId': 'fake_req_id',
+}]
 
 
 class ExecutionRunnerTest(parameterized.TestCase):
@@ -665,35 +672,41 @@ class ExecutionRunnerTest(parameterized.TestCase):
       autospec=True)
   def test_get_cost_estimate(self, mock_build_google_ads_objects):
     settings = settings_lib.Settings(
-        source_language_code='en',
-        target_language_codes=['es'],
         customer_ids=[123, 456],
         campaigns=[789, 101],
-        workers_to_run=[''],
         translate_ads=True,
+        translate_extensions=True,
+        translate_keywords=True,
     )
 
     mock_ads = mock.create_autospec(ads.Ads)
+    mock_extensions = mock.create_autospec(extensions.Extensions)
     mock_keywords = mock.create_autospec(keywords.Keywords)
 
     mock_ads.char_count.return_value = 12000
+    mock_extensions.char_count.return_value = 1000
     mock_keywords.char_count.return_value = 3000
 
     mock_build_google_ads_objects.return_value = (
         google_ads_objects_lib.GoogleAdsObjects(
             ads=mock_ads,
+            extensions=mock_extensions,
             keywords=mock_keywords,
         )
     )
 
-    expected_cost_estimate_msg = (
-        'Estimated cost: $0.30 USD. '
-        '(12000 ad chars + 3000 keyword chars) * $0.000020/char.)')
+    expected_cost_estimate = {
+        'total_cost_usd': '0.32',
+        'ads_char_count': '12000',
+        'extensions_char_count': '1000',
+        'keywords_char_count': '3000',
+        'cost_per_char': '0.000020'
+    }
 
     execution_runner = execution_runner_lib.ExecutionRunner(settings)
-    actual_cost_estimate_msg = execution_runner.get_cost_estimate()
+    actual_cost_estimate = execution_runner.get_cost_estimate()
 
-    self.assertEqual(expected_cost_estimate_msg, actual_cost_estimate_msg)
+    self.assertEqual(expected_cost_estimate, actual_cost_estimate)
 
   def test_execution_analytics_init(self):
     settings = settings_lib.Settings(
@@ -752,51 +765,81 @@ class ExecutionRunnerTest(parameterized.TestCase):
       {
           'testcase_name': 'translate_ads_false',
           'mock_translate_ads': False,
+          'mock_translate_extensions': False,
           'mock_translate_keywords': True,
-          'expected_cost_estimate_msg': (
-              'Estimated cost: $0.00 USD. '
-              '(0 ad chars + 20 keyword chars) * $0.000020/char.)'
-          ),
+          'expected_cost_estimate': {
+              'total_cost_usd': '0.00',
+              'ads_char_count': '0',
+              'extensions_char_count': '0',
+              'keywords_char_count': '20',
+              'cost_per_char': '0.000020',
+          },
       },
       {
           'testcase_name': 'translate_keywords_false',
           'mock_translate_ads': True,
+          'mock_translate_extensions': False,
           'mock_translate_keywords': False,
-          'expected_cost_estimate_msg': (
-              'Estimated cost: $0.00 USD. '
-              '(46 ad chars + 0 keyword chars) * $0.000020/char.)'
-          ),
+          'expected_cost_estimate': {
+              'total_cost_usd': '0.00',
+              'ads_char_count': '46',
+              'extensions_char_count': '0',
+              'keywords_char_count': '0',
+              'cost_per_char': '0.000020',
+          },
       },
       {
           'testcase_name': 'translate_ads_and_keywords_false',
           'mock_translate_ads': False,
+          'mock_translate_extensions': True,
           'mock_translate_keywords': False,
-          'expected_cost_estimate_msg': (
-              'Estimated cost: $0.00 USD. '
-              '(0 ad chars + 0 keyword chars) * $0.000020/char.)'
-          ),
+          'expected_cost_estimate': {
+              'total_cost_usd': '0.01',
+              'ads_char_count': '0',
+              'extensions_char_count': '444',
+              'keywords_char_count': '0',
+              'cost_per_char': '0.000020'
+          },
+      },
+      {
+          'testcase_name': 'translate_ads_and_extensions_and_keywords_false',
+          'mock_translate_ads': False,
+          'mock_translate_extensions': False,
+          'mock_translate_keywords': False,
+          'expected_cost_estimate': {
+              'total_cost_usd': '0.00',
+              'ads_char_count': '0',
+              'extensions_char_count': '0',
+              'keywords_char_count': '0',
+              'cost_per_char': '0.000020'
+          },
       },
   )
-  def test_translate_ads_setting_equals_false_does_not_fetch_ads_data(
+  def test_cost_estimate_with_assorted_false_settings_does_not_fetch_ads_data(
       self,
       mock_translate_ads,
+      mock_translate_extensions,
       mock_translate_keywords,
-      expected_cost_estimate_msg,
+      expected_cost_estimate,
   ):
-    """Tests GoogleAdsObjects.Ads is not populated when translate_ads is False.
+    """Tests get_cost_estimate based on the falsity of booleans in Settings.
 
     This is tricky to test as still make the API call to populate AdGroups, and
     the Ads field is protected. So I make sure some data is returned from the
     API mock call, but that the Ads object has 0 characters in a get_cost()
     call.
+
+    Args:
+      mock_translate_ads: Whether ads should be translated or not.
+      mock_translate_extensions: Whether extensions should be translated or not.
+      mock_translate_keywords: Whether keywords should be translated or not.
+      expected_cost_estimate: The expected cost estimate of the translation.
     """
     settings = settings_lib.Settings(
-        source_language_code='en',
-        target_language_codes=['es'],
         customer_ids=[123, 456],
         campaigns=[789, 101],
-        workers_to_run=['translationWorker'],
         translate_ads=mock_translate_ads,
+        translate_extensions=mock_translate_extensions,
         translate_keywords=mock_translate_keywords,
     )
 
@@ -808,10 +851,14 @@ class ExecutionRunnerTest(parameterized.TestCase):
         _ADS_RESPONSE
     )
 
-    execution_runner = execution_runner_lib.ExecutionRunner(settings)
-    actual_cost_estimate_msg = execution_runner.get_cost_estimate()
+    self.mock_google_ads_client.return_value.get_extensions_for_campaigns.return_value = (
+        _EXTENSIONS_RESPONSE
+    )
 
-    self.assertEqual(expected_cost_estimate_msg, actual_cost_estimate_msg)
+    execution_runner = execution_runner_lib.ExecutionRunner(settings)
+    actual_cost_estimate = execution_runner.get_cost_estimate()
+
+    self.assertEqual(expected_cost_estimate, actual_cost_estimate)
 
   def test_translate_extensions_setting_equals_false_does_not_fetch_extensions_data(
       self,
