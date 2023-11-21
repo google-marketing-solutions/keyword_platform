@@ -36,8 +36,7 @@ describe('GoogleAdsService', () => {
       providers: [{
         provide: LOCATION_TOKEN,
         useValue: {hostname: 'hostname.0.0.0.0.nip.io'}
-      }],
-
+      }]
     });
     service = TestBed.inject(GoogleAdsService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -68,11 +67,10 @@ describe('GoogleAdsService', () => {
     });
   });
 
-  it('should use http GET method with getCampaigns', () => {
+  it('should use http POST method with getCampaigns', () => {
     service.getCampaigns(['1']).subscribe();
-    const request =
-        httpMock.expectOne('./proxy?selected_accounts=1&endpoint=campaigns');
-    expect(request.request.method).toBe('GET');
+    const request = httpMock.expectOne('./proxy');
+    expect(request.request.method).toBe('POST');
     httpMock.verify();
   });
 
