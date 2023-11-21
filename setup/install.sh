@@ -179,7 +179,8 @@ rm -f refresh_token.txt
 terraform -chdir=./terraform init \
   -backend-config="bucket=$terraform_state_bucket_name" \
   -get=true \
-  -upgrade
+  -upgrade \
+  -reconfigure
 
 terraform -chdir=./terraform plan \
   -var "bucket_name=$BUCKET_NAME" \
