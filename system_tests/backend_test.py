@@ -145,6 +145,39 @@ def test_list_glossaries(token: str) -> None:
 
 
 @pytest.mark.systemtest
+def test_run(token: str) -> None:
+  """Tests the run endpoint."""
+  selected_accounts = os.environ.get(_SELECTED_ACCOUNTS)
+  selected_campaigns = os.environ.get(_SELECTED_CAMPAIGNS)
+
+  data = {
+      'source_language_code': 'en',
+      'target_language_code': 'de',
+      'workers_to_run': 'translationWorker',
+      'shorten_translations_to_char_limit': 'True',
+      'customer_ids': selected_accounts,
+      'campaigns': selected_campaigns,
+      'multiple_templates': 'False',
+      'translate_ads': 'True',
+      'translate_extensions': 'True',
+      'translate_keywords': 'True',
+  }
+
+  data = urllib.parse.urlencode(data).encode('utf-8')
+  request = urllib.request.Request(f'{_URL}/run', data)
+  request.add_header('Authorization', f'Bearer {token}')
+
+  with urllib.request.urlopen(request) as response:
+    assert (
+        response.status == 200
+    ), 'Got non-200 response from /run'
+    body = response.read()
+    results = json.loads(body)
+    assert results, (
+        f'Could not run for {selected_accounts} / {selected_campaigns}')
+
+
+@pytest.mark.systemtest
 @pytest.mark.skipif(
     os.getenv('TEST_FAILURE_ALERTING') != 'TRUE',
     reason='Test failure alerting is not set to TRUE.',
