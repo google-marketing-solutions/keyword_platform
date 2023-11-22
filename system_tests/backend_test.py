@@ -28,14 +28,16 @@ import pytest
 
 _BACKEND_URL_ENV_VAR = 'BACKEND_URL'
 _SERVICE_ACCOUNT = 'SERVICE_ACCOUNT'  # The service account to impersonate.
+_SELECTED_ACCOUNTS = 'SELECTED_ACCOUNTS'
+_URL = os.environ.get(_BACKEND_URL_ENV_VAR)
 
 client = google.cloud.logging.Client()
 client.setup_logging()
 
 
-@pytest.mark.systemtest
-def test_accessible_accounts():
-  url = os.environ.get(_BACKEND_URL_ENV_VAR)
+@pytest.fixture(name='token')
+def fixture_token() -> str:
+  """Returns an auth token for use in other system tests."""
   service_account = os.environ.get(_SERVICE_ACCOUNT)
 
   service_account_credentials_url = (
@@ -54,16 +56,22 @@ def test_accessible_accounts():
   token_response = authorized_session.request(
       'POST',
       service_account_credentials_url,
-      data=json.dumps({'audience': url}),
+      data=json.dumps({'audience': _URL}),
       headers={'Content-Type': 'application/json'})
 
   jwt = token_response.json()
-  id_token = jwt['token']
+  token = jwt['token']
 
-  assert id_token is not None, 'Could not fetch id token for get accounts.'
+  assert token is not None, 'Could not fetch token.'
 
-  request = urllib.request.Request(f'{url}/accessible_accounts')
-  request.add_header('Authorization', f'Bearer {id_token}')
+  return token
+
+
+@pytest.mark.systemtest
+def test_accessible_accounts(token: str) -> None:
+  """Tests the _accessible_accounts endpoint."""
+  request = urllib.request.Request(f'{_URL}/accessible_accounts')
+  request.add_header('Authorization', f'Bearer {token}')
 
   with urllib.request.urlopen(request) as response:
     assert (
@@ -72,6 +80,24 @@ def test_accessible_accounts():
     body = response.read()
     account_dict = json.loads(body)
     assert account_dict, 'Could not find accessible accounts'
+
+
+@pytest.mark.systemtest
+def test_campaigns(token: str) -> None:
+  """Tests the campaigns endpoint."""
+  selected_accounts = os.environ.get(_SELECTED_ACCOUNTS)
+  data = urllib.parse.urlencode(
+      {'selected_accounts': selected_accounts}).encode('utf-8')
+  request = urllib.request.Request(f'{_URL}/campaigns', data)
+  request.add_header('Authorization', f'Bearer {token}')
+
+  with urllib.request.urlopen(request) as response:
+    assert (
+        response.status == 200
+    ), 'Got non-200 response from /campaigns'
+    body = response.read()
+    campaigns = json.loads(body)
+    assert campaigns, f'Could not find campaigns for {selected_accounts}'
 
 
 @pytest.mark.systemtest
