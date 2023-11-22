@@ -29,6 +29,7 @@ import pytest
 _BACKEND_URL_ENV_VAR = 'BACKEND_URL'
 _SERVICE_ACCOUNT = 'SERVICE_ACCOUNT'  # The service account to impersonate.
 _SELECTED_ACCOUNTS = 'SELECTED_ACCOUNTS'
+_SELECTED_CAMPAIGNS = 'SELECTED_CAMPAIGNS'
 _URL = os.environ.get(_BACKEND_URL_ENV_VAR)
 
 client = google.cloud.logging.Client()
@@ -98,6 +99,34 @@ def test_campaigns(token: str) -> None:
     body = response.read()
     campaigns = json.loads(body)
     assert campaigns, f'Could not find campaigns for {selected_accounts}'
+
+
+@pytest.mark.systemtest
+def test_cost(token: str) -> None:
+  """Tests the cost endpoint."""
+  selected_accounts = os.environ.get(_SELECTED_ACCOUNTS)
+  selected_campaigns = os.environ.get(_SELECTED_CAMPAIGNS)
+
+  data = {
+      'selected_accounts': selected_accounts,
+      'selected_campaigns': selected_campaigns,
+      'translate_ads': 'True',
+      'translate_extensions': 'True',
+      'translate_keywords': 'True',
+  }
+
+  data = urllib.parse.urlencode(data).encode('utf-8')
+  request = urllib.request.Request(f'{_URL}/cost', data)
+  request.add_header('Authorization', f'Bearer {token}')
+
+  with urllib.request.urlopen(request) as response:
+    assert (
+        response.status == 200
+    ), 'Got non-200 response from /cost'
+    body = response.read()
+    cost = json.loads(body)
+    assert cost, (
+        f'Could not get cost for {selected_accounts} / {selected_campaigns}')
 
 
 @pytest.mark.systemtest
