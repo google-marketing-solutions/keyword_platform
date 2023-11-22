@@ -36,9 +36,12 @@ client = google.cloud.logging.Client()
 client.setup_logging()
 
 
-@pytest.fixture(name='token')
-def fixture_token() -> str:
-  """Returns an auth token for use in other system tests."""
+def _get_token() -> str:
+  """Returns an auth token for use in other system tests.
+
+  Note: Setting this as a fixture can result in the token being logged by
+        pytest, so it's a method instead.
+  """
   service_account = os.environ.get(_SERVICE_ACCOUNT)
 
   service_account_credentials_url = (
@@ -69,8 +72,9 @@ def fixture_token() -> str:
 
 
 @pytest.mark.systemtest
-def test_accessible_accounts(token: str) -> None:
+def test_accessible_accounts() -> None:
   """Tests the accessible_accounts endpoint."""
+  token = _get_token()
   request = urllib.request.Request(f'{_URL}/accessible_accounts')
   request.add_header('Authorization', f'Bearer {token}')
 
@@ -84,11 +88,12 @@ def test_accessible_accounts(token: str) -> None:
 
 
 @pytest.mark.systemtest
-def test_campaigns(token: str) -> None:
+def test_campaigns() -> None:
   """Tests the campaigns endpoint."""
   selected_accounts = os.environ.get(_SELECTED_ACCOUNTS)
   data = urllib.parse.urlencode(
       {'selected_accounts': selected_accounts}).encode('utf-8')
+  token = _get_token()
   request = urllib.request.Request(f'{_URL}/campaigns', data)
   request.add_header('Authorization', f'Bearer {token}')
 
@@ -102,20 +107,21 @@ def test_campaigns(token: str) -> None:
 
 
 @pytest.mark.systemtest
-def test_cost(token: str) -> None:
+def test_cost() -> None:
   """Tests the cost endpoint."""
   selected_accounts = os.environ.get(_SELECTED_ACCOUNTS)
   selected_campaigns = os.environ.get(_SELECTED_CAMPAIGNS)
 
   data = {
-      'selected_accounts': selected_accounts,
-      'selected_campaigns': selected_campaigns,
+      'customer_ids': selected_accounts,
+      'campaigns': selected_campaigns,
       'translate_ads': 'True',
       'translate_extensions': 'True',
       'translate_keywords': 'True',
   }
 
   data = urllib.parse.urlencode(data).encode('utf-8')
+  token = _get_token()
   request = urllib.request.Request(f'{_URL}/cost', data)
   request.add_header('Authorization', f'Bearer {token}')
 
@@ -130,8 +136,9 @@ def test_cost(token: str) -> None:
 
 
 @pytest.mark.systemtest
-def test_list_glossaries(token: str) -> None:
+def test_list_glossaries() -> None:
   """Tests the list_glossaries endpoint."""
+  token = _get_token()
   request = urllib.request.Request(f'{_URL}/list_glossaries')
   request.add_header('Authorization', f'Bearer {token}')
 
@@ -145,14 +152,14 @@ def test_list_glossaries(token: str) -> None:
 
 
 @pytest.mark.systemtest
-def test_run(token: str) -> None:
+def test_run() -> None:
   """Tests the run endpoint."""
   selected_accounts = os.environ.get(_SELECTED_ACCOUNTS)
   selected_campaigns = os.environ.get(_SELECTED_CAMPAIGNS)
 
   data = {
       'source_language_code': 'en',
-      'target_language_code': 'de',
+      'target_language_codes': 'de',
       'workers_to_run': 'translationWorker',
       'shorten_translations_to_char_limit': 'True',
       'customer_ids': selected_accounts,
@@ -164,6 +171,7 @@ def test_run(token: str) -> None:
   }
 
   data = urllib.parse.urlencode(data).encode('utf-8')
+  token = _get_token()
   request = urllib.request.Request(f'{_URL}/run', data)
   request.add_header('Authorization', f'Bearer {token}')
 
