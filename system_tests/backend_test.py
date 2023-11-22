@@ -70,7 +70,7 @@ def fixture_token() -> str:
 
 @pytest.mark.systemtest
 def test_accessible_accounts(token: str) -> None:
-  """Tests the _accessible_accounts endpoint."""
+  """Tests the accessible_accounts endpoint."""
   request = urllib.request.Request(f'{_URL}/accessible_accounts')
   request.add_header('Authorization', f'Bearer {token}')
 
@@ -127,6 +127,21 @@ def test_cost(token: str) -> None:
     cost = json.loads(body)
     assert cost, (
         f'Could not get cost for {selected_accounts} / {selected_campaigns}')
+
+
+@pytest.mark.systemtest
+def test_list_glossaries(token: str) -> None:
+  """Tests the list_glossaries endpoint."""
+  request = urllib.request.Request(f'{_URL}/list_glossaries')
+  request.add_header('Authorization', f'Bearer {token}')
+
+  with urllib.request.urlopen(request) as response:
+    assert (
+        response.status == 200
+    ), 'Got non-200 response from /list_glossaries'
+    body = response.read()
+    glossaries = json.loads(body)
+    assert glossaries, 'Could not find glossaries'
 
 
 @pytest.mark.systemtest
