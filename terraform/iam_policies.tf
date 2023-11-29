@@ -61,38 +61,38 @@ resource "google_project_service_identity" "pubsub_agent" {
 # Service Account Permissions
 #
 
-resource "google_project_iam_member" "backend_sa--logging-writer" {
+resource "google_project_iam_member" "backend_sa_logging_writer" {
   member  = "serviceAccount:${google_service_account.backend_sa.email}"
   project = var.project_id
   role    = "roles/logging.logWriter"
 }
 
-resource "google_project_iam_member" "backend_sa--logging-viewer" {
+resource "google_project_iam_member" "backend_sa_logging_viewer" {
   member  = "serviceAccount:${google_service_account.backend_sa.email}"
   project = var.project_id
   role    = "roles/logging.viewer"
 }
 
-resource "google_project_iam_member" "backend_sa--token-creator" {
+resource "google_project_iam_member" "backend_sa_token_creator" {
   member  = "serviceAccount:${google_service_account.backend_sa.email}"
   project = var.project_id
   role    = "roles/iam.serviceAccountTokenCreator"
 }
 
-resource "google_project_iam_member" "backend_sa--storage-object-admin" {
+resource "google_project_iam_member" "backend_sa_storage_object_admin" {
   member  = "serviceAccount:${google_service_account.backend_sa.email}"
   project = var.project_id
   role    = "roles/storage.objectAdmin"
 }
 
-resource "google_project_iam_member" "backend_sa--vertexai-user" {
+resource "google_project_iam_member" "backend_sa_vertexai_user" {
   member  = "serviceAccount:${google_service_account.backend_sa.email}"
   project = var.project_id
   role    = "roles/aiplatform.user"
 }
 
 # Needed to access the backend image during migrations from Cloud Build.
-resource "google_project_iam_member" "cloudbuild_managed_sa--object-viewer" {
+resource "google_project_iam_member" "cloudbuild_managed_sa_object_viewer" {
   member  = "serviceAccount:${google_project_service_identity.cloudbuild_managed_sa.email}"
   project = var.project_id
   role    = "roles/storage.objectViewer"
@@ -141,14 +141,14 @@ data "google_iam_policy" "backend_run_users" {
   }
 }
 
-resource "google_cloud_run_service_iam_policy" "frontend_run-invoker" {
+resource "google_cloud_run_service_iam_policy" "frontend_run_invoker" {
   location = google_cloud_run_service.frontend_run.location
   project = google_cloud_run_service.frontend_run.project
   service = google_cloud_run_service.frontend_run.name
   policy_data = data.google_iam_policy.frontend_run_users.policy_data
 }
 
-resource "google_cloud_run_service_iam_policy" "backend_run-invoker" {
+resource "google_cloud_run_service_iam_policy" "backend_run_invoker" {
   location = google_cloud_run_service.backend_run.location
   project = google_cloud_run_service.backend_run.project
   service = google_cloud_run_service.backend_run.name
