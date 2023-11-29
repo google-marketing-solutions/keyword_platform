@@ -136,6 +136,7 @@ data "google_iam_policy" "backend_run_users" {
     members = [
         "serviceAccount:${google_service_account.frontend_sa.email}",
         "serviceAccount:${google_service_account.pubsub_sa.email}",
+        "serviceAccount:${google_service_account.backend_sa.email}",
     ]
   }
 }
