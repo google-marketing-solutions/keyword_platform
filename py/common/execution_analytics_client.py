@@ -23,7 +23,6 @@ from typing import Any
 from absl import logging
 import requests
 
-from common import gcloud_client as gcloud_client_lib
 from data_models import settings as settings_lib
 from workers import worker_result as worker_result_lib
 
@@ -49,9 +48,7 @@ class ExecutionAnalyticsClient:
     self._settings = settings
     self._measurement_id = os.getenv('GA_MEASUREMENT_ID', '')
     self._api_secret = os.getenv('GA_API_SECRET', '')
-    self._version = gcloud_client_lib.GcloudClient().get_run_service_ref_name(
-        'backend'
-    )
+    self._version = os.getenv('VERSION', 'unset')
     self._project_id = os.getenv('GCP_PROJECT', '')
     self._url = (
         f'{_GA4_UPLOAD_URL}?measurement_id={self._measurement_id}&'

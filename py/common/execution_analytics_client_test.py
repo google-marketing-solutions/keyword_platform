@@ -20,7 +20,6 @@ from unittest import mock
 import requests_mock
 from absl.testing import absltest
 from common import execution_analytics_client as execution_analytics_client_lib
-from common import gcloud_client as gcloud_client_lib
 from data_models import settings as settings_lib
 from workers import worker_result as worker_result_lib
 
@@ -59,16 +58,11 @@ class ExecutionAnalyticsClientTest(absltest.TestCase):
     self.mock_os.side_effect = [
         'fake_measurement_id',
         'fake_api_secret',
+        'fake_version',
         'fake_cloud_project_id',
     ]
     self.enter_context(
         mock.patch.object(time, 'time', autospec=True, return_value=1)
-    )
-    self.mock_gcloud_client = self.enter_context(
-        mock.patch.object(gcloud_client_lib, 'GcloudClient', autospec=True)
-    )
-    self.mock_gcloud_client.return_value.get_run_service_ref_name.return_value = (
-        'fake_version'
     )
 
   def test_send_execution_results(self):
