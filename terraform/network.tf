@@ -18,12 +18,14 @@ resource "google_compute_global_address" "default" {
 
   # Create a network only if the compute.googleapis.com API has been activated.
   depends_on = [google_project_service.apis]
+  project = var.project_id
 }
 
 resource "google_compute_region_network_endpoint_group" "frontend_neg" {
   name                  = "frontend-neg"
   network_endpoint_type = "SERVERLESS"
   region                = var.region
+  project               = var.project_id
   cloud_run {
     service = google_cloud_run_service.frontend_run.name
   }
@@ -36,6 +38,7 @@ resource "google_compute_backend_service" "frontend_backend" {
   name                            = "keywordplatform-frontend-backend-service"
   enable_cdn                      = false
   connection_draining_timeout_sec = 10
+  project                         = var.project_id
 
   backend {
     group = google_compute_region_network_endpoint_group.frontend_neg.id
@@ -53,6 +56,7 @@ resource "google_compute_backend_service" "frontend_backend" {
 resource "google_compute_url_map" "default" {
   name             = "keywordplatform-http-lb"
   default_service  = google_compute_backend_service.frontend_backend.id
+  project          = var.project_id
 
   host_rule {
     hosts        = ["*"]
@@ -68,6 +72,7 @@ resource "google_compute_url_map" "default" {
 resource "google_compute_target_https_proxy" "default" {
   name    = "keywordplatform-default-https-lb-proxy"
   url_map = google_compute_url_map.default.id
+  project = var.project_id
   ssl_certificates = [
     google_compute_managed_ssl_certificate.default.id,
   ]
@@ -75,6 +80,7 @@ resource "google_compute_target_https_proxy" "default" {
 
 resource "google_compute_global_forwarding_rule" "default" {
   name = "keywordplatform-default-https-lb-forwarding-rule"
+  project = var.project_id
   ip_protocol = "TCP"
   load_balancing_scheme = "EXTERNAL"
   port_range = "443"

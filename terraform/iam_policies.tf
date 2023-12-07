@@ -37,6 +37,7 @@ resource "google_service_account" "iap_sa" {
 resource "google_service_account" "pubsub_sa" {
   account_id   = "keywordplatform-pubsub-invoker"
   display_name = "Keyword Platform Pub/Sub Service Account"
+  project      = var.project_id
 }
 
 resource "google_project_service_identity" "cloudbuild_managed_sa" {
@@ -174,6 +175,7 @@ data "google_storage_project_service_account" "gcs_account" {
 // Create a Pub/Sub topic.
 resource "google_pubsub_topic_iam_binding" "binding" {
   provider = google-beta
+  project  = var.project_id
   topic    = google_pubsub_topic.create_glossary.id
   role     = "roles/pubsub.publisher"
   members  = ["serviceAccount:${data.google_storage_project_service_account.gcs_account.email_address}"]

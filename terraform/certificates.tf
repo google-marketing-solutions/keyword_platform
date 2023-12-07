@@ -18,6 +18,7 @@ locals {
 
 resource "google_compute_managed_ssl_certificate" "default" {
   name = "keywordplatform-managed"
+  project = var.project_id
 
   managed {
     domains = [local.secured_domain]
