@@ -223,7 +223,6 @@ resource "google_secret_manager_secret" "client_id" {
 resource "google_secret_manager_secret_version" "client_id_latest" {
   secret = google_secret_manager_secret.client_id.name
   secret_data = var.client_id
-  project = var.project_id
 }
 
 resource "google_secret_manager_secret_iam_member" "client_id_access" {
@@ -246,7 +245,6 @@ resource "google_secret_manager_secret" "client_secret" {
 resource "google_secret_manager_secret_version" "client_secret_latest" {
   secret = google_secret_manager_secret.client_secret.name
   secret_data = var.client_secret
-  project = var.project_id
 }
 
 resource "google_secret_manager_secret_iam_member" "client_secret_access" {
@@ -269,7 +267,6 @@ resource "google_secret_manager_secret" "login_customer_id" {
 resource "google_secret_manager_secret_version" "login_customer_id_latest" {
   secret = google_secret_manager_secret.login_customer_id.name
   secret_data = var.login_customer_id
-  project = var.project_id
 }
 
 resource "google_secret_manager_secret_iam_member" "login_customer_id_access" {
@@ -292,7 +289,6 @@ resource "google_secret_manager_secret" "developer_token" {
 resource "google_secret_manager_secret_version" "developer_token_latest" {
   secret = google_secret_manager_secret.developer_token.name
   secret_data = var.developer_token
-  project = var.project_id
 }
 
 resource "google_secret_manager_secret_iam_member" "developer_token_access" {
@@ -315,7 +311,6 @@ resource "google_secret_manager_secret" "refresh_token" {
 resource "google_secret_manager_secret_version" "refresh_token_latest" {
   secret = google_secret_manager_secret.refresh_token.name
   secret_data = var.refresh_token
-  project = var.project_id
 }
 
 resource "google_secret_manager_secret_iam_member" "refresh_token_access" {
@@ -352,7 +347,6 @@ resource "google_pubsub_subscription" "create_glossary_subscription" {
 resource "google_storage_notification" "glossary_notification" {
   provider       = google-beta
   bucket         = google_storage_bucket.glossary_bucket.name
-  project        = var.project_id
   event_types    = ["OBJECT_FINALIZE"]
   payload_format = "JSON_API_V1"
   topic          = google_pubsub_topic.create_glossary.id

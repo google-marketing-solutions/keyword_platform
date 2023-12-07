@@ -27,7 +27,6 @@ resource "google_iap_brand" "default" {
 resource "google_iap_client" "default" {
   display_name = "Keyword Platform IAP Client"
   brand        =  var.iap_brand_id == "" ? google_iap_brand.default[0].name : "projects/${var.project_id}/brands/${var.iap_brand_id}"
-  project           = google_project_service.iap_service.project
 }
 
 resource "google_project_service_identity" "iap_sa" {
