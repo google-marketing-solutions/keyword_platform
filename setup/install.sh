@@ -199,7 +199,7 @@ terraform -chdir=./terraform plan \
   -var "iap_brand_id=$iap_brand_id" \
   -out="/tmp/tfplan"
 
-terraform_apply_exit_code=$(terraform -chdir=./terraform apply -auto-approve "/tmp/tfplan" | tee /dev/tty | ( ! grep "Error applying plan" ); echo $?)
+terraform_apply_exit_code=$(terraform -chdir=./terraform apply "/tmp/tfplan" | tee /dev/tty | ( ! grep "Error applying plan" ); echo $?)
 
 if [ $terraform_apply_exit_code -ne 0 ]; then
   echo "--------------------------------------------------------------------------------------"

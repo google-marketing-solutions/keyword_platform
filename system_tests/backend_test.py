@@ -28,14 +28,20 @@ import pytest
 
 _BACKEND_URL_ENV_VAR = 'BACKEND_URL'
 _SERVICE_ACCOUNT = 'SERVICE_ACCOUNT'  # The service account to impersonate.
+_SELECTED_ACCOUNTS = 'SELECTED_ACCOUNTS'
+_SELECTED_CAMPAIGNS = 'SELECTED_CAMPAIGNS'
+_URL = os.environ.get(_BACKEND_URL_ENV_VAR)
 
 client = google.cloud.logging.Client()
 client.setup_logging()
 
 
-@pytest.mark.systemtest
-def test_accessible_accounts():
-  url = os.environ.get(_BACKEND_URL_ENV_VAR)
+def _get_token() -> str:
+  """Returns an auth token for use in other system tests.
+
+  Note: Setting this as a fixture can result in the token being logged by
+        pytest, so it's a method instead.
+  """
   service_account = os.environ.get(_SERVICE_ACCOUNT)
 
   service_account_credentials_url = (
@@ -54,16 +60,23 @@ def test_accessible_accounts():
   token_response = authorized_session.request(
       'POST',
       service_account_credentials_url,
-      data=json.dumps({'audience': url}),
+      data=json.dumps({'audience': _URL}),
       headers={'Content-Type': 'application/json'})
 
   jwt = token_response.json()
-  id_token = jwt['token']
+  token = jwt['token']
 
-  assert id_token is not None, 'Could not fetch id token for get accounts.'
+  assert token is not None, 'Could not fetch token.'
 
-  request = urllib.request.Request(f'{url}/accessible_accounts')
-  request.add_header('Authorization', f'Bearer {id_token}')
+  return token
+
+
+@pytest.mark.systemtest
+def test_accessible_accounts() -> None:
+  """Tests the accessible_accounts endpoint."""
+  token = _get_token()
+  request = urllib.request.Request(f'{_URL}/accessible_accounts')
+  request.add_header('Authorization', f'Bearer {token}')
 
   with urllib.request.urlopen(request) as response:
     assert (
@@ -72,6 +85,104 @@ def test_accessible_accounts():
     body = response.read()
     account_dict = json.loads(body)
     assert account_dict, 'Could not find accessible accounts'
+
+
+@pytest.mark.systemtest
+def test_campaigns() -> None:
+  """Tests the campaigns endpoint."""
+  selected_accounts = os.environ.get(_SELECTED_ACCOUNTS)
+  data = urllib.parse.urlencode(
+      {'selected_accounts': selected_accounts}).encode('utf-8')
+  token = _get_token()
+  request = urllib.request.Request(f'{_URL}/campaigns', data)
+  request.add_header('Authorization', f'Bearer {token}')
+
+  with urllib.request.urlopen(request) as response:
+    assert (
+        response.status == 200
+    ), 'Got non-200 response from /campaigns'
+    body = response.read()
+    campaigns = json.loads(body)
+    assert campaigns, f'Could not find campaigns for {selected_accounts}'
+
+
+@pytest.mark.systemtest
+def test_cost() -> None:
+  """Tests the cost endpoint."""
+  selected_accounts = os.environ.get(_SELECTED_ACCOUNTS)
+  selected_campaigns = os.environ.get(_SELECTED_CAMPAIGNS)
+
+  data = {
+      'customer_ids': selected_accounts,
+      'campaigns': selected_campaigns,
+      'translate_ads': 'True',
+      'translate_extensions': 'True',
+      'translate_keywords': 'True',
+  }
+
+  data = urllib.parse.urlencode(data).encode('utf-8')
+  token = _get_token()
+  request = urllib.request.Request(f'{_URL}/cost', data)
+  request.add_header('Authorization', f'Bearer {token}')
+
+  with urllib.request.urlopen(request) as response:
+    assert (
+        response.status == 200
+    ), 'Got non-200 response from /cost'
+    body = response.read()
+    cost = json.loads(body)
+    assert cost, (
+        f'Could not get cost for {selected_accounts} / {selected_campaigns}')
+
+
+@pytest.mark.systemtest
+def test_list_glossaries() -> None:
+  """Tests the list_glossaries endpoint."""
+  token = _get_token()
+  request = urllib.request.Request(f'{_URL}/list_glossaries')
+  request.add_header('Authorization', f'Bearer {token}')
+
+  with urllib.request.urlopen(request) as response:
+    assert (
+        response.status == 200
+    ), 'Got non-200 response from /list_glossaries'
+    body = response.read()
+    glossaries = json.loads(body)
+    assert glossaries, 'Could not find glossaries'
+
+
+@pytest.mark.systemtest
+def test_run() -> None:
+  """Tests the run endpoint."""
+  selected_accounts = os.environ.get(_SELECTED_ACCOUNTS)
+  selected_campaigns = os.environ.get(_SELECTED_CAMPAIGNS)
+
+  data = {
+      'source_language_code': 'en',
+      'target_language_codes': 'de',
+      'workers_to_run': 'translationWorker',
+      'shorten_translations_to_char_limit': 'True',
+      'customer_ids': selected_accounts,
+      'campaigns': selected_campaigns,
+      'multiple_templates': 'False',
+      'translate_ads': 'True',
+      'translate_extensions': 'True',
+      'translate_keywords': 'True',
+  }
+
+  data = urllib.parse.urlencode(data).encode('utf-8')
+  token = _get_token()
+  request = urllib.request.Request(f'{_URL}/run', data)
+  request.add_header('Authorization', f'Bearer {token}')
+
+  with urllib.request.urlopen(request) as response:
+    assert (
+        response.status == 200
+    ), 'Got non-200 response from /run'
+    body = response.read()
+    results = json.loads(body)
+    assert results, (
+        f'Could not run for {selected_accounts} / {selected_campaigns}')
 
 
 @pytest.mark.systemtest

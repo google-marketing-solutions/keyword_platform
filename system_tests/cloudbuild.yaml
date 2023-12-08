@@ -17,7 +17,7 @@ steps:
     args:
       - clone
       - '-b'
-      - dev
+      - 'dev'
       - 'https://github.com/google-marketing-solutions/keyword_platform.git'
     id: Clone
   - name: 'python:3.10-slim'
@@ -29,6 +29,8 @@ steps:
         && export BACKEND_URL="$_CONTAINER_URL" \
         && export TEST_FAILURE_ALERTING="$_TEST_FAILURE" \
         && export SERVICE_ACCOUNT="$_SERVICE_ACCOUNT" \
+        && export SELECTED_ACCOUNTS="$_SELECTED_ACCOUNTS" \
+        && export SELECTED_CAMPAIGNS="$_SELECTED_CAMPAIGNS" \
         && pytest -m systemtest backend_test.py
     id: RunTests
     entrypoint: bash

@@ -21,6 +21,7 @@ resource "google_storage_bucket" "output_bucket" {
   name          = format("%s-%s", var.project_id, var.bucket_name)
   location      = "US"
   storage_class = "STANDARD"
+  project       = var.project_id
 
   uniform_bucket_level_access = true
   force_destroy = true
@@ -30,6 +31,7 @@ resource "google_storage_bucket" "glossary_bucket" {
   name                        = format("%s-glossaries", var.project_id)
   storage_class               = "REGIONAL"
   location                    = var.region
+  project                     = var.project_id
   uniform_bucket_level_access = true
   force_destroy = true
 }
@@ -106,7 +108,10 @@ resource "google_cloud_run_service" "backend_run" {
     latest_revision = true
   }
 
-  depends_on = [google_project_service.apis]
+  depends_on = [
+    google_project_service.apis,
+    google_project_iam_member.backend_sa_token_creator
+  ]
 }
 
 locals {
@@ -207,6 +212,7 @@ data "google_container_registry_image" "backend_latest" {
 
 resource "google_secret_manager_secret" "client_id" {
   secret_id = "client_id"
+  project   = var.project_id
   replication {
     automatic = true
   }
@@ -214,19 +220,21 @@ resource "google_secret_manager_secret" "client_id" {
   depends_on = [google_project_service.apis]
 }
 
-resource "google_secret_manager_secret_version" "client_id-latest" {
+resource "google_secret_manager_secret_version" "client_id_latest" {
   secret = google_secret_manager_secret.client_id.name
   secret_data = var.client_id
 }
 
-resource "google_secret_manager_secret_iam_member" "client_id-access" {
+resource "google_secret_manager_secret_iam_member" "client_id_access" {
   secret_id = google_secret_manager_secret.client_id.id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.backend_sa.email}"
+  project   = var.project_id
 }
 
 resource "google_secret_manager_secret" "client_secret" {
   secret_id = "client_secret"
+  project   = var.project_id
   replication {
     automatic = true
   }
@@ -234,19 +242,21 @@ resource "google_secret_manager_secret" "client_secret" {
   depends_on = [google_project_service.apis]
 }
 
-resource "google_secret_manager_secret_version" "client_secret-latest" {
+resource "google_secret_manager_secret_version" "client_secret_latest" {
   secret = google_secret_manager_secret.client_secret.name
   secret_data = var.client_secret
 }
 
-resource "google_secret_manager_secret_iam_member" "client_secret-access" {
+resource "google_secret_manager_secret_iam_member" "client_secret_access" {
   secret_id = google_secret_manager_secret.client_secret.id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.backend_sa.email}"
+  project   = var.project_id
 }
 
 resource "google_secret_manager_secret" "login_customer_id" {
   secret_id = "login_customer_id"
+  project   = var.project_id
   replication {
     automatic = true
   }
@@ -254,19 +264,21 @@ resource "google_secret_manager_secret" "login_customer_id" {
   depends_on = [google_project_service.apis]
 }
 
-resource "google_secret_manager_secret_version" "login_customer_id-latest" {
+resource "google_secret_manager_secret_version" "login_customer_id_latest" {
   secret = google_secret_manager_secret.login_customer_id.name
   secret_data = var.login_customer_id
 }
 
-resource "google_secret_manager_secret_iam_member" "login_customer_id-access" {
+resource "google_secret_manager_secret_iam_member" "login_customer_id_access" {
   secret_id = google_secret_manager_secret.login_customer_id.id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.backend_sa.email}"
+  project   = var.project_id
 }
 
 resource "google_secret_manager_secret" "developer_token" {
   secret_id = "developer_token"
+  project   = var.project_id
   replication {
     automatic = true
   }
@@ -274,19 +286,21 @@ resource "google_secret_manager_secret" "developer_token" {
   depends_on = [google_project_service.apis]
 }
 
-resource "google_secret_manager_secret_version" "developer_token-latest" {
+resource "google_secret_manager_secret_version" "developer_token_latest" {
   secret = google_secret_manager_secret.developer_token.name
   secret_data = var.developer_token
 }
 
-resource "google_secret_manager_secret_iam_member" "developer_token-access" {
+resource "google_secret_manager_secret_iam_member" "developer_token_access" {
   secret_id = google_secret_manager_secret.developer_token.id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.backend_sa.email}"
+  project   = var.project_id
 }
 
 resource "google_secret_manager_secret" "refresh_token" {
   secret_id = "refresh_token"
+  project   = var.project_id
   replication {
     automatic = true
   }
@@ -294,15 +308,16 @@ resource "google_secret_manager_secret" "refresh_token" {
   depends_on = [google_project_service.apis]
 }
 
-resource "google_secret_manager_secret_version" "refresh_token-latest" {
+resource "google_secret_manager_secret_version" "refresh_token_latest" {
   secret = google_secret_manager_secret.refresh_token.name
   secret_data = var.refresh_token
 }
 
-resource "google_secret_manager_secret_iam_member" "refresh_token-access" {
+resource "google_secret_manager_secret_iam_member" "refresh_token_access" {
   secret_id = google_secret_manager_secret.refresh_token.id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.backend_sa.email}"
+  project   = var.project_id
 }
 
 ##
@@ -310,11 +325,13 @@ resource "google_secret_manager_secret_iam_member" "refresh_token-access" {
 #
 resource "google_pubsub_topic" "create_glossary" {
   name = "create-glossary-topic"
+  project = var.project_id
 }
 
 resource "google_pubsub_subscription" "create_glossary_subscription" {
   name  = "create-glossary-subscription"
   topic = google_pubsub_topic.create_glossary.name
+  project = var.project_id
   push_config {
     push_endpoint = format("%s/create_glossary", local.backend_url)
     oidc_token {
