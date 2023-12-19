@@ -5,6 +5,7 @@ google-cloud
 google-cloud-secret-manager
 google-cloud-storage
 google-cloud-logging
+google-cloud-build
 gunicorn
 httplib2
 pandas

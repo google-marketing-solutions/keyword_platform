@@ -14,12 +14,28 @@
 
 """Tests for gcloud_client."""
 
+import datetime
 import os
 import subprocess
 from unittest import mock
+from google.cloud.devtools import cloudbuild_v1
 from absl.testing import absltest
 from common import gcloud_client as gcloud_client_lib
 
+
+_FAKE_CLOUDBUILD_SERVICE_RESPONSE = [
+    cloudbuild_v1.Build(
+        id='fake_build_id',
+        substitutions={'REF_NAME': 'fake_version'},
+        status=cloudbuild_v1.Build.Status.SUCCESS,
+        finish_time=datetime.datetime(2023, 10, 19, 17, 15, 59, 684230),
+        results={
+            'images': [
+                {'name': 'gcr.io/fake_project/keywordplatform-backend:latest'}
+            ]
+        },
+    )
+]
 
 class GcloudClientTest(absltest.TestCase):
 
@@ -31,8 +47,11 @@ class GcloudClientTest(absltest.TestCase):
     self.enter_context(
         mock.patch.dict(os.environ, {'GCP_REGION': 'fake_region'})
     )
-    self.mock_process = self.enter_context(
-        mock.patch.object(subprocess, 'Popen', autospec=True)
+    self.mock_cloudbuild_client = self.enter_context(
+        mock.patch.object(cloudbuild_v1, 'CloudBuildClient', autospec=True)
+    )
+    self.mock_cloudbuild_client.return_value.list_builds.return_value = (
+        _FAKE_CLOUDBUILD_SERVICE_RESPONSE
     )
 
   def test_init(self):
@@ -47,111 +66,14 @@ class GcloudClientTest(absltest.TestCase):
       self.assertEqual(gcloud_client._project_id, 'fake_project')
       self.assertEqual(gcloud_client._region, 'fake_region')
 
-  def test_run(self):
-    self.mock_process.return_value.communicate.return_value = ('', '')
-    gcloud_client = gcloud_client_lib.GcloudClient()
-    cmd_str = (
-        'run services describe fake_service'
-        ' --format=value(status.latestCreatedRevisionName) --platform=managed'
-    )
-    expected_cmd = [
-        'gcloud',
-        'run',
-        'services',
-        'describe',
-        'fake_service',
-        '--format=value(status.latestCreatedRevisionName)',
-        '--platform=managed',
-        '--project=fake_project',
-        '--region=fake_region',
-    ]
-    gcloud_client.run(cmd_str, True)
-
-    self.mock_process.assert_called_once_with(
-        expected_cmd, stdout=-1, stderr=-1, universal_newlines=True
-    )
-
   def test_get_run_service_ref_name(self):
-    self.mock_process.return_value.communicate.side_effect = [
-        ('fake_revision\n', ''),
-        ('fake_build\n', ''),
-        ('fake_version\n', ''),
-    ]
-    expected_result = 'fake_version'
     actual_result = gcloud_client_lib.GcloudClient().get_run_service_ref_name(
-        'fake_service'
+        'backend'
     )
-
-    self.assertEqual(expected_result, actual_result)
-    self.mock_process.assert_has_calls([
-        mock.call(
-            [
-                'gcloud',
-                'run',
-                'services',
-                'describe',
-                'fake_service',
-                '--format=value(status.latestCreatedRevisionName)',
-                '--platform=managed',
-                '--project=fake_project',
-                '--region=fake_region',
-            ],
-            stdout=-1,
-            stderr=-1,
-            universal_newlines=True,
-        ),
-        mock.call().communicate(),
-        mock.call(
-            [
-                'gcloud',
-                'run',
-                'revisions',
-                'describe',
-                'fake_revision',
-                '--format=value(labels.gcb-build-id)',
-                '--project=fake_project',
-                '--region=fake_region',
-            ],
-            stdout=-1,
-            stderr=-1,
-            universal_newlines=True,
-        ),
-        mock.call().communicate(),
-        mock.call(
-            [
-                'gcloud',
-                'builds',
-                'describe',
-                'fake_build',
-                '--format=value(substitutions.REF_NAME)',
-                '--project=fake_project',
-            ],
-            stdout=-1,
-            stderr=-1,
-            universal_newlines=True,
-        ),
-        mock.call().communicate(),
-    ])
-
-  def test_get_run_service_ref_name_has_errors(self):
-    self.mock_process.return_value.communicate.side_effect = [
-        ('fake_revision\n', ''),
-        ('fake_build\n', ''),
-        ('', 'fake_error\n'),
-    ]
-
-    with self.assertLogs(level='WARNING') as logs:
-      expected_result = ''
-      actual_result = gcloud_client_lib.GcloudClient().get_run_service_ref_name(
-          'fake_service'
-      )
-      self.assertEqual(
-          logs.output[0],
-          'WARNING:root:GCloud Client: An error occured running command: gcloud'
-          ' builds describe fake_build --format=value(substitutions.REF_NAME)'
-          ' --project=fake_project: fake_error',
-      )
-      self.assertEqual(expected_result, actual_result)
+    self.mock_cloudbuild_client.return_value.list_builds.assert_called_once_with(
+        project_id='fake_project'
+    )
+    self.assertEqual(actual_result, 'fake_version')
 
 
 if __name__ == '__main__':

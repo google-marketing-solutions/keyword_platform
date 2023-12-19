@@ -16,18 +16,7 @@
 
 import logging
 import os
-import subprocess
-
-_LATEST_RUN_REVISION_CMD = (
-    'run services describe {service}'
-    ' --format=value(status.latestCreatedRevisionName) --platform=managed'
-)
-_REVISION_BUILD_ID_CMD = (
-    'run revisions describe {revision} --format=value(labels.gcb-build-id)'
-)
-_BUILD_REF_NAME_CMD = (
-    'builds describe {build} --format=value(substitutions.REF_NAME)'
-)
+from google.cloud.devtools import cloudbuild_v1
 
 
 class GcloudClient:
@@ -46,6 +35,7 @@ class GcloudClient:
     """Initializes the client."""
     self._project_id = os.environ['GCP_PROJECT']
     self._region = os.environ['GCP_REGION']
+    self._cloud_build_client = cloudbuild_v1.CloudBuildClient()
     logging.info(
         'GCloud Client: Initialized in project %s and region %s',
         self._project_id,
@@ -64,45 +54,21 @@ class GcloudClient:
     Args:
       service: The name of the Google Cloud Run service.
     """
-    revision = self.run(
-        cmd=_LATEST_RUN_REVISION_CMD.format(service=service),
-        include_region=True,
-    )
-    build = self.run(
-        cmd=_REVISION_BUILD_ID_CMD.format(revision=revision),
-        include_region=True,
-    )
-    version = self.run(cmd=_BUILD_REF_NAME_CMD.format(build=build))
+    builds = self._cloud_build_client.list_builds(project_id=self._project_id)
+    build_time = 0
+    version = 'unknown'
+
+    # TODO: b/314440399 - The code below is a workaround to get the lastest
+    # successful build for a service based on the service name. Ideally we could
+    # use run_v2 (from google-cloud-run), but this isn't available
+    # in third_party, yet. Until it is this is the best we can do right now.
+    for build in builds:
+      if build.status == cloudbuild_v1.Build.Status.SUCCESS:
+        if build_time < int(build.finish_time.strftime('%s')):
+          images = [image for image in build.results.images]
+          for image in images:
+            if image.name and service in image.name:
+              build_time = int(build.finish_time.strftime('%s'))
+              version = build.substitutions.get('REF_NAME')
+              break
     return version
-
-  def run(self, cmd: str, include_region=False) -> str:
-    """Runs a gcloud command as subprocess.
-
-    Args:
-      cmd: The command to run.
-      include_region: Whether or not to include the cloud region flag in the
-        command.
-
-    Returns:
-      The output of the command.
-    """
-    cmd = f'gcloud {cmd} --project={self._project_id}'
-    if include_region:
-      cmd += f' --region={self._region}'
-    process = subprocess.Popen(
-        cmd.split(),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        universal_newlines=True,
-    )
-    out, err = process.communicate()
-
-    if err:
-      logging.warning(
-          'GCloud Client: An error occured running command: %s: %s',
-          cmd,
-          err.strip(),
-      )
-      return ''
-    logging.info('GCloud Client: Successfully ran command: %s', cmd)
-    return out.strip()
