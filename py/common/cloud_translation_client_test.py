@@ -248,6 +248,225 @@ class CloudTranslationClientTest(parameterized.TestCase):
         expected_api_calls, any_order=True
     )
 
+  @parameterized.named_parameters(
+      {
+          'testcase_name': 'without_glossary',
+          'mock_glossary_id': '',
+          'expected_api_calls': [
+              mock.call(
+                  (
+                      'https://translate.googleapis.com/v3/projects/fake-gcp-project/'
+                      'locations/fake-gcp-region:translateText'
+                  ),
+                  {
+                      'contents': [
+                          'Buy {0: now}',
+                          (
+                              'Data centers located in {0:denver}, {1: austin},'
+                              ' and {2: kansas city }'
+                          ),
+                          'Sign up now',
+                      ],
+                      'mimeType': 'text/plain',
+                      'parent': 'projects/fake-gcp-project',
+                      'source_language_code': 'en',
+                      'target_language_code': 'available_language',
+                  },
+                  {
+                      'Authorization': 'Bearer fake_access_token',
+                      'Content-Type': 'application/json',
+                  },
+              ),
+              mock.call(
+                  (
+                      'https://translate.googleapis.com/v3/projects/fake-gcp-project/'
+                      'locations/fake-gcp-region:translateText'
+                  ),
+                  {
+                      'contents': ['Get {KeyWord: now}'],
+                      'mimeType': 'text/plain',
+                      'parent': 'projects/fake-gcp-project',
+                      'source_language_code': 'en',
+                      'target_language_code': 'available_language',
+                  },
+                  {
+                      'Authorization': 'Bearer fake_access_token',
+                      'Content-Type': 'application/json',
+                  },
+              ),
+          ],
+      },
+      {
+          'testcase_name': 'with_glossary',
+          'mock_glossary_id': 'en-to-available_language-glossary',
+          'expected_api_calls': [
+              mock.call(
+                  (
+                      'https://translate.googleapis.com/v3/projects/fake-gcp-project/'
+                      'locations/fake-gcp-region:translateText'
+                  ),
+                  {
+                      'contents': [
+                          'Buy {0: now}',
+                          (
+                              'Data centers located in {0:denver}, {1: austin},'
+                              ' and {2: kansas city }'
+                          ),
+                          'Sign up now',
+                      ],
+                      'mimeType': 'text/plain',
+                      'parent': 'projects/fake-gcp-project',
+                      'source_language_code': 'en',
+                      'target_language_code': 'available_language',
+                      'glossaryConfig': {
+                          'glossary': 'projects/fake-gcp-project/locations/fake-gcp-region/glossaries/en-to-available_language-glossary',
+                          'ignore_case': False,
+                      },
+                  },
+                  {
+                      'Authorization': 'Bearer fake_access_token',
+                      'Content-Type': 'application/json',
+                  },
+              ),
+              mock.call(
+                  (
+                      'https://translate.googleapis.com/v3/projects/fake-gcp-project/'
+                      'locations/fake-gcp-region:translateText'
+                  ),
+                  {
+                      'contents': ['Get {KeyWord: now}'],
+                      'mimeType': 'text/plain',
+                      'parent': 'projects/fake-gcp-project',
+                      'source_language_code': 'en',
+                      'target_language_code': 'available_language',
+                      'glossaryConfig': {
+                          'glossary': 'projects/fake-gcp-project/locations/fake-gcp-region/glossaries/en-to-available_language-glossary',
+                          'ignore_case': False,
+                      },
+                  },
+                  {
+                      'Authorization': 'Bearer fake_access_token',
+                      'Content-Type': 'application/json',
+                  },
+              ),
+          ],
+      },
+  )
+  def test_translate_keyword_insertion(
+      self,
+      mock_glossary_id,
+      expected_api_calls,
+  ):
+    source_language = 'en'
+    target_language = 'available_language'
+
+    translation_frame = translation_frame_lib.TranslationFrame({
+        'Buy {0: now}': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(0, 'Headline 1'), (2, 'Keyword')],
+            char_limit=30,
+        ),
+        (
+            'Data centers located in {0:denver}, {1: austin}, and {2: kansas'
+            ' city }'
+        ): translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(1, 'Description 1')], char_limit=90
+        ),
+        'Sign up now': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(2, 'Headline 1')],
+            char_limit=30,
+        ),
+        'Get {KeyWord: now}': translation_metadata.TranslationMetadata(
+            dataframe_rows_and_cols=[(3, 'Keyword')], char_limit=90
+        ),
+    })
+
+    expected_translated_df = pd.DataFrame({
+        'source_term': [
+            'Buy {0: now}',
+            (
+                'Data centers located in {0:denver}, {1: austin}, and {2:'
+                ' kansas city }'
+            ),
+            'Sign up now',
+            'Get {KeyWord: now}',
+        ],
+        'target_terms': [
+            {'available_language': 'Comprar {0: ahora}'},
+            {
+                'available_language': (
+                    'Centros de datos ubicados en {0:denver}, {1: austin} y {2:'
+                    ' kansas city}'
+                )
+            },
+            {'available_language': 'Regístrese Ahora'},
+            {'available_language': 'Obtenga {Palabra clave: ahora}'},
+        ],
+        'dataframe_locations': [
+            [(0, 'Headline 1'), (2, 'Keyword')],
+            [(1, 'Description 1')],
+            [(2, 'Headline 1')],
+            [(3, 'Keyword')],
+        ],
+        'char_limit': [30, 90, 30, 90],
+    })
+
+    self.mock_send_api_request.side_effect = [
+        {
+            'translations': [
+                {'translatedText': 'Comprar {0: ahora}'},
+                {
+                    'translatedText': (
+                        'Centros de datos ubicados en {0:denver}, {1: austin} y'
+                        ' {2: kansas city}'
+                    )
+                },
+                {'translatedText': 'Regístrese Ahora'},
+            ],
+            'glossaryTranslations': [
+                {'translatedText': 'Comprar {0: ahora}'},
+                {
+                    'translatedText': (
+                        'Centros de datos ubicados en {0:denver}, {1: austin} y'
+                        ' {2: kansas city}'
+                    )
+                },
+                {'translatedText': 'Regístrese Ahora'},
+            ],
+        },
+        {
+            'translations': [
+                {'translatedText': 'Obtenga {Palabra clave: ahora}'}
+            ],
+            'glossaryTranslations': [
+                {'translatedText': 'Obtenga {Palabra clave: ahora}'}
+            ],
+        },
+    ]
+
+    with mock.patch.object(
+        vertex_client,
+        'AVAILABLE_LANGUAGES',
+        new=frozenset(['available_language']),
+    ):
+      self.cloud_translation_client._batch_char_limit = 93
+      self.cloud_translation_client.translate(
+          translation_frame=translation_frame,
+          source_language_code=source_language,
+          target_language_code=target_language,
+          glossary_id=mock_glossary_id,
+      )
+
+    actual_translated_df = translation_frame.df()
+
+    # Asserts expected translations added to translation frame
+    pd.testing.assert_frame_equal(
+        expected_translated_df, actual_translated_df, check_index_type=False)
+
+    # Asserts mock calls (covering batching logic)
+    self.mock_send_api_request.assert_has_calls(
+        expected_api_calls, any_order=True
+    )
+
   def test_translate_exits_early_on_api_error(self):
     source_language = 'en'
     target_language = 'available_language'
@@ -320,21 +539,28 @@ class CloudTranslationClientTest(parameterized.TestCase):
     mock_vertex_client = mock.create_autospec(vertex_client.VertexClient)
     mock_vertex_client.shorten_text_to_char_limit.side_effect = [
         ['shortened1'],
-        ['shortened2', 'shortened3'],
+        ['shortened2'],
     ]
 
     translation_frame = translation_frame_lib.TranslationFrame({
         'term_to_overflow_1': translation_metadata.TranslationMetadata(
-            dataframe_rows_and_cols=[(0, 'Keyword'), (2, 'Keyword')],
-            char_limit=10),
+            dataframe_rows_and_cols=[(0, 'Headline 1'), (2, 'Keyword')],
+            char_limit=10,
+        ),
         'term_that_fits_1': translation_metadata.TranslationMetadata(
-            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=90),
+            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=90
+        ),
         'term_to_overflow_2': translation_metadata.TranslationMetadata(
-            dataframe_rows_and_cols=[(3, 'Keyword')], char_limit=15),
+            dataframe_rows_and_cols=[(3, 'Headline 1')], char_limit=15
+        ),
         'term_that_fits_2': translation_metadata.TranslationMetadata(
-            dataframe_rows_and_cols=[(4, 'Keyword')], char_limit=90),
-        'term_to_overflow_3': translation_metadata.TranslationMetadata(
-            dataframe_rows_and_cols=[(5, 'Keyword')], char_limit=15),
+            dataframe_rows_and_cols=[(4, 'Keyword')], char_limit=90
+        ),
+        'term_to_overflow_{0:3}': (
+            translation_metadata.TranslationMetadata(
+                dataframe_rows_and_cols=[(5, 'Headline 1')], char_limit=15
+            )
+        ),
     })
 
     expected_translated_df = pd.DataFrame({
@@ -343,21 +569,21 @@ class CloudTranslationClientTest(parameterized.TestCase):
             'term_that_fits_1',
             'term_to_overflow_2',
             'term_that_fits_2',
-            'term_to_overflow_3',
+            'term_to_overflow_{0:3}',
         ],
         'target_terms': [
             {'available_language': 'shortened1'},
             {'available_language': 'untruncated_translation_1'},
             {'available_language': 'shortened2'},
             {'available_language': 'untruncated_translation_2'},
-            {'available_language': 'shortened3'},
+            {'available_language': 'untruncated_translation_{0:3}'},
         ],
         'dataframe_locations': [
-            [(0, 'Keyword'), (2, 'Keyword')],
+            [(0, 'Headline 1'), (2, 'Keyword')],
             [(1, 'Keyword')],
-            [(3, 'Keyword')],
+            [(3, 'Headline 1')],
             [(4, 'Keyword')],
-            [(5, 'Keyword')],
+            [(5, 'Headline 1')],
         ],
         'char_limit': [10, 90, 15, 90, 15],
     })
@@ -368,7 +594,7 @@ class CloudTranslationClientTest(parameterized.TestCase):
             {'translatedText': 'untruncated_translation_1'},
             {'translatedText': 'some long overflowing translation 2'},
             {'translatedText': 'untruncated_translation_2'},
-            {'translatedText': 'some long overflowing translation 3'}]},]
+            {'translatedText': 'untruncated_translation_{0:3}'}]},]
 
     with mock.patch.object(
         vertex_client,
@@ -392,7 +618,7 @@ class CloudTranslationClientTest(parameterized.TestCase):
     )
     # Asserts the number of characters sent to the Cloud Translation API.
     self.assertEqual(
-        self.cloud_translation_client.get_translated_characters(), 86
+        self.cloud_translation_client.get_translated_characters(), 90
     )
 
   @parameterized.named_parameters(

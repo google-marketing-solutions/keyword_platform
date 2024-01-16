@@ -54,6 +54,11 @@ _GOOGLE_ADS_RESPONSE = [
               'assetPerformanceLabel': 'PENDING',
               'policySummaryInfo':
               {'reviewStatus': 'REVIEWED',
+               'approvalStatus': 'APPROVED'}},
+             {'text': 'Sign up for {KeyWord:google ads}',
+              'assetPerformanceLabel': 'PENDING',
+              'policySummaryInfo':
+              {'reviewStatus': 'REVIEWED',
                'approvalStatus': 'APPROVED'}}],
             'descriptions':
             [{'text': 'Email thats intuitive, efficient, and useful',
@@ -62,6 +67,11 @@ _GOOGLE_ADS_RESPONSE = [
               {'reviewStatus': 'REVIEWED',
                'approvalStatus': 'APPROVED'}},
              {'text': '15 GB of storage, less spam, and mobile access',
+              'assetPerformanceLabel': 'PENDING',
+              'policySummaryInfo':
+              {'reviewStatus': 'REVIEWED',
+               'approvalStatus': 'APPROVED'}},
+             {'text': 'Open {Keyword:today} and {keyword: tomorrow}',
               'assetPerformanceLabel': 'PENDING',
               'policySummaryInfo':
               {'reviewStatus': 'REVIEWED',
@@ -97,6 +107,11 @@ _GOOGLE_ADS_RESPONSE = [
               'assetPerformanceLabel': 'PENDING',
               'policySummaryInfo':
               {'reviewStatus': 'REVIEWED',
+               'approvalStatus': 'APPROVED'}},
+             {'text': 'Powered by {KEYWord:"ai"}',
+              'assetPerformanceLabel': 'PENDING',
+              'policySummaryInfo':
+              {'reviewStatus': 'REVIEWED',
                'approvalStatus': 'APPROVED'}}],
             'descriptions':
             [{'text': 'Google Analytics',
@@ -105,6 +120,11 @@ _GOOGLE_ADS_RESPONSE = [
               {'reviewStatus': 'REVIEWED',
                'approvalStatus': 'APPROVED'}},
              {'text': 'Try Analytics today!',
+              'assetPerformanceLabel': 'PENDING',
+              'policySummaryInfo':
+              {'reviewStatus': 'REVIEWED',
+               'approvalStatus': 'APPROVED'}},
+             {'text': 'Try Analytics {Keyword:today}',
               'assetPerformanceLabel': 'PENDING',
               'policySummaryInfo':
               {'reviewStatus': 'REVIEWED',
@@ -139,8 +159,14 @@ _EXPECTED_DF = pd.DataFrame(
         'Original Headline 2': ['Online Email', 'Official Site'],
         'Headline 3': ['Sign in', 'High Quality Products'],
         'Original Headline 3': ['Sign in', 'High Quality Products'],
-        'Headline 4': ['', ''],
-        'Original Headline 4': ['', ''],
+        'Headline 4': [
+            'Sign up for {KeyWord:google ads}',
+            'Powered by {KEYWord:"ai"}',
+        ],
+        'Original Headline 4': [
+            'Sign up for {KeyWord:google ads}',
+            'Powered by {KEYWord:"ai"}',
+        ],
         'Headline 5': ['', ''],
         'Original Headline 5': ['', ''],
         'Headline 6': ['', ''],
@@ -179,8 +205,14 @@ _EXPECTED_DF = pd.DataFrame(
             '15 GB of storage, less spam, and mobile access',
             'Try Analytics today!',
         ],
-        'Description 3': ['', ''],
-        'Original Description 3': ['', ''],
+        'Description 3': [
+            'Open {Keyword:today} and {keyword: tomorrow}',
+            'Try Analytics {Keyword:today}',
+        ],
+        'Original Description 3': [
+            'Open {Keyword:today} and {keyword: tomorrow}',
+            'Try Analytics {Keyword:today}',
+        ],
         'Description 4': ['', ''],
         'Original Description 4': ['', ''],
         'Final URL': [
@@ -205,16 +237,21 @@ _EXPECTED_CSV_DATA = (
     ' 3,Description 4,Original Description 4,Final URL,Labels,Updates'
     ' applied\nAdd,Enter customer ID,Paused,Gmail Test Campaign,Ad group'
     ' 1,Responsive search ad,Email Login,Email Login,Online Email,Online'
-    ' Email,Sign in,Sign in,,,,,,,,,,,,,,,,,,,,,,,,,"Email thats intuitive,'
+    ' Email,Sign in,Sign in,Sign up for {KeyWord:google ads},Sign up for'
+    ' {KeyWord:google ads},,,,,,,,,,,,,,,,,,,,,,,"Email thats intuitive,'
     ' efficient, and useful","Email thats intuitive, efficient, and useful","15'
     ' GB of storage, less spam, and mobile access","15 GB of storage, less'
-    ' spam, and mobile access",,,,,https://mail.google.com/,Keyword'
-    ' Translator,[]\nAdd,Enter customer ID,Paused,Analytics Test Campaign,Ad'
-    ' group 1,Responsive search ad,Official Website,Official Website,Official'
-    ' Site,Official Site,High Quality Products,High Quality'
-    ' Products,,,,,,,,,,,,,,,,,,,,,,,,,Google Analytics,Google Analytics,Try'
-    ' Analytics today!,Try Analytics'
-    ' today!,,,,,http://analytics.google.com,Keyword Translator,[]\n'
+    ' spam, and mobile access",Open {Keyword:today} and {keyword:'
+    ' tomorrow},Open {Keyword:today} and {keyword:'
+    ' tomorrow},,,https://mail.google.com/,Keyword Translator,[]\nAdd,Enter'
+    ' customer ID,Paused,Analytics Test Campaign,Ad group 1,Responsive search'
+    ' ad,Official Website,Official Website,Official Site,Official Site,High'
+    ' Quality Products,High Quality Products,"Powered by'
+    ' {KEYWord:""ai""}","Powered by'
+    ' {KEYWord:""ai""}",,,,,,,,,,,,,,,,,,,,,,,Google Analytics,Google'
+    ' Analytics,Try Analytics today!,Try Analytics today!,Try Analytics'
+    ' {Keyword:today},Try Analytics'
+    ' {Keyword:today},,,http://analytics.google.com,Keyword Translator,[]\n'
 )
 
 _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame(
@@ -231,8 +268,14 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame(
         'Original Headline 2': ['Online Email', 'Official Site'],
         'Headline 3': ['Sign in', 'High Quality Products'],
         'Original Headline 3': ['Sign in', 'High Quality Products'],
-        'Headline 4': ['', ''],
-        'Original Headline 4': ['', ''],
+        'Headline 4': [
+            'Sign up for {KeyWord:google ads}',
+            'Powered by {KEYWord:"ai"}',
+        ],
+        'Original Headline 4': [
+            'Sign up for {KeyWord:google ads}',
+            'Powered by {KEYWord:"ai"}',
+        ],
         'Headline 5': ['', ''],
         'Original Headline 5': ['', ''],
         'Headline 6': ['', ''],
@@ -271,8 +314,14 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame(
             '15 GB of storage, less spam, and mobile access',
             'Try Analytics today!',
         ],
-        'Description 3': ['', ''],
-        'Original Description 3': ['', ''],
+        'Description 3': [
+            'Open {Keyword:today} and {keyword: tomorrow}',
+            'Try Analytics {Keyword:today}',
+        ],
+        'Original Description 3': [
+            'Open {Keyword:today} and {keyword: tomorrow}',
+            'Try Analytics {Keyword:today}',
+        ],
         'Description 4': ['', ''],
         'Original Description 4': ['', ''],
         'Final URL': [
@@ -301,8 +350,14 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame(
         'Original Headline 2': ['Online Email', 'Official Site'],
         'Headline 3': ['Sign in', 'High Quality Products'],
         'Original Headline 3': ['Sign in', 'High Quality Products'],
-        'Headline 4': ['', ''],
-        'Original Headline 4': ['', ''],
+        'Headline 4': [
+            'Sign up for {KeyWord:google ads}',
+            'Powered by {KEYWord:"ai"}',
+        ],
+        'Original Headline 4': [
+            'Sign up for {KeyWord:google ads}',
+            'Powered by {KEYWord:"ai"}',
+        ],
         'Headline 5': ['', ''],
         'Original Headline 5': ['', ''],
         'Headline 6': ['', ''],
@@ -341,8 +396,14 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame(
             '15 GB of storage, less spam, and mobile access',
             'Try Analytics today!',
         ],
-        'Description 3': ['', ''],
-        'Original Description 3': ['', ''],
+        'Description 3': [
+            'Open {Keyword:today} and {keyword: tomorrow}',
+            'Try Analytics {Keyword:today}',
+        ],
+        'Original Description 3': [
+            'Open {Keyword:today} and {keyword: tomorrow}',
+            'Try Analytics {Keyword:today}',
+        ],
         'Description 4': ['', ''],
         'Original Description 4': ['', ''],
         'Final URL': [
@@ -433,8 +494,14 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame(
         'Original Headline 2': ['Online Email', 'Official Site'],
         'Headline 3': ['anmelden', 'Produkte mit hoher Qualität'],
         'Original Headline 3': ['Sign in', 'High Quality Products'],
-        'Headline 4': ['', ''],
-        'Original Headline 4': ['', ''],
+        'Headline 4': [
+            'Melden Sie sich für {KeyWord:google ads} an',
+            'Unterstützt von {KEYWord:"ai"}',
+        ],
+        'Original Headline 4': [
+            'Sign up for {KeyWord:google ads}',
+            'Powered by {KEYWord:"ai"}',
+        ],
         'Headline 5': ['', ''],
         'Original Headline 5': ['', ''],
         'Headline 6': ['', ''],
@@ -473,8 +540,14 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame(
             '15 GB of storage, less spam, and mobile access',
             'Try Analytics today!',
         ],
-        'Description 3': ['', ''],
-        'Original Description 3': ['', ''],
+        'Description 3': [
+            'Öffnen Sie {Keyword:heute} und {keyword:morgen}',
+            'Probieren Sie Analytics {Keyword:heute} aus',
+        ],
+        'Original Description 3': [
+            'Open {Keyword:today} and {keyword: tomorrow}',
+            'Try Analytics {Keyword:today}',
+        ],
         'Description 4': ['', ''],
         'Original Description 4': ['', ''],
         'Final URL': [
@@ -503,8 +576,14 @@ _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame(
         'Original Headline 2': ['Online Email', 'Official Site'],
         'Headline 3': ['anmelden', 'Produkte mit hoher Qualität'],
         'Original Headline 3': ['Sign in', 'High Quality Products'],
-        'Headline 4': ['', ''],
-        'Original Headline 4': ['', ''],
+        'Headline 4': [
+            'Melden Sie sich für {KeyWord:google ads} an',
+            'Unterstützt von {KEYWord:"ai"}',
+        ],
+        'Original Headline 4': [
+            'Sign up for {KeyWord:google ads}',
+            'Powered by {KEYWord:"ai"}',
+        ],
         'Headline 5': ['', ''],
         'Original Headline 5': ['', ''],
         'Headline 6': ['', ''],
@@ -543,8 +622,14 @@ _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame(
             '15 GB of storage, less spam, and mobile access',
             'Try Analytics today!',
         ],
-        'Description 3': ['', ''],
-        'Original Description 3': ['', ''],
+        'Description 3': [
+            'Öffnen Sie {Keyword:heute} und {keyword:morgen}',
+            'Probieren Sie Analytics {Keyword:heute} aus',
+        ],
+        'Original Description 3': [
+            'Open {Keyword:today} and {keyword: tomorrow}',
+            'Try Analytics {Keyword:today}',
+        ],
         'Description 4': ['', ''],
         'Original Description 4': ['', ''],
         'Final URL': [
@@ -686,52 +771,83 @@ class AdsTest(parameterized.TestCase):
     actual_df = ads.df()
 
     pd.testing.assert_frame_equal(
-        actual_df, expected_df, check_index_type=False)
+        actual_df, expected_df, check_index_type=False
+    )
 
   def test_get_translation_frame(self):
-    expected_df = pd.DataFrame(
-        {
-            'source_term': ['Email Login',
-                            'Online Email',
-                            'Sign in',
-                            'Email thats intuitive, efficient, and useful',
-                            '15 GB of storage, less spam, and mobile access',
-                            'Official Website',
-                            'Official Site',
-                            'High Quality Products',
-                            'Google Analytics',
-                            'Try Analytics today!'],
-            'target_terms': [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
-            'dataframe_locations': [
-                [(0, 'Headline 1')],
-                [(0, 'Headline 2')],
-                [(0, 'Headline 3')],
-                [(0, 'Description 1')],
-                [(0, 'Description 2')],
-                [(1, 'Headline 1')],
-                [(1, 'Headline 2')],
-                [(1, 'Headline 3')],
-                [(1, 'Description 1')],
-                [(1, 'Description 2')]],
-            'char_limit': [
-                30,
-                30,
-                30,
-                90,
-                90,
-                30,
-                30,
-                30,
-                90,
-                90,
-            ],
-            })
+    expected_df = pd.DataFrame({
+        'source_term': [
+            'Email Login',
+            'Online Email',
+            'Sign in',
+            'Sign up for {0:google ads}',
+            'Email thats intuitive, efficient, and useful',
+            '15 GB of storage, less spam, and mobile access',
+            'Open {0:today} and {1: tomorrow}',
+            'Official Website',
+            'Official Site',
+            'High Quality Products',
+            'Powered by {0:"ai"}',
+            'Google Analytics',
+            'Try Analytics today!',
+            'Try Analytics {0:today}',
+        ],
+        'target_terms': [
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+        ],
+        'dataframe_locations': [
+            [(0, 'Headline 1')],
+            [(0, 'Headline 2')],
+            [(0, 'Headline 3')],
+            [(0, 'Headline 4')],
+            [(0, 'Description 1')],
+            [(0, 'Description 2')],
+            [(0, 'Description 3')],
+            [(1, 'Headline 1')],
+            [(1, 'Headline 2')],
+            [(1, 'Headline 3')],
+            [(1, 'Headline 4')],
+            [(1, 'Description 1')],
+            [(1, 'Description 2')],
+            [(1, 'Description 3')],
+        ],
+        'char_limit': [
+            30,
+            30,
+            30,
+            30,
+            90,
+            90,
+            90,
+            30,
+            30,
+            30,
+            30,
+            90,
+            90,
+            90,
+        ],
+    })
 
     ads = ads_lib.Ads(_GOOGLE_ADS_RESPONSE)
     actual_df = ads.get_translation_frame().df()
 
     pd.testing.assert_frame_equal(
-        actual_df, expected_df, check_index_type=False)
+        actual_df, expected_df, check_index_type=False
+    )
 
   @parameterized.named_parameters(
       {
@@ -757,13 +873,17 @@ class AdsTest(parameterized.TestCase):
             'E-Mail-Login',
             'Online-E-Mail',
             'anmelden',
+            'Melden Sie sich für {0:google ads} an',
             'E-Mail, die intuitiv, effizient und nützlich ist',
             '15 GB Speicherplatz, weniger Spam und mobiler Zugriff',
+            'Öffnen Sie {0:heute} und {1:morgen}',
             'Offizielle Website',
             'Offizielle Seite',
             'Produkte mit hoher Qualität',
+            'Unterstützt von {0:"ai"}',
             'Google Analytics',
             'Probieren Sie Analytics noch heute aus!',
+            'Probieren Sie Analytics {0:heute} aus',
             ])
 
     ads.apply_translations(
@@ -778,7 +898,7 @@ class AdsTest(parameterized.TestCase):
   def test_char_count(self):
     ads = ads_lib.Ads(_GOOGLE_ADS_RESPONSE)
 
-    expected_char_count = 183
+    expected_char_count = 301
 
     actual_char_count = ads.char_count()
 

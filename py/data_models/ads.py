@@ -18,9 +18,10 @@ See class docstring for more details.
 """
 
 import collections
+import re
 import sys
 import time
-from typing import Any
+from typing import Any, cast
 
 from absl import logging
 import pandas as pd
@@ -140,6 +141,11 @@ _NUM_DESCRIPTIONS = 4
 _HEADLINE_CHAR_LIMIT = 30
 _DESCRIPTION_CHAR_LIMIT = 90
 
+# See https://support.google.com/google-ads/answer/6371157
+_KEYWORD_INSERTION_TAG_REGEX = re.compile(
+    r'{(keyword|Keyword|KeyWord|KEYWord|KeyWORD):.+?}'
+)
+
 
 class Ads:
   """A class to represent data for a customer's Google Ads Ad Groups.
@@ -190,6 +196,9 @@ class Ads:
         ad_group_ad.ad.final_urls
     """
     self._df = self._build_ads_df(response_jsons=response_jsons)
+    # List of dicts that contain keyword insertion tag keys that correspond to
+    # source terms.
+    self._source_term_keyword_insertion_keys = []
     logging.info('Initialized Ads DataFrame with length %d.', self.size())
 
   def _build_ads_df(self, response_jsons: list[Any]) -> pd.DataFrame:
@@ -332,6 +341,9 @@ class Ads:
         if not headline.strip():
           continue
 
+        headline, keys = self._modify_keyword_insertion_tag(headline)
+        self._source_term_keyword_insertion_keys.append(keys)
+
         terms_with_metadata[headline].dataframe_rows_and_cols.append(
             (index, headline_field))
         terms_with_metadata[headline].char_limit = _HEADLINE_CHAR_LIMIT
@@ -345,6 +357,9 @@ class Ads:
 
         if not description.strip():
           continue
+
+        description, keys = self._modify_keyword_insertion_tag(description)
+        self._source_term_keyword_insertion_keys.append(keys)
 
         terms_with_metadata[description].dataframe_rows_and_cols.append(
             (index, description_field))
@@ -369,10 +384,12 @@ class Ads:
       update_ad_group_and_campaign_names: (Optional) Add the target language as
         a suffix to the ad group and campaign names.
     """
-    for _, row in translation_frame.df().iterrows():
+    for index, row in translation_frame.df().iterrows():
       target_row_and_columns = row[translation_frame_lib.DATAFRAME_LOCATIONS]
-      target_term = row[translation_frame_lib.TARGET_TERMS].get(
-          target_language, '')
+      target_term = self._revert_keyword_insertion_tag(
+          row[translation_frame_lib.TARGET_TERMS].get(target_language, ''),
+          self._source_term_keyword_insertion_keys[cast(int, index)],
+      )
 
       for target_row, target_column in target_row_and_columns:
         self._df.loc[target_row, target_column] = target_term
@@ -410,3 +427,76 @@ class Ads:
         count += len(txt.replace(' ', ''))
 
     return count
+
+  def _modify_keyword_insertion_tag(
+      self, source_term: str
+  ) -> tuple[str, dict[str, str]]:
+    """Changes the keyword insertion tag of a source term.
+
+    Modifes the key of the keyword insertion tag in a source term by replacing
+    it with an alpha numeric character that keeps track of the tags position.
+    For example, a term that reads "Buy {Keyword:now}" would be changed to read
+    "Buy {0:now}" whereas a term that reads "Data centers located in
+    {Keyword:denver} and {KeyWord:kansas city}" would read "Data centers located
+    in {0:denver} and {1:kansas city}", and so on. The character is then defined
+    as a key where it's value is the original key that got replaced in order to
+    store it in a dict for the purposes of reverting the tag to its original
+    state when invoking the _revert_keyword_insertion_tag function on the
+    translated version (target term) of the term.
+
+    Args:
+      source_term: The source term.
+
+    Returns:
+      Tuple of modified source term and a dict of the source term keyword
+      insertion tag keys. For example:
+
+      ('Open {0:today} and {1: tomorrow}', {'0': 'keyword', '1': 'keyword'})
+    """
+    term = source_term
+    keys = {}
+    # The loop does not iterate when there's no match thus returning the
+    # originally assigned term.
+    for index, match in enumerate(_KEYWORD_INSERTION_TAG_REGEX.finditer(term)):
+      key = str(index)
+      # Exact match tuple of keyword key. E.g, ('Keyword',).
+      group = match.groups()[0]
+      # Replace keyword key with an alpha numeric integer.
+      term = re.sub(group, key, term)
+      # Store keyword insertion tag key in a dict as their key cases could vary
+      # if there's more than a single tag. E.g. Keyword or KeyWord, etc.
+      keys[key] = group
+    return term, keys
+
+  def _revert_keyword_insertion_tag(
+      self, target_term: str, source_term_keys: dict[str, str]
+  ) -> str:
+    """Reverts the keyword insertion tag of a target term.
+
+    Reverts the keyword insertion tag of a target term by replacing its alpha
+    numeric characters with the values of the corresponing keys in the inputted
+    dict. For example, a term that reads "Comprar {0:ahora}" would be changed
+    to "Comprar {Keyword:ahora}" whereas a term tha reads "Centros de datos
+    ubicados en {0:denver} y {2:kansas city}" would read "Centros de datos
+    ubicados en {Keyword:denver} y {KeyWord:kansas city}", and so on due to the
+    shape of the dict. E.g. {0:Keyword, 1:KeyWord}.
+
+    Args:
+      target_term: The target term.
+      source_term_keys: Dict of the source term keyword insertion tag keys.
+
+    Returns:
+      The target_term with the reverted keyword insertion tag.
+    """
+    term = target_term
+    # Note that if a dict is empty then the term will not be changed as an empty
+    # dict identifies that the term has no keyword insertion tag.
+    for key in source_term_keys:
+      # Replace alpha numeric character with a keyword key. E.g. 0 to Keyword.
+      # TODO(): Confirm if replacing the sequential integer key with
+      # a sort function is needed if the position of the numeric keyed tags
+      # change due to the translation.
+      term = re.sub(
+          r'{' + key + ':', '{' + source_term_keys[key] + ':', term
+      )
+    return term
