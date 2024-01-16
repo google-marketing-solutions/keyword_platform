@@ -230,6 +230,98 @@ e.g. `en-to-de-brandterms.csv`
     Terraform only supports internal OAuth Consent Screens. Before installing
     Keyword Platform, ensure that your OAuth Consent Screen is set to `internal`.
 
+1. **Installation failed, what are my options?**
+
+    The installation script `setup/install.sh` accomplishes the following set of
+    tasks:
+    1.      Ensure that certain APIs are enabled.
+    1.      Create a terraform state bucket
+    1.      Build the frontend and backend images from Dockerfiles.
+    1.      Execute the oAuth2.0 flow to gain a refresh token.
+    1.      Runs terraform with a set of variables collected from user input.
+
+    If any of the steps between 1 and 3 fail, the most common reason is that
+    your user doesn't have the required permissions - ensure you have `Project
+    Owner` permissions. For troubleshooting Step 4, see some of the FAQs above.
+    If there are errors in Step 5, you do not need to run the entire
+    installation script again, which can take time, because it will build to
+    front- and backend images from Dockerfiles which can take some time. Instead
+    you can run the terraform commands manually as follows:
+
+    1.  Ensure you have cloned the repository and navigated to the 
+        `keyword-platform` directory: `cd keyword-platform`.
+
+    2.  Run the following command replacing the variable values, this sets
+        a range of environment variables which will make it easier to run
+        commands in subsequent steps:
+
+        ```shell
+        backend_image=gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform-backend && \
+        frontend_image=gcr.io/${GOOGLE_CLOUD_PROJECT}/keywordplatform-frontend && \
+        terraform_state_bucket_name=${GOOGLE_CLOUD_PROJECT}-bucket-tfstate && \
+        OPT_OUT=false &&
+        BUCKET_NAME=<enter-bucket-name> && \
+        CLIENT_ID=<your-client-id> && \
+        CLIENT_SECRET=<your-client-secret> && \
+        DEVELOPER_TOKEN=<your-developer-token> && \
+        LOGIN_CUSTOMER_ID=<your-login-customer-id> && \
+        IAP_ALLOWED_USERS=<your-email> && \
+        IAP_SUPPORT_EMAIL=<your-email> && \
+        iap_brand_id=$(gcloud iap oauth-brands list --format="value(name)" | sed "s:.*/::") && \
+        support_email=$(gcloud iap oauth-brands list --format="value(supportEmail)") && \
+        allowed_users_tf_list=$(echo "$IAP_ALLOWED_USERS" | sed 's/\([^,]\+\)/"user:\1"/g' | sed 's/,/, /g' | sed 's/.*/[&]/') && \
+        refresh_token=<your-refresh-token> && \
+        GOOGLE_CLOUD_REGION=us-central1
+        ```
+        If you don't have access to a refresh token, you can create one manually
+        by following instruction under *"Why are there no accounts in the account
+        dropdown?"* above.
+
+    3.  If you previously ran the installation script and the front- and backend
+        images were built successfully, you can skip this step.
+
+        Build the frontend- and backend images.
+
+        ```shell
+        gcloud builds submit ./py \ --tag $backend_image
+        gcloud builds submit ./ui \--tag $frontend_image
+        ```
+
+    4.  Initialize terraform
+
+        ```shell
+        terraform -chdir=./terraform init \
+            -backend-config="bucket=$terraform_state_bucket_name" \
+            -get=true \
+            -upgrade \
+            -reconfigure
+        ```
+    5.  Create a terraform plan:
+
+        ```shell
+        terraform -chdir=./terraform plan \
+            -var "bucket_name=$BUCKET_NAME" \
+            -var "frontend_image=$frontend_image" \
+            -var "backend_image=$backend_image" \
+            -var "client_id=$CLIENT_ID" \
+            -var "opt_out=$OPT_OUT" \
+            -var "client_secret=$CLIENT_SECRET" \
+            -var "developer_token=$DEVELOPER_TOKEN" \
+            -var "login_customer_id=$LOGIN_CUSTOMER_ID" \
+            -var "refresh_token=$refresh_token" \
+            -var "project_id=$GOOGLE_CLOUD_PROJECT" \
+            -var "region=$GOOGLE_CLOUD_REGION" \
+            -var "iap_allowed_users=$allowed_users_tf_list" \
+            -var "iap_support_email=$support_email" \
+            -var "iap_brand_id=$iap_brand_id" \
+            -out="/tmp/tfplan"
+        ```
+    6.  Check the plan! If everything looks good execute the plan:
+
+        ```shell
+        terraform -chdir=./terraform apply "/tmp/tfplan"
+        ```
+
 
 ## Privacy Notice
 

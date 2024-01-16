@@ -1,10 +1,10 @@
-# Copyright 2023 Google LLC.
+# Copyright 2024 Google LLC.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -76,6 +76,29 @@ _KEYWORDS_GOOGLE_ADS_API_RESPONSE = [[{
                 'resourceName': 'customers/123/keywordViews/789~1314'
             },
         },
+        {
+            'customer': {'resourceName': 'customers/123', 'id': '123'},
+            'campaign': {
+                'resourceName': 'customers/123/campaigns/012',
+                'advertisingChannelType': 'SEARCH',
+                'biddingStrategyType': 'TARGET_SPEND',
+                'name': 'Gmail Test Campaign',
+            },
+            'adGroup': {
+                'resourceName': 'customers/123/adGroups/789',
+                'name': 'Ad group 1',
+            },
+            'adGroupCriterion': {
+                'resourceName': 'customers/123/adGroupCriteria/789~1516',
+                'keyword': {
+                    'matchType': 'BROAD',
+                    'text': 'Open {Keyword:today} and {keyword: tomorrow}',
+                },
+            },
+            'keywordView': {
+                'resourceName': 'customers/123/keywordViews/789~1516'
+            },
+        },
     ],
     'fieldMask': 'fake_field_mask',
     'requestId': 'fake_req_id',
@@ -122,6 +145,14 @@ _ADS_DATA_GOOGLE_ADS_API_RESPONSE = [[{
                                     'approvalStatus': 'APPROVED',
                                 },
                             },
+                            {
+                                'text': 'Sign up for {KeyWord:google ads}',
+                                'assetPerformanceLabel': 'PENDING',
+                                'policySummaryInfo': {
+                                    'reviewStatus': 'REVIEWED',
+                                    'approvalStatus': 'APPROVED',
+                                },
+                            },
                         ],
                         'descriptions': [
                             {
@@ -139,6 +170,17 @@ _ADS_DATA_GOOGLE_ADS_API_RESPONSE = [[{
                                 'text': (
                                     '15 GB of storage, less spam, and mobile'
                                     ' access'
+                                ),
+                                'assetPerformanceLabel': 'PENDING',
+                                'policySummaryInfo': {
+                                    'reviewStatus': 'REVIEWED',
+                                    'approvalStatus': 'APPROVED',
+                                },
+                            },
+                            {
+                                'text': (
+                                    'Open {Keyword:today} and {keyword:'
+                                    ' tomorrow}'
                                 ),
                                 'assetPerformanceLabel': 'PENDING',
                                 'policySummaryInfo': {
@@ -192,6 +234,14 @@ _ADS_DATA_GOOGLE_ADS_API_RESPONSE = [[{
                                     'approvalStatus': 'APPROVED',
                                 },
                             },
+                            {
+                                'text': 'Powered by {KEYWord:"ai"}',
+                                'assetPerformanceLabel': 'PENDING',
+                                'policySummaryInfo': {
+                                    'reviewStatus': 'REVIEWED',
+                                    'approvalStatus': 'APPROVED',
+                                },
+                            },
                         ],
                         'descriptions': [
                             {
@@ -204,6 +254,14 @@ _ADS_DATA_GOOGLE_ADS_API_RESPONSE = [[{
                             },
                             {
                                 'text': 'Try Analytics today!',
+                                'assetPerformanceLabel': 'PENDING',
+                                'policySummaryInfo': {
+                                    'reviewStatus': 'REVIEWED',
+                                    'approvalStatus': 'APPROVED',
+                                },
+                            },
+                            {
+                                'text': 'Try Analytics {Keyword:today}',
                                 'assetPerformanceLabel': 'PENDING',
                                 'policySummaryInfo': {
                                     'reviewStatus': 'REVIEWED',
@@ -347,6 +405,14 @@ _AD_GROUPS_GOOGLE_ADS_RESPONSE = [
                                         'approvalStatus': 'APPROVED',
                                     },
                                 },
+                                {
+                                    'text': 'Sign up for {KeyWord:google ads}',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
                             ],
                             'descriptions': [
                                 {
@@ -364,6 +430,17 @@ _AD_GROUPS_GOOGLE_ADS_RESPONSE = [
                                     'text': (
                                         '15 GB of storage, less spam, and'
                                         ' mobile access'
+                                    ),
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                                {
+                                    'text': (
+                                        'Open {Keyword:today} and {keyword:'
+                                        ' tomorrow}'
                                     ),
                                     'assetPerformanceLabels': 'PENDING',
                                     'policySummaryInfo': {
@@ -417,6 +494,14 @@ _AD_GROUPS_GOOGLE_ADS_RESPONSE = [
                                         'approvalStatus': 'APPROVED',
                                     },
                                 },
+                                {
+                                    'text': 'Powered by {KEYWord:"ai"}',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
                             ],
                             'descriptions': [
                                 {
@@ -429,6 +514,14 @@ _AD_GROUPS_GOOGLE_ADS_RESPONSE = [
                                 },
                                 {
                                     'text': 'Try Analytics today!',
+                                    'assetPerformanceLabels': 'PENDING',
+                                    'policySummaryInfo': {
+                                        'reviewStatus': 'REVIEWED',
+                                        'approvalStatus': 'APPROVED',
+                                    },
+                                },
+                                {
+                                    'text': 'Try Analytics {Keyword:today}',
                                     'assetPerformanceLabels': 'PENDING',
                                     'policySummaryInfo': {
                                         'reviewStatus': 'REVIEWED',
@@ -913,16 +1006,36 @@ _EXPECTED_EXTENSIONS_DF_WHEN_TRANSLATION_SKIPPED = pd.DataFrame({
 
 _EXPECTED_KEYWORDS_DF = pd.DataFrame(
     {
-        'Action': ['Add', 'Add'],
-        'Customer ID': ['Enter customer ID', 'Enter customer ID'],
-        'Campaign': ['Gmail Test Campaign (es)', 'Gmail Test Campaign (es)'],
-        'Ad group': ['Ad group 1 (es)', 'Ad group 1 (es)'],
-        'Keyword': ['correo electrónico', 'rápido'],
-        'Original Keyword': ['e mail', 'fast'],
-        'Match Type': ['BROAD', 'BROAD'],
-        'Keyword status': ['Paused', 'Paused'],
-        'Labels': ['Keyword Translator', 'Keyword Translator'],
-        'Updates applied': [[], []],
+        'Action': ['Add', 'Add', 'Add'],
+        'Customer ID': [
+            'Enter customer ID',
+            'Enter customer ID',
+            'Enter customer ID',
+        ],
+        'Campaign': [
+            'Gmail Test Campaign (es)',
+            'Gmail Test Campaign (es)',
+            'Gmail Test Campaign (es)',
+        ],
+        'Ad group': ['Ad group 1 (es)', 'Ad group 1 (es)', 'Ad group 1 (es)'],
+        'Keyword': [
+            'correo electrónico',
+            'rápido',
+            'Abra {palabra clave:hoy} y {palabra clave: mañana}',
+        ],
+        'Original Keyword': [
+            'e mail',
+            'fast',
+            'Open {Keyword:today} and {keyword: tomorrow}',
+        ],
+        'Match Type': ['BROAD', 'BROAD', 'BROAD'],
+        'Keyword status': ['Paused', 'Paused', 'Paused'],
+        'Labels': [
+            'Keyword Translator',
+            'Keyword Translator',
+            'Keyword Translator',
+        ],
+        'Updates applied': [[], [], []],
     },
 )
 
@@ -946,8 +1059,14 @@ _EXPECTED_ADS_DF = pd.DataFrame(
         'Original Headline 2': ['Online Email', 'Official Site'],
         'Headline 3': ['Iniciar sesión', 'Productos de alta calidad'],
         'Original Headline 3': ['Sign in', 'High Quality Products'],
-        'Headline 4': ['', ''],
-        'Original Headline 4': ['', ''],
+        'Headline 4': [
+            'Regístrate en {KeyWord:google ads}',
+            'Desarrollado por {KEYWord:"ai"}',
+        ],
+        'Original Headline 4': [
+            'Sign up for {KeyWord:google ads}',
+            'Powered by {KEYWord:"ai"}',
+        ],
         'Headline 5': ['', ''],
         'Original Headline 5': ['', ''],
         'Headline 6': ['', ''],
@@ -986,8 +1105,14 @@ _EXPECTED_ADS_DF = pd.DataFrame(
             '15 GB of storage, less spam, and mobile access',
             'Try Analytics today!',
         ],
-        'Description 3': ['', ''],
-        'Original Description 3': ['', ''],
+        'Description 3': [
+            'Abra {Keyword:hoy} y {keyword: mañana}',
+            'Pruebe Analytics {Keyword:hoy}',
+        ],
+        'Original Description 3': [
+            'Open {Keyword:today} and {keyword: tomorrow}',
+            'Try Analytics {Keyword:today}',
+        ],
         'Description 4': ['', ''],
         'Original Description 4': ['', ''],
         'Final URL': [
@@ -1016,8 +1141,14 @@ _EXPECTED_ADS_DF_WHEN_TRANSLATION_SKIPPED = pd.DataFrame(
         'Original Headline 2': ['Online Email', 'Official Site'],
         'Headline 3': ['Sign in', 'High Quality Products'],
         'Original Headline 3': ['Sign in', 'High Quality Products'],
-        'Headline 4': ['', ''],
-        'Original Headline 4': ['', ''],
+        'Headline 4': [
+            'Sign up for {KeyWord:google ads}',
+            'Powered by {KEYWord:"ai"}',
+        ],
+        'Original Headline 4': [
+            'Sign up for {KeyWord:google ads}',
+            'Powered by {KEYWord:"ai"}',
+        ],
         'Headline 5': ['', ''],
         'Original Headline 5': ['', ''],
         'Headline 6': ['', ''],
@@ -1056,8 +1187,14 @@ _EXPECTED_ADS_DF_WHEN_TRANSLATION_SKIPPED = pd.DataFrame(
             '15 GB of storage, less spam, and mobile access',
             'Try Analytics today!',
         ],
-        'Description 3': ['', ''],
-        'Original Description 3': ['', ''],
+        'Description 3': [
+            'Open {Keyword:today} and {keyword: tomorrow}',
+            'Try Analytics {Keyword:today}',
+        ],
+        'Original Description 3': [
+            'Open {Keyword:today} and {keyword: tomorrow}',
+            'Try Analytics {Keyword:today}',
+        ],
         'Description 4': ['', ''],
         'Original Description 4': ['', ''],
         'Final URL': [
@@ -1153,6 +1290,11 @@ class TranslationWorkerTest(absltest.TestCase):
             'translations': [
                 {'translatedText': 'correo electrónico'},
                 {'translatedText': 'rápido'},
+                {
+                    'translatedText': (
+                        'Abra {palabra clave:hoy} y {palabra clave: mañana}'
+                    )
+                },
             ]
         },
         {
@@ -1160,13 +1302,17 @@ class TranslationWorkerTest(absltest.TestCase):
                 {'translatedText': 'Inicio de sesión de correo electrónico'},
                 {'translatedText': 'Correo electrónico en línea'},
                 {'translatedText': 'Iniciar sesión'},
+                {'translatedText': 'Regístrate en {KeyWord:google ads}'},
                 {'translatedText': 'Correo electrónico intuitivo y útil'},
                 {'translatedText': '15 GB de almacenamiento y acceso móvil'},
+                {'translatedText': 'Abra {Keyword:hoy} y {keyword: mañana}'},
                 {'translatedText': 'Página web oficial'},
                 {'translatedText': 'Sitio oficial'},
                 {'translatedText': 'Productos de alta calidad'},
+                {'translatedText': 'Desarrollado por {KEYWord:"ai"}'},
                 {'translatedText': 'Google analitico'},
                 {'translatedText': '¡Pruebe Analytics hoy!'},
+                {'translatedText': 'Pruebe Analytics {Keyword:hoy}'},
             ]
         },
         {
@@ -1215,7 +1361,7 @@ class TranslationWorkerTest(absltest.TestCase):
         settings=settings, google_ads_objects=google_ads_objects)
 
     # Asserts result
-    self.assertEqual(2, result.keywords_modified)
+    self.assertEqual(3, result.keywords_modified)
     self.assertEqual(worker_result.Status.SUCCESS, result.status)
 
     # Asserts keywords translated
@@ -1314,10 +1460,19 @@ class TranslationWorkerTest(absltest.TestCase):
     )
 
     mock_send_api_request.side_effect = [
-        {'translations': [
-            {'translatedText': 'correo electrónico'},
-            {'translatedText': 'rápido'}]},
-        requests.exceptions.HTTPError()]
+        {
+            'translations': [
+                {'translatedText': 'correo electrónico'},
+                {'translatedText': 'rápido'},
+                {
+                    'translatedText': (
+                        'Abra {palabra clave:hoy} y {palabra clave: mañana}'
+                    )
+                },
+            ]
+        },
+        requests.exceptions.HTTPError(),
+    ]
 
     mock_refresh_access_token.return_value = 'fake_access_token'
 
@@ -1380,10 +1535,17 @@ class TranslationWorkerTest(absltest.TestCase):
         )
     )
 
-    mock_send_api_request.side_effect = [
-        {'translations': [
+    mock_send_api_request.side_effect = [{
+        'translations': [
             {'translatedText': 'correo electrónico'},
-            {'translatedText': 'rápido'}]}]
+            {'translatedText': 'rápido'},
+            {
+                'translatedText': (
+                    'Abra {palabra clave: hoy} y {palabra clave: mañana}'
+                )
+            },
+        ]
+    }]
 
     mock_refresh_access_token.return_value = 'fake_access_token'
 

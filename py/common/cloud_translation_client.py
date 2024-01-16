@@ -1,10 +1,10 @@
-# Copyright 2023 Google LLC.
+# Copyright 2024 Google LLC.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -65,6 +65,11 @@ _GLOSSARY_FILE_VALIDATION_REGEX = r'^[a-z]{2}-to-[a-z]{2}-.+\.csv$'
 # average case, and stops us exceeding limits in the worst case of all chars
 # being represented by multiple code points.
 _DEFAULT_BATCH_CHAR_LIMIT = 1500
+
+# Modified version of keyword insertion tag where the key is an alpha numeric
+# character instead of a key labeled "Keyword", etc. E.g, Buy {0:now}.
+# See py/data_models/ads.py
+_MODIFIED_KEYWORD_INSERTION_TAG_REGEX = re.compile(r'{\d:.+?}')
 
 
 @dataclasses.dataclass
@@ -351,14 +356,28 @@ class CloudTranslationClient:
       A DataFrame
     """
     # Gets the length of translations.
-    translation_lengths = [
-        len(target_term[target_language_code])
-        for target_term in translation_frame.df()[
-            translation_frame_lib.TARGET_TERMS
-        ]
-    ]
+    translation_lengths = []
+    for target_term in translation_frame.df()[
+        translation_frame_lib.TARGET_TERMS
+    ]:
+      # Only append target term lengths to list when the dataframe does not have
+      # an ads column and its text does not include keyword insertion tags
+      # because the text shortener may remove the tags. For example, "Data
+      # centers in {0:denver}" may resolve to "Denver data centers".
+      # TODO(): Shorten text that include keyword insertion tags for
+      # ads translations.
+      # TODO(): Add column/row for keyword insertion tags to ads
+      # dataframe.
+      if not _MODIFIED_KEYWORD_INSERTION_TAG_REGEX.search(
+          target_term[target_language_code]
+      ):
+        translation_lengths.append(len(target_term[target_language_code]))
+      else:
+        translation_lengths.append(0)
 
     # Gets translations that are > the char limit.
+    # TODO(): Change how translation lengths and character limits
+    # logic omits text with keyword insertion tags.
     return translation_frame.df()[
         translation_lengths
         > translation_frame.df()[translation_frame_lib.CHAR_LIMIT]
