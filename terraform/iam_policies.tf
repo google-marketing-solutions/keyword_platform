@@ -92,6 +92,12 @@ resource "google_project_iam_member" "backend_sa_vertexai_user" {
   role    = "roles/aiplatform.user"
 }
 
+resource "google_project_iam_member" "backend_builds_viewer" {
+  member  = "serviceAccount:${google_service_account.backend_sa.email}"
+  project = var.project_id
+  role    = "roles/cloudbuild.builds.viewer"
+}
+
 # Needed to access the backend image during migrations from Cloud Build.
 resource "google_project_iam_member" "cloudbuild_managed_sa_object_viewer" {
   member  = "serviceAccount:${google_project_service_identity.cloudbuild_managed_sa.email}"
@@ -116,17 +122,17 @@ data "google_iam_policy" "iap_users" {
 }
 
 resource "google_iap_web_backend_service_iam_policy" "frontend" {
-  project = google_compute_backend_service.frontend_backend.project
+  project             = google_compute_backend_service.frontend_backend.project
   web_backend_service = google_compute_backend_service.frontend_backend.name
-  policy_data = data.google_iam_policy.iap_users.policy_data
+  policy_data         = data.google_iam_policy.iap_users.policy_data
 }
 
 data "google_iam_policy" "frontend_run_users" {
   binding {
     role = "roles/run.invoker"
     members = [
-        "serviceAccount:${google_project_service_identity.iap_sa.email}",
-        "serviceAccount:${google_service_account.frontend_sa.email}",
+      "serviceAccount:${google_project_service_identity.iap_sa.email}",
+      "serviceAccount:${google_service_account.frontend_sa.email}",
     ]
   }
 }
@@ -135,24 +141,24 @@ data "google_iam_policy" "backend_run_users" {
   binding {
     role = "roles/run.invoker"
     members = [
-        "serviceAccount:${google_service_account.frontend_sa.email}",
-        "serviceAccount:${google_service_account.pubsub_sa.email}",
-        "serviceAccount:${google_service_account.backend_sa.email}",
+      "serviceAccount:${google_service_account.frontend_sa.email}",
+      "serviceAccount:${google_service_account.pubsub_sa.email}",
+      "serviceAccount:${google_service_account.backend_sa.email}",
     ]
   }
 }
 
 resource "google_cloud_run_service_iam_policy" "frontend_run_invoker" {
-  location = google_cloud_run_service.frontend_run.location
-  project = google_cloud_run_service.frontend_run.project
-  service = google_cloud_run_service.frontend_run.name
+  location    = google_cloud_run_service.frontend_run.location
+  project     = google_cloud_run_service.frontend_run.project
+  service     = google_cloud_run_service.frontend_run.name
   policy_data = data.google_iam_policy.frontend_run_users.policy_data
 }
 
 resource "google_cloud_run_service_iam_policy" "backend_run_invoker" {
-  location = google_cloud_run_service.backend_run.location
-  project = google_cloud_run_service.backend_run.project
-  service = google_cloud_run_service.backend_run.name
+  location    = google_cloud_run_service.backend_run.location
+  project     = google_cloud_run_service.backend_run.project
+  service     = google_cloud_run_service.backend_run.name
   policy_data = data.google_iam_policy.backend_run_users.policy_data
 }
 
