@@ -181,7 +181,6 @@ _GOOGLE_ADS_RESPONSE = [
                     'sitelinkAsset': {
                         'linkText': 'Calendar',
                         'description1': 'Open Calendar',
-                        'description2': 'Calendar open',
                     },
                 },
                 'campaignAsset': {
@@ -324,7 +323,7 @@ _EXPECTED_DF = pd.DataFrame({
         '',
         '',
         'This is a Description 2',
-        'Calendar open',
+        '',
         '',
     ],
     'Original description 2': [
@@ -333,7 +332,7 @@ _EXPECTED_DF = pd.DataFrame({
         '',
         '',
         'This is a Description 2',
-        'Calendar open',
+        '',
         '',
     ],
     'Link text': [
@@ -384,9 +383,8 @@ _EXPECTED_CSV_DATA = (
     ' 1,This is a Description 1,This is a Description 2,This is a Description'
     ' 2,This is a link text,This is a link'
     ' text,https://www.google.com/gmail,[]\nAdd,Enter customer ID,Campaign'
-    ' 1,,SITELINK,ENABLED,,,,,,Open Calendar,Open Calendar,Calendar'
-    ' open,Calendar'
-    ' open,Calendar,Calendar,https://www.google.com/gmail,[]\nAdd,Enter'
+    ' 1,,SITELINK,ENABLED,,,,,,Open Calendar,Open Calendar,,,'
+    'Calendar,Calendar,https://www.google.com/gmail,[]\nAdd,Enter'
     ' customer ID,Campaign 1,,CALLOUT,ENABLED,,,,Buy my product now,Buy my'
     ' product now,,,,,,,,[]\n'
 )
@@ -491,7 +489,7 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame({
         '',
         '',
         'This is a Description 2',
-        'Calendar open',
+        '',
         '',
     ],
     'Original description 2': [
@@ -500,7 +498,7 @@ _EXPECTED_DF_AFTER_UPDATE = pd.DataFrame({
         '',
         '',
         'This is a Description 2',
-        'Calendar open',
+        '',
         '',
     ],
     'Link text': [
@@ -649,7 +647,7 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame({
         '',
         '',
         'This is a Description 2',
-        'Calendar open',
+        '',
         '',
     ],
     'Original description 2': [
@@ -658,7 +656,7 @@ _EXPECTED_DF_AFTER_CAMPAIGN_AND_AD_GROUP_UPDATE = pd.DataFrame({
         '',
         '',
         'This is a Description 2',
-        'Calendar open',
+        '',
         '',
     ],
     'Link text': [
@@ -822,7 +820,7 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame({
         '',
         '',
         'Dies ist eine Beschreibung 2',
-        'Kalender geöffnet',
+        '',
         '',
     ],
     'Original description 2': [
@@ -831,7 +829,7 @@ _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame({
         '',
         '',
         'This is a Description 2',
-        'Calendar open',
+        '',
         '',
     ],
     'Link text': [
@@ -972,7 +970,7 @@ _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame({
         '',
         '',
         'Dies ist eine Beschreibung 2',
-        'Kalender geöffnet',
+        '',
         '',
     ],
     'Original description 2': [
@@ -981,7 +979,7 @@ _EXPECTED_DF_AFTER_TRANSLATION_WITH_AD_GROUP_UPDATE = pd.DataFrame({
         '',
         '',
         'This is a Description 2',
-        'Calendar open',
+        '',
         '',
     ],
     'Link text': [
@@ -1130,11 +1128,9 @@ class ExtensionsTest(parameterized.TestCase):
             'This is a link text',
             'Buy my product now',
             'Open Calendar',
-            'Calendar open',
             'Calendar',
         ],
         'target_terms': [
-            {},
             {},
             {},
             {},
@@ -1153,7 +1149,6 @@ class ExtensionsTest(parameterized.TestCase):
             [(1, 'Link text'), (4, 'Link text')],
             [(2, 'Callout text'), (6, 'Callout text')],
             [(5, 'Description 1')],
-            [(5, 'Description 2')],
             [(5, 'Link text')],
         ],
         'char_limit': [
@@ -1162,7 +1157,6 @@ class ExtensionsTest(parameterized.TestCase):
             35,
             25,
             25,
-            35,
             35,
             25,
         ],
@@ -1203,7 +1197,6 @@ class ExtensionsTest(parameterized.TestCase):
             'Dies ist ein Linktext',
             'Kaufen Sie jetzt mein Produkt',
             'Kalender öffnen',
-            'Kalender geöffnet',
             'Kalender',
         ],
     )
@@ -1222,7 +1215,7 @@ class ExtensionsTest(parameterized.TestCase):
   def test_char_count(self):
     extensions = extensions_lib.Extensions(_GOOGLE_ADS_RESPONSE)
 
-    expected_char_count = 222
+    expected_char_count = 210
 
     actual_char_count = extensions.char_count()
 
