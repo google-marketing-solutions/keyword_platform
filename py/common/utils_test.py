@@ -75,9 +75,9 @@ class UtilsTest(absltest.TestCase):
       except FileNotFoundError:
         pass
 
-      self.assertEqual(
-          log_mock.output,
-          ['ERROR:absl:FileNotFoundError not within exception to retry.'],
+      self.assertIn(
+          'ERROR:absl:FileNotFoundError not within exception to retry.',
+          log_mock.output[0],
       )
 
 

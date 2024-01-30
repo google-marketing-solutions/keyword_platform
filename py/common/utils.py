@@ -56,17 +56,17 @@ def exponential_backoff_retry(
         except Exception as err:
           retries += 1
           if not isinstance(err, tuple(exceptions)):
-            logging.error(
+            logging.exception(
                 '%s not within exception to retry.', type(err).__name__
             )
             raise err
           if retries == max_retries:
-            logging.error('Max retries of %d reached: %s', retries, err)
+            logging.exception('Max retries of %d reached: %s', retries, err)
             raise MaxRetriesExceededError(
                 f'Max retries of {retries} reached.'
             ) from err
           delay = int(base_delay * back_off_factor**retries)
-          logging.error(
+          logging.exception(
               'Exception when attempting to run %s: %s. Retrying in %ds.',
               func,
               err,

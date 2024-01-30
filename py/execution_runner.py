@@ -163,7 +163,7 @@ class ExecutionRunner:
     # UI validation should confirm at least 1 worker is selected, but in case
     # that fails, this check will exit early.
     if not self._settings.workers_to_run:
-      logging.error('No workers selected. Exiting...')
+      logging.exception('No workers selected. Exiting...')
       return {'worker_results': [], 'asset_urls': {}}
 
     google_ads_objects = self._build_google_ads_objects()

@@ -220,7 +220,8 @@ class VertexClient:
     # Catching broadly here to ensure the generator is never stopped
     # prematurely.
     except utils.MaxRetriesExceededError as err:
-      logging.error('Failed to shorten text: %s, returning original text.', err)
+      logging.exception(
+          'Failed to shorten text: %s, returning original text.', err)
     return shortened_text
 
   @utils.exponential_backoff_retry(
