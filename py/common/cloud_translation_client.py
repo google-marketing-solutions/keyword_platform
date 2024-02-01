@@ -484,7 +484,7 @@ class CloudTranslationClient:
           glossary_id, source_language, target_language, input_uri, timeout_sec
       )
     except GlossaryError:
-      logging.error('Failed to create glossary with id %s', glossary_id)
+      logging.exception('Failed to create glossary with id %s', glossary_id)
       raise
     return operation
 

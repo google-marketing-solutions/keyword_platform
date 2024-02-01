@@ -135,7 +135,7 @@ class GoogleAdsClient:
         FROM
           campaign
         WHERE
-          campaign.status = 'ENABLED'
+          campaign.status IN ('ENABLED', 'PAUSED')
           AND campaign.advertising_channel_type = 'SEARCH'
         """
     if campaign_ids:
@@ -168,7 +168,7 @@ class GoogleAdsClient:
       The API response object.
     """
     kw_statuses = kw_statuses or ['ENABLED']
-    campaign_statuses = campaign_statuses or ['ENABLED']
+    campaign_statuses = campaign_statuses or ['ENABLED', 'PAUSED']
     ad_group_statuses = ad_group_statuses or ['ENABLED']
     query = f"""
         SELECT
@@ -217,7 +217,7 @@ class GoogleAdsClient:
     Returns:
       The API response object.
     """
-    campaign_statuses = campaign_statuses or ['ENABLED']
+    campaign_statuses = campaign_statuses or ['ENABLED', 'PAUSED']
     ad_group_statuses = ad_group_statuses or ['ENABLED']
     ad_statuses = ad_statuses or ['ENABLED']
     query = f"""
@@ -261,7 +261,7 @@ class GoogleAdsClient:
           ad_group_criterion.keyword.text
         FROM ad_group_criterion
         WHERE
-          campaign.status = 'ENABLED'
+          campaign.status IN ('ENABLED', 'PAUSED')
           AND ad_group.status = 'ENABLED'
           AND ad_group_criterion.type = 'KEYWORD'
         """

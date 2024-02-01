@@ -87,7 +87,7 @@ def main() -> flask.Response:
     response_dict = execution_runner.run_workers()
   except Exception as exception:
     # (Isolation block for server)
-    logging.error('Execution Runner raised an exception trying to run '
+    logging.exception('Execution Runner raised an exception trying to run '
                   'workers: %s', exception)
     return flask.Response(
         ('The server encountered and error and could not complete your '
@@ -115,7 +115,7 @@ def get_accessible_accounts() -> flask.Response:
     accounts_list = execution_runner.get_accounts()
   except Exception as exception:
                                   # (Isolation block for server)
-    logging.error('Execution Runner raised an exception trying to get '
+    logging.exception('Execution Runner raised an exception trying to get '
                   'accessible accounts: %s', exception)
     return flask.Response(
         ('The server encountered and error and could not complete your '
@@ -151,7 +151,7 @@ def get_campaigns() -> flask.Response:
     )
   except Exception as exception:
                                   # (Isolation block for server)
-    logging.error('Execution Runner raised an exception trying to get '
+    logging.exception('Execution Runner raised an exception trying to get '
                   'campaigns: %s', exception)
     return flask.Response(
         ('The server encountered and error and could not complete your request.'
@@ -204,7 +204,7 @@ def get_cost() -> flask.Response:
     cost_estimate = execution_runner.get_cost_estimate()
   except Exception as exception:
     # (Isolation block for server)
-    logging.error('Execution Runner raised an exception trying to get '
+    logging.exception('Execution Runner raised an exception trying to get '
                   'cost estimate: %s', exception)
     return flask.Response(
         ('The server encountered and error and could not complete your request.'
@@ -230,7 +230,7 @@ def get_glossaries() -> flask.Response:
     glossaries = execution_runner.list_glossaries()
   except Exception as exception:
     # (Isolation block for server)
-    logging.error(
+    logging.exception(
         'Cloud Translation Client raised an exception trying to get '
         'glossaries: %s',
         exception,
@@ -255,12 +255,12 @@ def create_glossary() -> flask.Response:
   envelope = flask.request.get_json()
   if not envelope:
     msg = 'no Pub/Sub message received'
-    logging.error('Bad Request: %s', msg)
+    logging.exception('Bad Request: %s', msg)
     return flask.make_response(f'Bad Request: {msg}', 400)
 
   if not isinstance(envelope, dict) or 'message' not in envelope:
     msg = 'invalid Pub/Sub message format'
-    logging.error('Bad Request: %s', msg)
+    logging.exception('Bad Request: %s', msg)
     return flask.make_response(f'Bad Request: {msg}', 400)
 
   pubsub_message = envelope['message']
@@ -273,7 +273,7 @@ def create_glossary() -> flask.Response:
     response = execution_runner.create_or_replace_glossary(event_data)
   except Exception as exception:
     # (Isolation block for server)
-    logging.error(
+    logging.exception(
         'Cloud Translation Client raised an exception trying to create a'
         ' glossary %s ',
         exception,

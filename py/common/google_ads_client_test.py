@@ -135,7 +135,7 @@ class GoogleAdsClientTest(parameterized.TestCase):
         FROM
           campaign
         WHERE
-          campaign.status = 'ENABLED'
+          campaign.status IN ('ENABLED', 'PAUSED')
           AND campaign.advertising_channel_type = 'SEARCH'
         """
     expected_request = _expected_request_from_query(query)
@@ -166,7 +166,7 @@ class GoogleAdsClientTest(parameterized.TestCase):
             FROM keyword_view
             WHERE
                 campaign.status in (
-                    'ENABLED')
+                    'ENABLED', 'PAUSED')
                 AND ad_group.status in (
                     'ENABLED')
                 AND ad_group_criterion.status in (
@@ -193,7 +193,7 @@ class GoogleAdsClientTest(parameterized.TestCase):
               FROM keyword_view
               WHERE
                 campaign.status in (
-                    'ENABLED')
+                    'ENABLED', 'PAUSED')
                 AND ad_group.status in (
                     'ENABLED')
                 AND ad_group_criterion.status in (
@@ -236,7 +236,7 @@ class GoogleAdsClientTest(parameterized.TestCase):
               WHERE
                 ad_group_ad.ad.type = RESPONSIVE_SEARCH_AD
                 AND campaign.status in (
-                    'ENABLED')
+                    'ENABLED', 'PAUSED')
                 AND ad_group.status in (
                     'ENABLED')
                 AND ad_group_ad.status in (
@@ -262,7 +262,7 @@ class GoogleAdsClientTest(parameterized.TestCase):
               WHERE
                 ad_group_ad.ad.type = RESPONSIVE_SEARCH_AD
                 AND campaign.status in (
-                    'ENABLED')
+                    'ENABLED', 'PAUSED')
                 AND ad_group.status in (
                     'ENABLED')
                 AND ad_group_ad.status in (
@@ -297,7 +297,7 @@ class GoogleAdsClientTest(parameterized.TestCase):
           ad_group_criterion.keyword.text
         FROM ad_group_criterion
         WHERE
-          campaign.status = 'ENABLED'
+          campaign.status IN ('ENABLED', 'PAUSED')
           AND ad_group.status = 'ENABLED'
           AND ad_group_criterion.type = 'KEYWORD'
         """

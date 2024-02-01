@@ -145,59 +145,55 @@ class Extensions:
               TYPE: result['asset']['type'],
               UPDATES_APPLIED: [],
           }
-          extension[STATUS] = (
-              result['adGroupAsset']['status']
-              if result.get('adGroupAsset')
-              else result['campaignAsset']['status']
-          )
-          extension[AD_GROUP] = (
-              result['adGroup']['name'] if result.get('adGroup') else ''
-          )
+          extension[STATUS] = result.get(
+              'adGroupAsset', result.get('campaignAsset', {})
+          ).get('status', '')
+          extension[AD_GROUP] = result.get('adGroup', {}).get('name', '')
           extension[STRUCTURED_SNIPPET_HEADER] = (
-              result['asset']['structuredSnippetAsset']['header']
-              if result['asset'].get('structuredSnippetAsset')
-              else ''
+              result.get('asset', {})
+              .get('structuredSnippetAsset', {})
+              .get('header', '')
           )
-          structured_snippet_values = (
-              '\n'.join(result['asset']['structuredSnippetAsset']['values'])
-              if result['asset'].get('structuredSnippetAsset')
-              else ''
+          structured_snippet_values = '\n'.join(
+              result.get('asset', {})
+              .get('structuredSnippetAsset', {})
+              .get('values', '')
           )
           extension[STRUCTURED_SNIPPET_VALUES] = structured_snippet_values
           extension[ORIGINAL_STRUCTURED_SNIPPET_VALUES] = (
               structured_snippet_values
           )
           callout_text = (
-              result['asset']['calloutAsset']['calloutText']
-              if result['asset'].get('calloutAsset')
-              else ''
+              result.get('asset', {})
+              .get('calloutAsset', {})
+              .get('calloutText', '')
           )
           extension[CALLOUT_TEXT] = callout_text
           extension[ORIGINAL_CALLOUT_TEXT] = callout_text
           sitelink_description_1 = (
-              result['asset']['sitelinkAsset']['description1']
-              if result['asset'].get('sitelinkAsset')
-              else ''
+              result.get('asset', {})
+              .get('sitelinkAsset', {})
+              .get('description1', '')
           )
           sitelink_description_2 = (
-              result['asset']['sitelinkAsset']['description2']
-              if result['asset'].get('sitelinkAsset')
-              else ''
+              result.get('asset', {})
+              .get('sitelinkAsset', {})
+              .get('description2', '')
           )
           extension[SITELINK_DESCRIPTION_1] = sitelink_description_1
           extension[ORIGINAL_SITELINK_DESCRIPTION_1] = sitelink_description_1
           extension[SITELINK_DESCRIPTION_2] = sitelink_description_2
           extension[ORIGINAL_SITELINK_DESCRIPTION_2] = sitelink_description_2
           sitelink_link_text = (
-              result['asset']['sitelinkAsset']['linkText']
-              if result['asset'].get('sitelinkAsset')
-              else ''
+              result.get('asset', {})
+              .get('sitelinkAsset', {})
+              .get('linkText', '')
           )
           extension[SITELINK_LINK_TEXT] = sitelink_link_text
           extension[ORIGINAL_SITELINK_LINK_TEXT] = sitelink_link_text
           final_urls = (
-              ' '.join(result['asset']['finalUrls'])
-              if result['asset'].get('sitelinkAsset')
+              ' '.join(result.get('asset', {}).get('finalUrls', ''))
+              if result.get('asset', {}).get('sitelinkAsset', '')
               else ''
           )
           extension[SITELINK_FINAL_URLS] = final_urls
