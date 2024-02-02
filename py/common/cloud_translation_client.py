@@ -360,6 +360,9 @@ class CloudTranslationClient:
     for target_term in translation_frame.df()[
         translation_frame_lib.TARGET_TERMS
     ]:
+      translation_lengths.append(len(target_term[target_language_code]))
+      # TODO(): Fix issue where keyword insertion tag in ad text
+      # contains numeric key. E.g, {0:buy now} should read {Keyword:buy now}.
       # Only append target term lengths to list when the dataframe does not have
       # an ads column and its text does not include keyword insertion tags
       # because the text shortener may remove the tags. For example, "Data
@@ -368,12 +371,12 @@ class CloudTranslationClient:
       # ads translations.
       # TODO(): Add column/row for keyword insertion tags to ads
       # dataframe.
-      if not _MODIFIED_KEYWORD_INSERTION_TAG_REGEX.search(
-          target_term[target_language_code]
-      ):
-        translation_lengths.append(len(target_term[target_language_code]))
-      else:
-        translation_lengths.append(0)
+      # if not _MODIFIED_KEYWORD_INSERTION_TAG_REGEX.search(
+      #     target_term[target_language_code]
+      # ):
+      #   translation_lengths.append(len(target_term[target_language_code]))
+      # else:
+      #   translation_lengths.append(0)
 
     # Gets translations that are > the char limit.
     # TODO(): Change how translation lengths and character limits
