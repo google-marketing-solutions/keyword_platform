@@ -68,7 +68,7 @@ _FAKE_HEADERS = {
 _FAKE_CUSTOMER_ID = '1234567890'
 _FAKE_CAMPAIGN_IDS = [1]
 
-_TEST_SEARCH_STREAM_URL = 'https://googleads.googleapis.com/v13/customers/1234567890/googleAds:searchStream'
+_TEST_SEARCH_STREAM_URL = 'https://googleads.googleapis.com/v15/customers/1234567890/googleAds:searchStream'
 _TEST_OAUTH2_TOKEN_URL = 'https://www.googleapis.com/oauth2/v3/token'
 
 
