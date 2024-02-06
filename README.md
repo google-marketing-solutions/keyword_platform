@@ -94,6 +94,9 @@ in Cloud Shell button below.
 > [!IMPORTANT]
 > To use GenAI features you have to choose `us-central1` as region.
 
+1.  Join the [Keywords & Ads Platform users group](https://groups.google.com/g/kap-users-external)
+    to get updates on new features and bug fixes.
+
 1.  Click the button to deploy:
 
     [![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fgoogle-marketing-solutions%2Fkeyword_platform&cloudshell_git_branch=main&cloudshell_tutorial=setup%2Fdocs%2Finstall.md&show=terminal)
