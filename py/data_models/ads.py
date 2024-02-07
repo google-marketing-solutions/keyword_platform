@@ -341,8 +341,10 @@ class Ads:
         if not headline.strip():
           continue
 
-        headline, keys = self._modify_keyword_insertion_tag(headline)
-        self._source_term_keyword_insertion_keys.append(keys)
+        # TODO(): Fix issue where keyword insertion tag in text
+        # contains numeric key. E.g, {0:buy now} should read {Keyword:buy now}.
+        # headline, keys = self._modify_keyword_insertion_tag(headline)
+        # self._source_term_keyword_insertion_keys.append(keys)
 
         terms_with_metadata[headline].dataframe_rows_and_cols.append(
             (index, headline_field))
@@ -358,8 +360,10 @@ class Ads:
         if not description.strip():
           continue
 
-        description, keys = self._modify_keyword_insertion_tag(description)
-        self._source_term_keyword_insertion_keys.append(keys)
+        # TODO(): Fix issue where keyword insertion tag in text
+        # contains numeric key. E.g, {0:buy now} should read {Keyword:buy now}.
+        # description, keys = self._modify_keyword_insertion_tag(description)
+        # self._source_term_keyword_insertion_keys.append(keys)
 
         terms_with_metadata[description].dataframe_rows_and_cols.append(
             (index, description_field))
@@ -386,10 +390,16 @@ class Ads:
     """
     for index, row in translation_frame.df().iterrows():
       target_row_and_columns = row[translation_frame_lib.DATAFRAME_LOCATIONS]
-      target_term = self._revert_keyword_insertion_tag(
-          row[translation_frame_lib.TARGET_TERMS].get(target_language, ''),
-          self._source_term_keyword_insertion_keys[cast(int, index)],
+
+      target_term = row[translation_frame_lib.TARGET_TERMS].get(
+          target_language, ''
       )
+      # TODO(): Fix issue where keyword insertion tag in text
+      # contains numeric key. E.g, {0:buy now} should read {Keyword:buy now}.
+      # target_term = self._revert_keyword_insertion_tag(
+      #     row[translation_frame_lib.TARGET_TERMS].get(target_language, ''),
+      #     self._source_term_keyword_insertion_keys[cast(int, index)],
+      # )
 
       for target_row, target_column in target_row_and_columns:
         self._df.loc[target_row, target_column] = target_term

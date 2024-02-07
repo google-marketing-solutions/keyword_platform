@@ -776,21 +776,27 @@ class AdsTest(parameterized.TestCase):
 
   def test_get_translation_frame(self):
     expected_df = pd.DataFrame({
+        # TODO(): Fix issue where keyword insertion tag in text
+        # contains numeric key before uncommenting items in list.
         'source_term': [
             'Email Login',
             'Online Email',
             'Sign in',
-            'Sign up for {0:google ads}',
+            'Sign up for {KeyWord:google ads}',
+            # 'Sign up for {0:google ads}',
             'Email thats intuitive, efficient, and useful',
             '15 GB of storage, less spam, and mobile access',
-            'Open {0:today} and {1: tomorrow}',
+            'Open {Keyword:today} and {keyword: tomorrow}',
+            # 'Open {0:today} and {1: tomorrow}',
             'Official Website',
             'Official Site',
             'High Quality Products',
-            'Powered by {0:"ai"}',
+            'Powered by {KEYWord:"ai"}',
+            # 'Powered by {0:"ai"}',
             'Google Analytics',
             'Try Analytics today!',
-            'Try Analytics {0:today}',
+            'Try Analytics {Keyword:today}',
+            # 'Try Analytics {0:today}',
         ],
         'target_terms': [
             {},
@@ -869,21 +875,27 @@ class AdsTest(parameterized.TestCase):
     translation_frame.add_translations(
         start_index=0,
         target_language_code='de',
+        # TODO(): Fix issue where keyword insertion tag in text
+        # contains numeric key before uncommenting items in list.
         translations=[
             'E-Mail-Login',
             'Online-E-Mail',
             'anmelden',
-            'Melden Sie sich für {0:google ads} an',
+            'Melden Sie sich für {KeyWord:google ads} an',
+            # 'Melden Sie sich für {0:google ads} an',
             'E-Mail, die intuitiv, effizient und nützlich ist',
             '15 GB Speicherplatz, weniger Spam und mobiler Zugriff',
-            'Öffnen Sie {0:heute} und {1:morgen}',
+            'Öffnen Sie {Keyword:heute} und {keyword:morgen}',
+            # 'Öffnen Sie {0:heute} und {1:morgen}',
             'Offizielle Website',
             'Offizielle Seite',
             'Produkte mit hoher Qualität',
-            'Unterstützt von {0:"ai"}',
+            'Unterstützt von {KEYWord:"ai"}',
+            # 'Unterstützt von {0:"ai"}',
             'Google Analytics',
             'Probieren Sie Analytics noch heute aus!',
-            'Probieren Sie Analytics {0:heute} aus',
+            'Probieren Sie Analytics {Keyword:heute} aus',
+            # 'Probieren Sie Analytics {0:heute} aus',
             ])
 
     ads.apply_translations(

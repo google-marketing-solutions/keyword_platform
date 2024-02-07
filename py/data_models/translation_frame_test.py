@@ -144,6 +144,9 @@ class TranslationFrameTest(parameterized.TestCase):
     )
 
   def test_get_term_batch(self):
+    # TODO(): Figure out best approach for testing ad text that
+    # includes keyword insertion tag after fixing issue where keyword insertion
+    # in text contains numeric key.
     input_data = {
         'email': translation_metadata.TranslationMetadata(
             dataframe_rows_and_cols=[(0, 'Keyword'), (2, 'Keyword')],
@@ -152,7 +155,7 @@ class TranslationFrameTest(parameterized.TestCase):
         'fast': translation_metadata.TranslationMetadata(
             dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=30
         ),
-        'Open {0:today} and {1: tomorrow}': (
+        'Open {Keyword:today} and {keyword: tomorrow}': (
             translation_metadata.TranslationMetadata(
                 dataframe_rows_and_cols=[(2, 'Headline 1')], char_limit=45
             )
@@ -162,7 +165,7 @@ class TranslationFrameTest(parameterized.TestCase):
     expected_terms = [
         'email',
         'fast',
-        'Open {0:today} and {1: tomorrow}',
+        'Open {Keyword:today} and {keyword: tomorrow}',
     ]
     expected_next_row = 3
 
