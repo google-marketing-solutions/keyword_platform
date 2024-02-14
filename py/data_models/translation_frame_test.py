@@ -23,41 +23,23 @@ from data_models import translation_metadata
 
 
 _EXPECTED_DF = pd.DataFrame(
-    {
-        'source_term': [
-            'email',
-            'fast',
-            'Open {Keyword:today} and {keyword: tomorrow}',
-        ],
-        'target_terms': [{}, {}, {}],
-        'dataframe_locations': [
-            [(0, 'Keyword'), (2, 'Keyword')],
-            [(1, 'Keyword')],
-            [(2, 'Headline 1')],
-        ],
-        'char_limit': [30, 30, 45],
-    },
+    {'source_term': ['email', 'fast'],
+     'target_terms': [{}, {}],
+     'dataframe_locations': [
+         [(0, 'Keyword'), (2, 'Keyword')], [(1, 'Keyword')]],
+     'char_limit': [30, 30],
+     'keyword_insertion_keys': [{}, {}],
+     },
 )
 
 _EXPECTED_DF_AFTER_TRANSLATION = pd.DataFrame(
-    {
-        'source_term': [
-            'email',
-            'fast',
-            'Open {Keyword:today} and {keyword: tomorrow}',
-        ],
-        'target_terms': [
-            {'es': 'correo electrónico'},
-            {'es': 'rápida'},
-            {'es': 'Abra {Keyword:hoy} y {keyword: mañana}'},
-        ],
-        'dataframe_locations': [
-            [(0, 'Keyword'), (2, 'Keyword')],
-            [(1, 'Keyword')],
-            [(2, 'Headline 1')],
-        ],
-        'char_limit': [30, 30, 45],
-    },
+    {'source_term': ['email', 'fast'],
+     'target_terms': [{'es': 'correo electrónico'}, {'es': 'rápida'}],
+     'dataframe_locations': [
+         [(0, 'Keyword'), (2, 'Keyword')], [(1, 'Keyword')]],
+     'char_limit': [30, 30],
+     'keyword_insertion_keys': [{}, {}],
+     },
 )
 
 
@@ -68,14 +50,12 @@ class TranslationFrameTest(parameterized.TestCase):
         'email': translation_metadata.TranslationMetadata(
             dataframe_rows_and_cols=[(0, 'Keyword'), (2, 'Keyword')],
             char_limit=30,
+            keyword_insertion_keys={},
         ),
         'fast': translation_metadata.TranslationMetadata(
-            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=30
-        ),
-        'Open {Keyword:today} and {keyword: tomorrow}': (
-            translation_metadata.TranslationMetadata(
-                dataframe_rows_and_cols=[(2, 'Headline 1')], char_limit=45
-            )
+            dataframe_rows_and_cols=[(1, 'Keyword')],
+            char_limit=30,
+            keyword_insertion_keys={},
         ),
     }
     expected_df = _EXPECTED_DF
@@ -92,17 +72,15 @@ class TranslationFrameTest(parameterized.TestCase):
         'email': translation_metadata.TranslationMetadata(
             dataframe_rows_and_cols=[(0, 'Keyword'), (2, 'Keyword')],
             char_limit=30,
+            keyword_insertion_keys={},
         ),
         'fast': translation_metadata.TranslationMetadata(
-            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=30
-        ),
-        'Open {Keyword:today} and {keyword: tomorrow}': (
-            translation_metadata.TranslationMetadata(
-                dataframe_rows_and_cols=[(2, 'Headline 1')], char_limit=45
-            )
+            dataframe_rows_and_cols=[(1, 'Keyword')],
+            char_limit=30,
+            keyword_insertion_keys={},
         ),
     }
-    expected_size = 3
+    expected_size = 2
 
     translation_frame = translation_frame_lib.TranslationFrame(input_data)
     actual_size = translation_frame.size()
@@ -114,14 +92,12 @@ class TranslationFrameTest(parameterized.TestCase):
         'email': translation_metadata.TranslationMetadata(
             dataframe_rows_and_cols=[(0, 'Keyword'), (2, 'Keyword')],
             char_limit=30,
+            keyword_insertion_keys={},
         ),
         'fast': translation_metadata.TranslationMetadata(
-            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=30
-        ),
-        'Open {Keyword:today} and {keyword: tomorrow}': (
-            translation_metadata.TranslationMetadata(
-                dataframe_rows_and_cols=[(2, 'Headline 1')], char_limit=45
-            )
+            dataframe_rows_and_cols=[(1, 'Keyword')],
+            char_limit=30,
+            keyword_insertion_keys={},
         ),
     }
     expected_df = _EXPECTED_DF_AFTER_TRANSLATION
@@ -133,7 +109,6 @@ class TranslationFrameTest(parameterized.TestCase):
         translations=[
             'correo electrónico',
             'rápida',
-            'Abra {Keyword:hoy} y {keyword: mañana}',
         ],
     )
 
@@ -144,33 +119,27 @@ class TranslationFrameTest(parameterized.TestCase):
     )
 
   def test_get_term_batch(self):
-    # TODO(): Figure out best approach for testing ad text that
-    # includes keyword insertion tag after fixing issue where keyword insertion
-    # in text contains numeric key.
     input_data = {
         'email': translation_metadata.TranslationMetadata(
             dataframe_rows_and_cols=[(0, 'Keyword'), (2, 'Keyword')],
             char_limit=30,
+            keyword_insertion_keys={},
         ),
         'fast': translation_metadata.TranslationMetadata(
-            dataframe_rows_and_cols=[(1, 'Keyword')], char_limit=30
-        ),
-        'Open {Keyword:today} and {keyword: tomorrow}': (
-            translation_metadata.TranslationMetadata(
-                dataframe_rows_and_cols=[(2, 'Headline 1')], char_limit=45
-            )
+            dataframe_rows_and_cols=[(1, 'Keyword')],
+            char_limit=30,
+            keyword_insertion_keys={},
         ),
     }
 
     expected_terms = [
         'email',
         'fast',
-        'Open {Keyword:today} and {keyword: tomorrow}',
     ]
-    expected_next_row = 3
+    expected_next_row = 2
 
     translation_frame = translation_frame_lib.TranslationFrame(input_data)
-    actual_terms, actual_next_row = translation_frame.get_term_batch(0, 53)
+    actual_terms, actual_next_row = translation_frame.get_term_batch(0, 10)
 
     self.assertEqual(actual_terms, expected_terms)
     self.assertEqual(actual_next_row, expected_next_row)

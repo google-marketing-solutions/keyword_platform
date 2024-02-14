@@ -26,12 +26,14 @@ SOURCE_TERM = 'source_term'
 TARGET_TERMS = 'target_terms'
 DATAFRAME_LOCATIONS = 'dataframe_locations'
 CHAR_LIMIT = 'char_limit'
+KEYWORD_INSERTION_KEYS = 'keyword_insertion_keys'
 
 _COLS = [
     SOURCE_TERM,
     TARGET_TERMS,
     DATAFRAME_LOCATIONS,
     CHAR_LIMIT,
+    KEYWORD_INSERTION_KEYS,
 ]
 
 
@@ -102,6 +104,7 @@ class TranslationFrame:
           TARGET_TERMS: {},
           DATAFRAME_LOCATIONS: metadata.dataframe_rows_and_cols,
           CHAR_LIMIT: metadata.char_limit,
+          KEYWORD_INSERTION_KEYS: metadata.keyword_insertion_keys,
       })
 
     self._df = pd.DataFrame(terms, columns=_COLS)

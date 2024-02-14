@@ -295,6 +295,7 @@ class KeywordsTest(parameterized.TestCase):
             'target_terms': [{}, {}],
             'dataframe_locations': [[(0, 'Keyword')], [(1, 'Keyword')]],
             'char_limit': [80, 80],
+            'keyword_insertion_keys': [{}, {}],
             })
 
     keywords = keywords_lib.Keywords(_GOOGLE_ADS_RESPONSE)

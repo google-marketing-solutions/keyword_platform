@@ -58,18 +58,12 @@ _CREDENTIAL_REQUIRED_KEYS = (
 
 _GLOSSARY_FILE_VALIDATION_REGEX = r'^[a-z]{2}-to-[a-z]{2}-.+\.csv$'
 
-
 # Max batch size for the Cloud Translation API V3 is 5000 code points.
 # Setting the batch too high could result in long response times, and some chars
 # may be represented by 3 code points, so 1500 keeps response times short in the
 # average case, and stops us exceeding limits in the worst case of all chars
 # being represented by multiple code points.
 _DEFAULT_BATCH_CHAR_LIMIT = 1500
-
-# Modified version of keyword insertion tag where the key is an alpha numeric
-# character instead of a key labeled "Keyword", etc. E.g, Buy {0:now}.
-# See py/data_models/ads.py
-_MODIFIED_KEYWORD_INSERTION_TAG_REGEX = re.compile(r'{\d:.+?}')
 
 
 @dataclasses.dataclass
@@ -357,26 +351,21 @@ class CloudTranslationClient:
     """
     # Gets the length of translations.
     translation_lengths = []
-    for target_term in translation_frame.df()[
-        translation_frame_lib.TARGET_TERMS
-    ]:
-      translation_lengths.append(len(target_term[target_language_code]))
-      # TODO(): Fix issue where keyword insertion tag in ad text
-      # contains numeric key. E.g, {0:buy now} should read {Keyword:buy now}.
-      # Only append target term lengths to list when the dataframe does not have
-      # an ads column and its text does not include keyword insertion tags
-      # because the text shortener may remove the tags. For example, "Data
-      # centers in {0:denver}" may resolve to "Denver data centers".
+    for _, row in translation_frame.df().iterrows():
+      target_term = row[translation_frame_lib.TARGET_TERMS]
+      keyword_insertion_keys = row[translation_frame_lib.KEYWORD_INSERTION_KEYS]
       # TODO(): Shorten text that include keyword insertion tags for
       # ads translations.
-      # TODO(): Add column/row for keyword insertion tags to ads
-      # dataframe.
-      # if not _MODIFIED_KEYWORD_INSERTION_TAG_REGEX.search(
-      #     target_term[target_language_code]
-      # ):
-      #   translation_lengths.append(len(target_term[target_language_code]))
-      # else:
-      #   translation_lengths.append(0)
+      #
+      # Only append target term lengths to list when text has no keyword
+      # insertion tags (which is identified when key insertion keys in the
+      # dataframe are not empty) because the text shortener may remove the tags.
+      # For example, "Data centers in {0:denver}" may resolve to
+      # "Denver data centers".
+      if not keyword_insertion_keys:
+        translation_lengths.append(len(target_term[target_language_code]))
+      else:
+        translation_lengths.append(0)
 
     # Gets translations that are > the char limit.
     # TODO(): Change how translation lengths and character limits

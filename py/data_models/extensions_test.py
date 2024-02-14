@@ -1160,6 +1160,7 @@ class ExtensionsTest(parameterized.TestCase):
             35,
             25,
         ],
+        'keyword_insertion_keys': [{}, {}, {}, {}, {}, {}, {}],
     })
 
     extensions = extensions_lib.Extensions(_GOOGLE_ADS_RESPONSE)
