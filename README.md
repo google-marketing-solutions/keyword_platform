@@ -92,7 +92,9 @@ Once you have completed the above mentioned steps, proceed by clicking the Open
 in Cloud Shell button below.
 
 > [!IMPORTANT]
-> To use GenAI features you have to choose `us-central1` as region.
+> To use GenAI features you have to choose a
+> [region](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/locations-genai#available-regions)
+> where Generative AI features on Vertex AI are available, e.g. `us-central1`.
 
 1.  Join the [Keywords & Ads Platform users group](https://groups.google.com/g/kap-users-external)
     to get updates on new features and bug fixes.

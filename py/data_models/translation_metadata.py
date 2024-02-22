@@ -24,3 +24,6 @@ class TranslationMetadata:
   dataframe_rows_and_cols: list[
       tuple[int, str]] = dataclasses.field(default_factory=list)
   char_limit: int = 0
+  keyword_insertion_keys: dict[str, str] = dataclasses.field(
+      default_factory=dict
+  )
