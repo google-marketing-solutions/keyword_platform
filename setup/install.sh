@@ -29,7 +29,6 @@
 #   LOGIN_CUSTOMER_ID
 #   REFRESH_TOKEN
 #   IAP_ALLOWED_USERS
-#   IAP_SUPPORT_EMAIL
 
 # Supress apt-get warnings if run in an ephemeral cloud shell.
 mkdir ~/.cloudshell touch ~/.cloudshell/no-apt-get-warning
@@ -88,10 +87,6 @@ DEVELOPER_TOKEN=$developer_token
 echo "Enter your Google Ads Login Customer ID (without hyphens):"
 read login_customer_id
 LOGIN_CUSTOMER_ID=$login_customer_id
-
-echo "Enter a support Email for the OAuth Consent Screen:"
-read iap_support_email
-IAP_SUPPORT_EMAIL=$iap_support_email
 
 echo "Enter a comma-separated list of users to grant access to the solution:"
 read iap_allowed_users
@@ -157,16 +152,8 @@ gcloud builds submit ./ui \
 
 echo "SUCCESS: Frontend and Backend images built successfully."
 
-# Check if there is an existing Consent Screen.
-oauth_brands=$(gcloud iap oauth-brands list)
-
-if [ $? -eq 0 ]; then
-  iap_brand_id=$(gcloud iap oauth-brands list --format="value(name)" | sed "s:.*/::")
-  support_email=$(gcloud iap oauth-brands list --format="value(supportEmail)")
-else
-  support_email=$IAP_SUPPORT_EMAIL
-  iap_brand_id=""
-fi
+# Get existing Consent Screen OAuth brand data.
+iap_brand_id=$(gcloud iap oauth-brands list --format="value(name)" | sed "s:.*/::")
 
 # Convert the list of iap allowed users to a terraform compatible list.
 allowed_users_tf_list=$(echo "$IAP_ALLOWED_USERS" | sed 's/\([^,]\+\)/"user:\1"/g' | sed 's/,/, /g' | sed 's/.*/[&]/')
@@ -195,7 +182,6 @@ terraform -chdir=./terraform plan \
   -var "project_id=$GOOGLE_CLOUD_PROJECT" \
   -var "region=$GOOGLE_CLOUD_REGION" \
   -var "iap_allowed_users=$allowed_users_tf_list" \
-  -var "iap_support_email=$support_email" \
   -var "iap_brand_id=$iap_brand_id" \
   -out="/tmp/tfplan"
 

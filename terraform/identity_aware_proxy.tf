@@ -17,16 +17,9 @@ resource "google_project_service" "iap_service" {
   service = "iap.googleapis.com"
 }
 
-resource "google_iap_brand" "default" {
-  count = var.iap_brand_id == "" ? 1 : 0
-  support_email     = var.iap_support_email
-  application_title = "Cloud IAP protected Application"
-  project           = google_project_service.iap_service.project
-}
-
 resource "google_iap_client" "default" {
   display_name = "Keyword Platform IAP Client"
-  brand        =  var.iap_brand_id == "" ? google_iap_brand.default[0].name : "projects/${var.project_id}/brands/${var.iap_brand_id}"
+  brand        =  "projects/${var.project_id}/brands/${var.iap_brand_id}"
 }
 
 resource "google_project_service_identity" "iap_sa" {
