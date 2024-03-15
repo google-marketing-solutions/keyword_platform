@@ -357,7 +357,7 @@ collect information about Google Ads accounts and campaigns connected to the
 Keyword Platform service (such as account and campaign IDs as well as campaign
 settings such as bid strategy, target network and others). We also collect
 information about the size of the requests sent to API endpoints such as Cloud
-Translation API and VertexAI API as well as information about the originating
+Translation API and Vertex AI API as well as information about the originating
 Cloud Project (such as project ID and name).
 
 *	Device Data. We collect device data such as information about your computer,
