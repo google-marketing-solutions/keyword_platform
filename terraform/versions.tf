@@ -15,32 +15,35 @@
 terraform {
   required_providers {
     google = {
-      source = "hashicorp/google"
+      source  = "hashicorp/google"
       version = "4.43.1"
     }
     google-beta = {
-      source = "hashicorp/google-beta"
+      source  = "hashicorp/google-beta"
       version = "4.43.1"
     }
     random = {
-      source = "hashicorp/random"
+      source  = "hashicorp/random"
       version = "3.4.3"
     }
     docker = {
-      source = "kreuzwerker/docker"
+      source  = "kreuzwerker/docker"
       version = "3.0.2"
     }
+  }
+  provider_meta "google" {
+    module_name = "cloud-solutions/keyword-platform-deploy-v2.1.7"
   }
 }
 
 provider "google" {
   access_token = var.test_google_access_token
-  project = var.project_id
-  region  = var.region
+  project      = var.project_id
+  region       = var.region
 }
 
 provider "google-beta" {
   access_token = var.test_google_access_token
-  project = var.project_id
-  region  = var.region
+  project      = var.project_id
+  region       = var.region
 }
