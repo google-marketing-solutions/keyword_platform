@@ -374,7 +374,7 @@ to access the Keyword Platform website. For example, we may use GPS and other
 technologies to collect geolocation data that tells us your current location
 (based on your IP address).
 
-We do not collect and personal information such as email, name or phone number.
+We do not collect and personal information such as email, name, or phone number.
 
 We process your personal information to identify usage trends. We may process
 information about how you use our Services to better understand how they are
