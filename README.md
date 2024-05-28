@@ -150,7 +150,7 @@ The solution uses a set of workers (as of Aug 2023 only one worker is available)
 to run certain tasks. The workers themselves generate costs by sending requests
 to various Google Cloud APIs (see the individual workers for details).
 
-Running the solution on Google Cloud infrastructure also incurs some ongoing 
+Running the solution on Google Cloud infrastructure also incurs some ongoing
 costs associated with Cloud Run, Load Balancers and Storage.
 
 ### Translation Worker
@@ -253,7 +253,7 @@ e.g. `en-to-de-brandterms.csv`
     front- and backend images from Dockerfiles which can take some time. Instead
     you can run the terraform commands manually as follows:
 
-    1.  Ensure you have cloned the repository and navigated to the 
+    1.  Ensure you have cloned the repository and navigated to the
         `keyword-platform` directory: `cd keyword-platform`.
 
     2.  Run the following command replacing the variable values, this sets
@@ -271,9 +271,7 @@ e.g. `en-to-de-brandterms.csv`
         DEVELOPER_TOKEN=<your-developer-token> && \
         LOGIN_CUSTOMER_ID=<your-login-customer-id> && \
         IAP_ALLOWED_USERS=<your-email> && \
-        IAP_SUPPORT_EMAIL=<your-email> && \
         iap_brand_id=$(gcloud iap oauth-brands list --format="value(name)" | sed "s:.*/::") && \
-        support_email=$(gcloud iap oauth-brands list --format="value(supportEmail)") && \
         allowed_users_tf_list=$(echo "$IAP_ALLOWED_USERS" | sed 's/\([^,]\+\)/"user:\1"/g' | sed 's/,/, /g' | sed 's/.*/[&]/') && \
         refresh_token=<your-refresh-token> && \
         GOOGLE_CLOUD_REGION=us-central1
@@ -317,7 +315,6 @@ e.g. `en-to-de-brandterms.csv`
             -var "project_id=$GOOGLE_CLOUD_PROJECT" \
             -var "region=$GOOGLE_CLOUD_REGION" \
             -var "iap_allowed_users=$allowed_users_tf_list" \
-            -var "iap_support_email=$support_email" \
             -var "iap_brand_id=$iap_brand_id" \
             -out="/tmp/tfplan"
         ```
@@ -360,7 +357,7 @@ collect information about Google Ads accounts and campaigns connected to the
 Keyword Platform service (such as account and campaign IDs as well as campaign
 settings such as bid strategy, target network and others). We also collect
 information about the size of the requests sent to API endpoints such as Cloud
-Translation API and VertexAI API as well as information about the originating
+Translation API and Vertex AI API as well as information about the originating
 Cloud Project (such as project ID and name).
 
 *	Device Data. We collect device data such as information about your computer,
@@ -377,7 +374,7 @@ to access the Keyword Platform website. For example, we may use GPS and other
 technologies to collect geolocation data that tells us your current location
 (based on your IP address).
 
-We do not collect and personal information such as email, name or phone number.
+We do not collect and personal information such as email, name, or phone number.
 
 We process your personal information to identify usage trends. We may process
 information about how you use our Services to better understand how they are

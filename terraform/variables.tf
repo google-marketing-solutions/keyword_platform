@@ -17,11 +17,6 @@
 
 variable "iap_brand_id" {
   description = "Existing IAP Brand ID - only INTERNAL TYPE (you can obtain it using this command: `$ gcloud iap oauth-brands list --format='value(name)' | sed 's:.*/::'`)."
-  default = ""
-}
-
-variable "iap_support_email" {
-  description = "Support email used for configuring IAP"
 }
 
 variable "iap_allowed_users" {
