@@ -24,7 +24,7 @@ resource "google_storage_bucket" "output_bucket" {
   project       = var.project_id
 
   uniform_bucket_level_access = true
-  force_destroy = true
+  force_destroy               = true
 }
 
 resource "google_storage_bucket" "glossary_bucket" {
@@ -33,7 +33,7 @@ resource "google_storage_bucket" "glossary_bucket" {
   location                    = var.region
   project                     = var.project_id
   uniform_bucket_level_access = true
-  force_destroy = true
+  force_destroy               = true
 }
 
 locals {
@@ -67,7 +67,7 @@ resource "google_cloud_run_service" "backend_run" {
 
         resources {
           limits = {
-            cpu = "4000m"
+            cpu    = "4000m"
             memory = "8Gi"
           }
         }
@@ -85,15 +85,15 @@ resource "google_cloud_run_service" "backend_run" {
           value = google_storage_bucket.output_bucket.name
         }
         env {
-          name = "GA_MEASUREMENT_ID"
+          name  = "GA_MEASUREMENT_ID"
           value = "G-C0ZGCTLG7Z"
         }
         env {
-          name = "GA_API_SECRET"
+          name  = "GA_API_SECRET"
           value = "20nczPaFRCm7lmlsofClSg"
         }
         env {
-          name = "GA_OPT_OUT"
+          name  = "GA_OPT_OUT"
           value = var.opt_out
         }
       }
@@ -147,7 +147,7 @@ resource "google_cloud_run_service" "frontend_run" {
 
         resources {
           limits = {
-            cpu = "2000m"
+            cpu    = "2000m"
             memory = "2Gi"
           }
         }
@@ -184,26 +184,17 @@ provider "docker" {
   }
 }
 
-data "docker_registry_image" "frontend_image" {
-  name = format("%s:%s", var.frontend_image, "latest")
-}
-
 data "google_container_registry_image" "frontend_latest" {
   name    = "keywordplatform-frontend"
   project = var.project_id
-  digest  = data.docker_registry_image.frontend_image.sha256_digest
-}
-
-data "docker_registry_image" "backend_image" {
-  name = format("%s:%s", var.backend_image, "latest")
+  tag     = "latest"
 }
 
 data "google_container_registry_image" "backend_latest" {
   name    = "keywordplatform-backend"
   project = var.project_id
-  digest  = data.docker_registry_image.backend_image.sha256_digest
+  tag     = "latest"
 }
-
 
 ##
 # Secret Manager
@@ -221,7 +212,7 @@ resource "google_secret_manager_secret" "client_id" {
 }
 
 resource "google_secret_manager_secret_version" "client_id_latest" {
-  secret = google_secret_manager_secret.client_id.name
+  secret      = google_secret_manager_secret.client_id.name
   secret_data = var.client_id
 }
 
@@ -243,7 +234,7 @@ resource "google_secret_manager_secret" "client_secret" {
 }
 
 resource "google_secret_manager_secret_version" "client_secret_latest" {
-  secret = google_secret_manager_secret.client_secret.name
+  secret      = google_secret_manager_secret.client_secret.name
   secret_data = var.client_secret
 }
 
@@ -265,7 +256,7 @@ resource "google_secret_manager_secret" "login_customer_id" {
 }
 
 resource "google_secret_manager_secret_version" "login_customer_id_latest" {
-  secret = google_secret_manager_secret.login_customer_id.name
+  secret      = google_secret_manager_secret.login_customer_id.name
   secret_data = var.login_customer_id
 }
 
@@ -287,7 +278,7 @@ resource "google_secret_manager_secret" "developer_token" {
 }
 
 resource "google_secret_manager_secret_version" "developer_token_latest" {
-  secret = google_secret_manager_secret.developer_token.name
+  secret      = google_secret_manager_secret.developer_token.name
   secret_data = var.developer_token
 }
 
@@ -309,7 +300,7 @@ resource "google_secret_manager_secret" "refresh_token" {
 }
 
 resource "google_secret_manager_secret_version" "refresh_token_latest" {
-  secret = google_secret_manager_secret.refresh_token.name
+  secret      = google_secret_manager_secret.refresh_token.name
   secret_data = var.refresh_token
 }
 
@@ -324,13 +315,13 @@ resource "google_secret_manager_secret_iam_member" "refresh_token_access" {
 # PubSub topics and subscriptions.
 #
 resource "google_pubsub_topic" "create_glossary" {
-  name = "create-glossary-topic"
+  name    = "create-glossary-topic"
   project = var.project_id
 }
 
 resource "google_pubsub_subscription" "create_glossary_subscription" {
-  name  = "create-glossary-subscription"
-  topic = google_pubsub_topic.create_glossary.name
+  name    = "create-glossary-subscription"
+  topic   = google_pubsub_topic.create_glossary.name
   project = var.project_id
   push_config {
     push_endpoint = format("%s/create_glossary", local.backend_url)
