@@ -18,7 +18,7 @@ from unittest import mock
 
 import google.api_core
 import vertexai
-from vertexai.language_models import TextGenerationModel
+from vertexai import generative_models
 
 from absl.testing import absltest
 from common import vertex_client as vertex_client_lib
@@ -41,38 +41,40 @@ class VertexClientTest(absltest.TestCase):
             side_effect=['fake_project', 'fake_region'],
         )
     )
-    self.mock_model = self.enter_context(
+    self.mock_text_generation_response = mock.MagicMock()
+    self.mock_text_generation_model = self.enter_context(
         mock.patch.object(
-            TextGenerationModel,
-            'from_pretrained',
+            generative_models,
+            'GenerativeModel',
             autospec=True,
         )
     )
     self.mock_response = mock.MagicMock()
     self.mock_response.text = 'This text needs to be shorter.'
+    self.mock_text_generation_model.return_value.generate_content.return_value = (
+        self.mock_response
+    )
 
   def test_shorten_text_to_char_limit(self):
-    self.mock_model.return_value.predict.return_value = self.mock_response
     expected_prompt = f"""
           Make the following sentence simple and short:
 
           {_FAKE_TEXT}
         """
     expected_result = ['This text needs to be shorter.']
+
     vertex_client = vertex_client_lib.VertexClient()
 
     actual_result = vertex_client.shorten_text_to_char_limit(
         [_FAKE_TEXT], 'en', _TEST_CHAR_LIMIT
     )
 
-    self.mock_model.return_value.predict.assert_has_calls([
+    self.mock_text_generation_model.return_value.generate_content.assert_has_calls([
         mock.call('Are you there?'),
         mock.call(
             expected_prompt,
-            temperature=0.4,
-            top_p=0.9,
-            top_k=40,
-            max_output_tokens=8,
+            stream=False,
+            generation_config=mock.ANY,
         ),
     ])
     self.assertEqual(actual_result, expected_result)

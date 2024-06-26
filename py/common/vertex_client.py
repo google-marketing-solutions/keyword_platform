@@ -19,16 +19,17 @@ See class doctring for more details.
 from concurrent import futures
 import math
 import os
+from typing import cast
 
 from absl import logging
 import google.api_core
 import vertexai
-from vertexai.language_models import TextGenerationModel, TextGenerationResponse
+from vertexai import generative_models
 
 from common import utils
 
 
-_MODEL = 'text-bison@001'
+_MODEL = 'gemini-1.5-flash-001'
 
 AVAILABLE_LANGUAGES = frozenset([
     'ar',
@@ -128,10 +129,10 @@ class VertexClient:
     vertexai.init(
         project=os.environ['GCP_PROJECT'], location=os.environ['GCP_REGION']
     )
-    self._client = TextGenerationModel.from_pretrained(_MODEL)
+    self._client = generative_models.GenerativeModel(_MODEL)
     # Making a call in __init__ to ensure initialization of VertexClient fails
     # if the GCP_PROJECT was not allowlisted to use Vertex LLMs.
-    self._client.predict('Are you there?')
+    self._client.generate_content('Are you there?')
     self._genai_characters_sent = 0
 
   def shorten_text_to_char_limit(
@@ -195,20 +196,24 @@ class VertexClient:
     output_tokens = start_output_tokens
     try:
       while len(shortened_text) > char_limit:
-        parameters = {
-            'temperature': 0.4,
-            'top_p': 0.9,
-            'top_k': 40,
-            'max_output_tokens': output_tokens,
-        }
+        generation_config = generative_models.GenerationConfig(
+            temperature=0.4,
+            top_p=0.9,
+            top_k=40,
+            candidate_count=1,
+            max_output_tokens=output_tokens,
+            stop_sequences=['STOP!'],
+        )
         shorten_prompt = f"""
           {_PROMPT_MAP[language_code]}
 
           {text}
         """
-        response = self._send_prompt_with_backoff(shorten_prompt, **parameters)
+        generation_response = self._send_prompt_with_backoff(
+            shorten_prompt, generation_config
+        )
         self._genai_characters_sent += len(shorten_prompt)
-        shortened_text = response.text
+        shortened_text = generation_response.text.strip()
         # Decrease the max number of output tokens by 1 for the next iteration.
         output_tokens += -1
       logging.info(
@@ -230,7 +235,13 @@ class VertexClient:
       exceptions=[google.api_core.exceptions.ResourceExhausted],
   )
   def _send_prompt_with_backoff(
-      self, prompt: str, **parameters
-  ) -> TextGenerationResponse:
+      self, prompt: str, generation_config: generative_models.GenerationConfig
+  ) -> generative_models.GenerationResponse:
     """Sends a prompt to the LLM."""
-    return self._client.predict(prompt, **parameters)
+    response = self._client.generate_content(
+        prompt,
+        stream=False,
+        generation_config=generation_config,
+    )
+    generation_response = cast(generative_models.GenerationResponse, response)
+    return generation_response
