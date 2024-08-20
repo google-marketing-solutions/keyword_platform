@@ -158,6 +158,7 @@ iap_brand_id=$(gcloud iap oauth-brands list --format="value(name)" | sed "s:.*/:
 # Convert the list of iap allowed users to a terraform compatible list.
 allowed_users_tf_list=$(echo "$IAP_ALLOWED_USERS" | sed 's/\([^,]\+\)/"user:\1"/g' | sed 's/,/, /g' | sed 's/.*/[&]/')
 
+pip3 install google-auth-oauthlib
 python ./setup/utils/oauth_flow.py --client_id="${CLIENT_ID}" --client_secret="${CLIENT_SECRET}"
 refresh_token=$(cat refresh_token.txt)
 rm -f refresh_token.txt
