@@ -12,7 +12,7 @@ pandas
 requests
 google-generativeai
 google-api-core
-google-cloud-aiplatform
+google-cloud-aiplatform>=1.49
 gcsfs
 XlsxWriter
 fsspec
