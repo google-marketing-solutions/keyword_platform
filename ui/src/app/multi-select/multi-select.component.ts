@@ -39,6 +39,7 @@ interface Option {
 
 /** A multi select component. */
 @Component({
+  standalone: false,
   selector: 'app-multi-select',
   templateUrl: './multi-select.component.html',
   styleUrls: ['./multi-select.component.scss']

@@ -33,6 +33,7 @@ import {SnackbarComponent} from '../snackbar/snackbar.component';
  * as there are other components that follow the same pattern/logic.
  */
 @Component({
+  standalone: false,
   selector: 'app-campaigns',
   templateUrl: './campaigns.component.html',
   styleUrls: ['./campaigns.component.scss']

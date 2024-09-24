@@ -24,6 +24,7 @@ import {map, startWith} from 'rxjs/operators';
 
 /** A single select component. */
 @Component({
+  standalone: false,
   selector: 'app-single-select',
   templateUrl: './single-select.component.html',
   styleUrls: ['./single-select.component.scss']
