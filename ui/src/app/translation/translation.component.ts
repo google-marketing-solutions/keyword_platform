@@ -44,6 +44,7 @@ const SHORTEN_TRANSLATION_LANGUAGE_CODES = [
  * as there are other components that follow the same pattern/logic.
  */
 @Component({
+  standalone: false,
   selector: 'app-translation',
   templateUrl: './translation.component.html',
   styleUrls: ['./translation.component.scss']

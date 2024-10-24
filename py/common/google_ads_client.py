@@ -24,7 +24,7 @@ SEARCH_URL = (
     + '/{api_version}/customers/{customer_id}/googleAds:searchStream'
 )
 
-_API_VERSION = '15'
+_API_VERSION = '18'
 
 _CREDENTIAL_REQUIRED_KEYS = (
     'developer_token',

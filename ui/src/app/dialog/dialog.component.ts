@@ -26,6 +26,7 @@ interface DialogData {
 
 /** The dialog component to display output. */
 @Component({
+  standalone: false,
   selector: 'app-dialog',
   templateUrl: './dialog.component.html',
   styleUrls: ['./dialog.component.scss']
