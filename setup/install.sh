@@ -30,6 +30,8 @@
 #   REFRESH_TOKEN
 #   IAP_ALLOWED_USERS
 
+# Update apt-get packages.
+sudo apt-get update
 # Supress apt-get warnings if run in an ephemeral cloud shell.
 mkdir ~/.cloudshell touch ~/.cloudshell/no-apt-get-warning
 sudo apt-get install fzf
