@@ -54,6 +54,19 @@ fi
 echo "Setting Project ID: ${GOOGLE_CLOUD_PROJECT}"
 gcloud config set project ${GOOGLE_CLOUD_PROJECT}
 
+# Enable the APIs.
+REQUIRED_APIS=(
+  storage.googleapis.com
+  compute.googleapis.com
+  run.googleapis.com
+  cloudbuild.googleapis.com
+  cloudresourcemanager.googleapis.com
+)
+
+for API in "${REQUIRED_APIS[@]}"; do
+  gcloud services enable "$API"
+done
+
 regions=($(gcloud compute regions list --format="value(name)"))
 
 # Display a select menu for the user to choose a region
