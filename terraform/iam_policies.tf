@@ -165,7 +165,10 @@ resource "google_cloud_run_service_iam_policy" "backend_run_invoker" {
 resource "google_project_iam_binding" "project_token_creator" {
   project = var.project_id
   role    = "roles/iam.serviceAccountTokenCreator"
-  members = ["serviceAccount:${google_project_service_identity.pubsub_agent.email}"]
+  members = [
+    "serviceAccount:${google_project_service_identity.pubsub_agent.email}",
+    "serviceAccount:${google_service_account.backend_sa.email}"
+  ]
 }
 
 

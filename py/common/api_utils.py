@@ -105,7 +105,7 @@ def send_api_request(
   )
 
   if response.status_code == 403:
-    logging.warning('403 Caught: %s', response)
+    logging.warning('403 Caught: %s', response.json())
     return '403: Not allowed (Check permissions)'
   else:
     response.raise_for_status()
