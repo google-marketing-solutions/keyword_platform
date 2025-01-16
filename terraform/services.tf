@@ -95,7 +95,7 @@ resource "google_cloud_run_service" "backend_run" {
         }
         env {
           name  = "GA_API_SECRET"
-          value = "20nczPaFRCm7lmlsofClSg"
+          value = var.developer_token
         }
         env {
           name  = "GA_OPT_OUT"
