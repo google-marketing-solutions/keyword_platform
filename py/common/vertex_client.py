@@ -29,7 +29,7 @@ from vertexai import generative_models
 from common import utils
 
 
-_MODEL = 'gemini-1.5-flash-001'
+_MODEL = 'gemini-2.0-flash-lite'
 
 AVAILABLE_LANGUAGES = frozenset([
     'ar',
