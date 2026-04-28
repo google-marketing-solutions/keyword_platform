@@ -17,6 +17,10 @@
 #
 # Creates a Google Cloud Storage bucket for the keywordplatform outputs.
 
+resource "random_id" "instance" {
+  byte_length = 8
+}
+
 resource "google_storage_bucket" "output_bucket" {
   name          = format("%s-%s", var.project_id, var.bucket_name)
   location      = "US"
@@ -54,8 +58,9 @@ resource "google_cloud_run_service" "backend_run" {
   template {
     metadata {
       annotations = {
-        "autoscaling.knative.dev/minScale" = "1"
-        "autoscaling.knative.dev/maxScale" = "1000"
+        "autoscaling.knative.dev/minScale"  = "1"
+        "autoscaling.knative.dev/maxScale"  = "250"
+        "deployment.kubernetes.io/revision" = random_id.instance.hex
       }
     }
 
@@ -134,8 +139,9 @@ resource "google_cloud_run_service" "frontend_run" {
   template {
     metadata {
       annotations = {
-        "autoscaling.knative.dev/minScale" = "1"
-        "autoscaling.knative.dev/maxScale" = "5"
+        "autoscaling.knative.dev/minScale"  = "1"
+        "autoscaling.knative.dev/maxScale"  = "5"
+        "deployment.kubernetes.io/revision" = random_id.instance.hex
       }
     }
 
