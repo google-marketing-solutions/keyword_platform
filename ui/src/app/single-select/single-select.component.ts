@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {AbstractControl, FormControl, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 import {MatOption} from '@angular/material/core';
 import {Selection} from 'app/models/interfaces';
@@ -24,6 +24,7 @@ import {map, startWith} from 'rxjs/operators';
 
 /** A single select component. */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,standalone: false,
   selector: 'app-single-select',
   templateUrl: './single-select.component.html',
   styleUrls: ['./single-select.component.scss']
