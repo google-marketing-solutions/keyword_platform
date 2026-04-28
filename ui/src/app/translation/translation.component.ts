@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, QueryList, ViewChild, ViewChildren, ChangeDetectionStrategy} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {MatSlideToggle} from '@angular/material/slide-toggle';
@@ -44,6 +44,7 @@ const SHORTEN_TRANSLATION_LANGUAGE_CODES = [
  * as there are other components that follow the same pattern/logic.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,standalone: false,
   selector: 'app-translation',
   templateUrl: './translation.component.html',
   styleUrls: ['./translation.component.scss']

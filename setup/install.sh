@@ -30,6 +30,8 @@
 #   REFRESH_TOKEN
 #   IAP_ALLOWED_USERS
 
+# Update apt-get packages.
+sudo apt-get update
 # Supress apt-get warnings if run in an ephemeral cloud shell.
 mkdir ~/.cloudshell touch ~/.cloudshell/no-apt-get-warning
 sudo apt-get install fzf
@@ -51,6 +53,19 @@ fi
 
 echo "Setting Project ID: ${GOOGLE_CLOUD_PROJECT}"
 gcloud config set project ${GOOGLE_CLOUD_PROJECT}
+
+# Enable the APIs.
+REQUIRED_APIS=(
+  storage.googleapis.com
+  compute.googleapis.com
+  run.googleapis.com
+  cloudbuild.googleapis.com
+  cloudresourcemanager.googleapis.com
+)
+
+for API in "${REQUIRED_APIS[@]}"; do
+  gcloud services enable "$API"
+done
 
 regions=($(gcloud compute regions list --format="value(name)"))
 

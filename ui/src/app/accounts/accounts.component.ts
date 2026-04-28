@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {AbstractControl, FormGroup} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
@@ -33,6 +33,7 @@ import {SnackbarComponent} from '../snackbar/snackbar.component';
  * as there are other components that follow the same pattern/logic.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,standalone: false,
   selector: 'app-accounts',
   templateUrl: './accounts.component.html',
   styleUrls: ['./accounts.component.scss']
