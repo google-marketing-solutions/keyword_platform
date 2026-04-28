@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {Component, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Component, QueryList, ViewChild, ViewChildren, ChangeDetectionStrategy} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -58,7 +58,7 @@ enum TabIndex {
  * features.
  */
 @Component({
-  standalone: false,
+  changeDetection: ChangeDetectionStrategy.Eager,standalone: false,
   selector: 'app-content',
   templateUrl: './content.component.html',
   styleUrls: ['./content.component.scss']
