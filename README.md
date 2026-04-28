@@ -214,12 +214,27 @@ e.g. `en-to-de-brandterms.csv`
     *   In Google Cloud Console head to `Secret Manager` and update the secrets
         accordingly.
 
+1.  **Why am I getting a `Http failure …/proxy: 500 OK` when opening the app?**
+
+    There can be various reasons for this and the logs will give you more
+    details as to what happened. Head to your Cloud Console `Logs Explorer`
+    and investigate any errors. A common issue for this is invalid credentials
+    to authenticate with Google Ads API. Ensure the user who installed KAP has
+    standard access to the Google Ads manager account used as the
+    `login_customer_id`. See the above point for details on how to update the
+    credentials.
+
 1.  **Why am I getting a `Http failure …/proxy: 500 OK` response after hitting
     the RUN button?**
 
     There can be various reasons for this and the logs will give you more
     details as to what happened. Head to your Cloud Console `Logs Explorer`
-    and investigate any errors.
+    and investigate any errors. A known issue for this happening right after
+    installation is the `Service Account Token Creator` role not being properly
+    assigned to the backend service account. Make sure that this role has been
+    added to `keywordplatform-backend-sa@<your-project>.iam.gserviceaccount.com`
+    via IAM.
+
 
 1.  **When logging into my Google Account during installation I get "Access
     blocked: This app's request is invalid".**
@@ -234,6 +249,7 @@ e.g. `en-to-de-brandterms.csv`
     We use terraform for installation and setting up the Google Cloud resources.
     Terraform only supports internal OAuth Consent Screens. Before installing
     Keyword Platform, ensure that your OAuth Consent Screen is set to `internal`.
+    You can change the oauth consent screen to `external` again after installation.
 
 1. **Installation failed, what are my options?**
 

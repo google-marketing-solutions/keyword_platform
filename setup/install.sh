@@ -30,6 +30,8 @@
 #   REFRESH_TOKEN
 #   IAP_ALLOWED_USERS
 
+# Update apt-get packages.
+sudo apt-get update
 # Supress apt-get warnings if run in an ephemeral cloud shell.
 mkdir ~/.cloudshell touch ~/.cloudshell/no-apt-get-warning
 sudo apt-get install fzf
@@ -51,6 +53,19 @@ fi
 
 echo "Setting Project ID: ${GOOGLE_CLOUD_PROJECT}"
 gcloud config set project ${GOOGLE_CLOUD_PROJECT}
+
+# Enable the APIs.
+REQUIRED_APIS=(
+  storage.googleapis.com
+  compute.googleapis.com
+  run.googleapis.com
+  cloudbuild.googleapis.com
+  cloudresourcemanager.googleapis.com
+)
+
+for API in "${REQUIRED_APIS[@]}"; do
+  gcloud services enable "$API"
+done
 
 regions=($(gcloud compute regions list --format="value(name)"))
 
@@ -158,6 +173,7 @@ iap_brand_id=$(gcloud iap oauth-brands list --format="value(name)" | sed "s:.*/:
 # Convert the list of iap allowed users to a terraform compatible list.
 allowed_users_tf_list=$(echo "$IAP_ALLOWED_USERS" | sed 's/\([^,]\+\)/"user:\1"/g' | sed 's/,/, /g' | sed 's/.*/[&]/')
 
+pip3 install google-auth-oauthlib
 python ./setup/utils/oauth_flow.py --client_id="${CLIENT_ID}" --client_secret="${CLIENT_SECRET}"
 refresh_token=$(cat refresh_token.txt)
 rm -f refresh_token.txt
