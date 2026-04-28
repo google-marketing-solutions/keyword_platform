@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChildren} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChildren, ChangeDetectionStrategy} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {Selection} from 'app/models/interfaces';
@@ -39,6 +39,7 @@ interface Option {
 
 /** A multi select component. */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,standalone: false,
   selector: 'app-multi-select',
   templateUrl: './multi-select.component.html',
   styleUrls: ['./multi-select.component.scss']
