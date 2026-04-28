@@ -16,7 +16,7 @@
  */
 
 import {HttpClientModule} from '@angular/common/http';
-import {NgModule} from '@angular/core';
+import {NgModule, provideZoneChangeDetection} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatButtonModule} from '@angular/material/button';
@@ -46,13 +46,23 @@ import {SingleSelectComponent} from './single-select/single-select.component';
 import {SnackbarComponent} from './snackbar/snackbar.component';
 import {TranslationComponent} from './translation/translation.component';
 
+@NgModule({providers: [provideZoneChangeDetection()]})
+export class ZoneChangeDetectionModule {}
+
 @NgModule({
   declarations: [
-    AccountsComponent, AppComponent, CampaignsComponent, ContentComponent,
-    DialogComponent, MultiSelectComponent, SingleSelectComponent,
-    SnackbarComponent, TranslationComponent
+    AccountsComponent,
+    AppComponent,
+    CampaignsComponent,
+    ContentComponent,
+    DialogComponent,
+    MultiSelectComponent,
+    SingleSelectComponent,
+    SnackbarComponent,
+    TranslationComponent,
   ],
   imports: [
+    ZoneChangeDetectionModule,
     BrowserAnimationsModule,
     BrowserModule,
     AppRoutingModule,
@@ -72,10 +82,9 @@ import {TranslationComponent} from './translation/translation.component';
     MatTabsModule,
     ReactiveFormsModule,
     RouterModule,
-    ServicesModule
+    ServicesModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule {
-}
+export class AppModule {}

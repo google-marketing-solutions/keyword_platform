@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 import {Output} from '../models/interfaces';
@@ -26,7 +26,7 @@ interface DialogData {
 
 /** The dialog component to display output. */
 @Component({
-  standalone: false,
+  changeDetection: ChangeDetectionStrategy.Eager,standalone: false,
   selector: 'app-dialog',
   templateUrl: './dialog.component.html',
   styleUrls: ['./dialog.component.scss']
