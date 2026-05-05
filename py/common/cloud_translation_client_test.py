@@ -782,6 +782,11 @@ class CloudTranslationClientTest(parameterized.TestCase):
           'expected_response': {'glossaries': []},
           'expected_result': [],
       },
+      {
+          'testcase_name': 'glossaries_key_missing',
+          'expected_response': {},
+          'expected_result': [],
+      },
   )
   def test_list_glossaies(
       self,

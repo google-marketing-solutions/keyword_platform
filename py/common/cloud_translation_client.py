@@ -396,7 +396,7 @@ class CloudTranslationClient:
           'Encountered error during calls to Translation API: %s', http_error
       )
       raise
-    for glossary in response['glossaries']:
+    for glossary in response.get('glossaries', []):
       id = glossary['name'].split('/')[-1]
       glossaries.append(Glossary(id=id, name=glossary['name'], display_name=id))
     return glossaries
